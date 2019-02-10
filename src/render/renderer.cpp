@@ -1,12 +1,9 @@
 #include "../darktimes.h"
 
 game::renderer::renderer(win::display &display, win::roll &roll)
+	: screen(-8.0f, 8.0f, -4.5f, 4.5)
+	, quadpass(roll, screen)
 {
-	screen.left = -8.0f;
-	screen.right = 8.0f;
-	screen.bottom = -4.5f;
-	screen.top = 4.5f;
-
 	font_renderer = display.make_font_renderer(display.width(), display.height(), screen.left, screen.right, screen.bottom, screen.top);
 	font.title = font_renderer.make_font(roll["Nervous.ttf"], 0.5f);
 

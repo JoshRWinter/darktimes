@@ -8,15 +8,22 @@ add_executable( darktimes
 	src/darktimes.h
 	src/world.cpp
 	src/world.h
+
 	src/render/renderer.cpp
 	src/render/renderer.h
+	src/render/quadpass.cpp
+	src/render/quadpass.vert
+	src/render/quadpass.frag
+
 	src/entity/entity.cpp
 	src/entity/entity.h
+	src/entity/wall.cpp
 
 	build/assets
 )
 
 file(GLOB assetfiles ${CMAKE_CURRENT_LIST_DIR}/asset/*)
+list(APPEND assetfiles ${CMAKE_CURRENT_LIST_DIR}/src/render/quadpass.vert ${CMAKE_CURRENT_LIST_DIR}/src/render/quadpass.frag)
 
 add_custom_command(
 	OUTPUT

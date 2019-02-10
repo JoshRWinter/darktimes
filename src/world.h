@@ -9,6 +9,11 @@ struct world
 	world();
 	void step();
 	void render(game::renderer&);
+
+	struct
+	{
+		std::vector<ent::wall> walls;
+	} entity;
 };
 
 }
