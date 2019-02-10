@@ -819,7 +819,7 @@ win::display::display(const char *caption, int w, int h, int flags, window_handl
 		throw exception("Could not register window class");
 
 	if(flags & FULLSCREEN)
-		window_ = CreateWindowEx(0, window_class, "", WS_POPUP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CXSCREEN), NULL, NULL, GetModuleHandle(NULL), indirect_.get());
+		window_ = CreateWindowEx(0, window_class, "", WS_POPUP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), NULL, NULL, GetModuleHandle(NULL), indirect_.get());
 	else
 		window_ = CreateWindowEx(0, window_class, caption, WS_SYSMENU | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, w, h, NULL, NULL, GetModuleHandle(NULL), indirect_.get());
 	if(window_ == NULL)
