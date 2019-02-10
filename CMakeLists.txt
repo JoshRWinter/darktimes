@@ -22,6 +22,12 @@ add_executable( darktimes
 	build/assets
 )
 
+if(WIN32)
+	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		string(REGEX REPLACE "/W[0-4]" "/W1" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	endif()
+endif()
+
 file(GLOB assetfiles ${CMAKE_CURRENT_LIST_DIR}/asset/*)
 list(APPEND assetfiles ${CMAKE_CURRENT_LIST_DIR}/src/render/quadpass.vert ${CMAKE_CURRENT_LIST_DIR}/src/render/quadpass.frag)
 
