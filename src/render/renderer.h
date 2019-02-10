@@ -6,9 +6,15 @@ namespace game
 
 struct renderer
 {
-	renderer(win::display&);
+	renderer(win::display&, win::roll&);
 
 	win::area screen;
+	win::font_renderer font_renderer;
+
+	struct
+	{
+		win::font title;
+	} font;
 };
 
 }

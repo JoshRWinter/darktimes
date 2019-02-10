@@ -12,6 +12,19 @@ add_executable( darktimes
 	src/render/renderer.h
 	src/entity/entity.cpp
 	src/entity/entity.h
+
+	build/assets
+)
+
+file(GLOB assetfiles ${CMAKE_CURRENT_LIST_DIR}/asset/*)
+
+add_custom_command(
+	OUTPUT
+		${CMAKE_CURRENT_LIST_DIR}/build/assets
+	COMMAND
+		cd ${CMAKE_CURRENT_LIST_DIR}/asset && roll ../build/assets
+	DEPENDS
+		${assetfiles}
 )
 
 target_link_libraries(darktimes PRIVATE win)

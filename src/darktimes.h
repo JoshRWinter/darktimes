@@ -8,4 +8,6 @@
 #include "render/renderer.h"
 #include "world.h"
 
+#define dput(string, ...) press::fwriteln(stderr, string, ##__VA_ARGS__)
+
 #endif

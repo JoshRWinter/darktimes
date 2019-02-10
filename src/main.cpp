@@ -17,7 +17,9 @@ int main()
 		}
 	});
 
-	game::renderer renderer(display);
+	win::roll roll("assets");
+
+	game::renderer renderer(display, roll);
 	game::world world;
 
 	while(display.process() && !quit)

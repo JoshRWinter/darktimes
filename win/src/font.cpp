@@ -351,7 +351,7 @@ void win::font_renderer::draw(const font &fnt, const char *text, float xpos, flo
 
 		// pos vbo
 		pos_buffer[(charcount * 2) + 0] = alignx(display_width_, right_ - left_, xoffset);
-		pos_buffer[(charcount * 2) + 1] = aligny(display_height_, bottom_ - top_, yoffset + fnt.metrics.at(metrics_index).bearing_y);
+		pos_buffer[(charcount * 2) + 1] = aligny(display_height_, top_ - bottom_, yoffset + fnt.metrics.at(metrics_index).bearing_y);
 
 		// texcoord vbo
 		const float xnormal = 1.0f / cols;
