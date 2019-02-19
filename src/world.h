@@ -7,12 +7,15 @@ namespace game
 struct world
 {
 	world();
+
 	void step();
 	void render(game::renderer&);
+	void reset();
 
 	struct
 	{
 		std::vector<ent::wall> walls;
+		std::vector<ent::furnishing> furnishings;
 	} entity;
 };
 

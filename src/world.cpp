@@ -7,7 +7,7 @@ game::world::world()
 void game::world::step()
 {
 	if(entity.walls.size() == 0)
-		entity.walls = ent::wall::generate();
+		reset();
 }
 
 void game::world::render(game::renderer &renderer)
@@ -20,4 +20,9 @@ void game::world::render(game::renderer &renderer)
 	ent::wall::render(renderer, entity.walls);
 
 	renderer.quadpass.send();
+}
+
+void game::world::reset()
+{
+	game::level::build_level(entity.walls, entity.furnishings);
 }

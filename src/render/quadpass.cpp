@@ -6,7 +6,8 @@ game::quadpass::quadpass(win::roll &roll, const win::area &screen)
 	glUseProgram(program);
 
 	float matrix[16];
-	win::init_ortho(matrix, screen.left, screen.right, screen.bottom, screen.top);
+	const float zooma_zoom_zoom = 14.0f;
+	win::init_ortho(matrix, screen.left * zooma_zoom_zoom, screen.right * zooma_zoom_zoom, screen.bottom * zooma_zoom_zoom, screen.top * zooma_zoom_zoom);
 	glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, false, matrix);
 
 	glBindVertexArray(vao);

@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
+set(CMAKE_CXX_STANDARD 17)
+
 project(darktimes)
 add_subdirectory(win)
 
@@ -8,6 +10,8 @@ add_executable( darktimes
 	src/darktimes.h
 	src/world.cpp
 	src/world.h
+	src/level.cpp
+	src/level.h
 
 	src/render/renderer.cpp
 	src/render/renderer.h
