@@ -24,8 +24,16 @@ void game::level::build_level(std::vector<ent::wall> &walls, std::vector<ent::fu
 
 	const int iterate = mersenne(14, 25);
 
+	int tries = 100;
 	while(rooms.size() < iterate)
 	{
+		if(--tries < 0)
+		{
+			// recurse, try again
+			build_level(walls, furnishings);
+			return;
+		}
+
 		const int children = mersenne(0, 5);
 
 		for(int j = 0; j < children; ++j)
