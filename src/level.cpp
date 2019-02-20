@@ -43,7 +43,12 @@ void game::level::build_level(std::vector<ent::wall> &walls, std::vector<ent::fu
 				rooms.push_back(new_room);
 		}
 
-		prev = rooms.size() - 1;
+		if(rooms.size() < 5)
+			prev = rooms.size() - 1;
+		else if(!mersenne(5))
+			prev = rooms.size() - mersenne(1, 5);
+		else
+			prev = mersenne(0, 4);
 	}
 
 	const std::vector<ent::wall> built = build_walls(rooms);
