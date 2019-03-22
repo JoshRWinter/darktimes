@@ -32,21 +32,24 @@ void game::level::build_level(std::vector<ent::wall> &walls, std::vector<ent::fu
 	std::vector<room> rooms;
 
 	// first room
-	rooms.push_back(build_room(NULL, NULL));
 
 	const int target_count = mersenne(30, 35);
-	int tries = 200;
-	int current_room = 0;
+	int tries = 0;
+	int current_room;
 
 	while(rooms.size() < target_count)
 	{
-		if(tries-- < 0)
+		if(--tries < 0)
 		{
-			// start over and try again
+			// reset
+			tries = 200;
+			current_room = 0;
+
+			rooms.clear();
 			walls.clear();
 			furnishings.clear();
-			build_level(walls, furnishings);
-			return;
+
+			rooms.push_back(build_room(NULL, NULL));
 		}
 
 		neighbor_type::ntype type;
