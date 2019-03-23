@@ -20,7 +20,7 @@ namespace ent
 
 	struct wall : ent::entity
 	{
-		static constexpr float THICKNESS = 0.3f;
+		static constexpr float THICKNESS = 0.2f;
 
 		wall(float, float, float, float);
 
