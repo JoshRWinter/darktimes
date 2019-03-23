@@ -1,6 +1,8 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include <vector>
+
 namespace game { struct renderer; }
 
 namespace ent

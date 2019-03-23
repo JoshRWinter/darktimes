@@ -39,7 +39,7 @@ add_custom_command(
 	OUTPUT
 		${CMAKE_CURRENT_LIST_DIR}/build/assets
 	COMMAND
-		cd ${CMAKE_CURRENT_LIST_DIR}/asset && roll ../build/assets
+		cd ${CMAKE_CURRENT_LIST_DIR}/asset && atlas main1.atlas main1.adesc && roll ../build/assets
 	DEPENDS
 		${assetfiles}
 )
