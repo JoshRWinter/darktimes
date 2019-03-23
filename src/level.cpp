@@ -82,7 +82,10 @@ void game::level::build_level(std::vector<ent::wall> &walls, std::vector<ent::fu
 		rooms.push_back(candidate);
 
 		if(mersenne(3))
-			++current_room;
+		{
+			if(++current_room >= rooms.size())
+				current_room = 0;
+		}
 	}
 
 	walls = build_walls(rooms);
