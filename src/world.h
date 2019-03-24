@@ -12,10 +12,10 @@ struct world
 	void render(game::renderer&);
 	void reset();
 
+	game::level level;
+
 	struct
 	{
-		std::vector<ent::wall> walls;
-		std::vector<ent::furnishing> furnishings;
 	} entity;
 };
 

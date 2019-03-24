@@ -29,6 +29,24 @@ namespace ent
 		static void render(game::renderer&, const std::vector<ent::wall>&);
 	};
 
+	struct room_neighbor_type
+	{
+		enum class ntype
+		{
+			LEFT, RIGHT, ABOVE, BELOW
+		};
+	
+		int index;
+		ntype type;
+	};
+
+	struct room : ent::entity
+	{
+		room(float xx, float yy, float ww, float hh) { x = xx; y = yy; w = ww; h = hh; rot = 0.0; }
+	
+		std::vector<ent::room_neighbor_type> neighbors;
+	};
+
 }
 
 #endif

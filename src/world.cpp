@@ -2,12 +2,11 @@
 
 game::world::world()
 {
+	reset();
 }
 
 void game::world::step()
 {
-	if(entity.walls.size() == 0)
-		reset();
 }
 
 void game::world::render(game::renderer &renderer)
@@ -17,12 +16,12 @@ void game::world::render(game::renderer &renderer)
 	renderer.font_renderer.draw(renderer.font.title, "Dark Times", 0.0f, 3.0f, win::color(1.0f, 1.0f, 1.0f), win::font_renderer::CENTERED);
 
 	// draw walls
-	ent::wall::render(renderer, entity.walls);
+	ent::wall::render(renderer, level.walls);
 
 	renderer.quadpass.send();
 }
 
 void game::world::reset()
 {
-	game::level::build_level(entity.walls, entity.furnishings);
+	level.reset();
 }
