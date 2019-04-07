@@ -29,11 +29,7 @@ static float clamp_balance(float bal)
 
 win::audio_engine::audio_engine(audio_engine &&rhs)
 {
-#ifdef WINPLAT_WINDOWS
-	parent_ = NULL;
-#endif
-	move_common(rhs);
-	move_platform(rhs);
+	remote = std::move(rhs.remote);
 }
 
 win::audio_engine::~audio_engine()
@@ -44,10 +40,7 @@ win::audio_engine::~audio_engine()
 win::audio_engine &win::audio_engine::operator=(audio_engine &&rhs)
 {
 	finalize();
-
-	move_common(rhs);
-	move_platform(rhs);
-
+	remote = std::move(rhs.remote);
 	return *this;
 }
 
@@ -55,7 +48,7 @@ void win::audio_engine::get_config(float listenerx, float listenery, float sourc
 {
 	float volume = 0.0f, balance = 0.0f;
 
-	config_fn_(listenerx, listenery, sourcex, sourcey, &volume, &balance);
+	remote->config_fn_(listenerx, listenery, sourcex, sourcey, &volume, &balance);
 
 	// clamp [0.0, 1.0f]
 	volume = clamp_volume(volume);
@@ -75,15 +68,6 @@ void win::audio_engine::get_config(float listenerx, float listenery, float sourc
 	// reclamp
 	*volume_l = clamp_volume(*volume_l);
 	*volume_r = clamp_volume(*volume_r);
-}
-
-// move the member data that is common to all platforms
-void win::audio_engine::move_common(audio_engine &rhs)
-{
-	next_id_ = rhs.next_id_;
-	listener_x_ = rhs.listener_x_;
-	listener_y_ = rhs.listener_y_;
-	config_fn_ = rhs.config_fn_;
 }
 
 /* ------------------------------------*/
@@ -184,53 +168,50 @@ static void callback_stream_write(pa_stream *stream, const size_t bytes, void *d
 	}
 }
 
-win::audio_engine::audio_engine()
-{
-	context_ = NULL;
-}
-
 win::audio_engine::audio_engine(sound_config_fn fn)
 {
-	next_id_ = 1;
-	listener_x_ = 0.0f;
-	listener_y_ = 0.0f;
+	remote.reset(new audio_engine_remote);
+
+	remote->next_id_ = 1;
+	remote->listener_x_ = 0.0f;
+	remote->listener_y_ = 0.0f;
 	if(fn == NULL)
-		config_fn_ = default_sound_config_fn;
+		remote->config_fn_ = default_sound_config_fn;
 	else
-		config_fn_ = fn;
+		remote->config_fn_ = fn;
 
 	// loop
-	loop_ = pa_threaded_mainloop_new();
-	if(loop_ == NULL)
+	remote->loop_ = pa_threaded_mainloop_new();
+	if(remote->loop_ == NULL)
 		raise("Could not initialize process loop");
-	pa_mainloop_api *api = pa_threaded_mainloop_get_api(loop_);
+	pa_mainloop_api *api = pa_threaded_mainloop_get_api(remote->loop_);
 
 	// pa context
-	context_ = pa_context_new(api, "pcm-playback");
-	if(context_ == NULL)
+	remote->context_ = pa_context_new(api, "pcm-playback");
+	if(remote->context_ == NULL)
 		raise("Could not create PA context");
 
 	// start the loop
-	pa_context_set_state_callback(context_, callback_connect, loop_);
-	pa_threaded_mainloop_lock(loop_);
-	if(pa_threaded_mainloop_start(loop_))
+	pa_context_set_state_callback(remote->context_, callback_connect, remote->loop_);
+	pa_threaded_mainloop_lock(remote->loop_);
+	if(pa_threaded_mainloop_start(remote->loop_))
 		raise("Could not start the process loop");
 
-	if(pa_context_connect(context_, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL))
+	if(pa_context_connect(remote->context_, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL))
 		raise("Could not connect the PA context");
 
 	// wait for the context
 	for(;;)
 	{
-		const pa_context_state_t context_state = pa_context_get_state(context_);
+		const pa_context_state_t context_state = pa_context_get_state(remote->context_);
 		if(context_state == PA_CONTEXT_READY)
 			break;
 		else if(context_state == PA_CONTEXT_FAILED)
 			raise("Context connection failed");
-		pa_threaded_mainloop_wait(loop_);
+		pa_threaded_mainloop_wait(remote->loop_);
 	}
 
-	pa_threaded_mainloop_unlock(loop_);
+	pa_threaded_mainloop_unlock(remote->loop_);
 }
 
 // ambient (for music)
@@ -247,20 +228,20 @@ int win::audio_engine::play(apack &ap, int id, float x, float y, bool looping)
 
 int win::audio_engine::play(apack &ap, int id, bool ambient, bool looping, float x, float y)
 {
-	if(id >= (int)ap.count_ || id < 0)
+	if(id >= (int)ap.remote->count_ || id < 0)
 		bug("Apack id out of bounds");
 
-	if(sounds_.size() > MAX_SOUNDS)
+	if(remote->sounds_.size() > MAX_SOUNDS)
 	{
-		pa_threaded_mainloop_lock(loop_);
+		pa_threaded_mainloop_lock(remote->loop_);
 		cleanup(false);
-		pa_threaded_mainloop_unlock(loop_);
+		pa_threaded_mainloop_unlock(remote->loop_);
 	}
 
-	if(sounds_.size() > MAX_SOUNDS)
+	if(remote->sounds_.size() > MAX_SOUNDS)
 		return -1;
 
-	const int sid = next_id_++;
+	const int sid = remote->next_id_++;
 	char namestr[16];
 	snprintf(namestr, sizeof(namestr), "%d", sid);
 
@@ -277,18 +258,18 @@ int win::audio_engine::play(apack &ap, int id, bool ambient, bool looping, float
 
 	const unsigned flags = PA_STREAM_START_CORKED;
 
-	pa_threaded_mainloop_lock(loop_);
+	pa_threaded_mainloop_lock(remote->loop_);
 
 	// cleanup dead streams
 	cleanup(false);
 
-	pa_stream *stream = pa_stream_new(context_, namestr, &spec, NULL);
+	pa_stream *stream = pa_stream_new(remote->context_, namestr, &spec, NULL);
 	if(stream == NULL)
 		raise("Could not create stream object");
 
-	sound &stored = sounds_.emplace_front(sid, looping, 0, ap.stored_[id].buffer.get(), &ap.stored_[id].size, ap.stored_[id].target_size, stream, ambient, x, y);
+	sound &stored = remote->sounds_.emplace_front(sid, looping, 0, ap.remote->stored_[id].buffer.get(), &ap.remote->stored_[id].size, ap.remote->stored_[id].target_size, stream, ambient, x, y);
 
-	pa_stream_set_state_callback(stream, callback_stream, loop_);
+	pa_stream_set_state_callback(stream, callback_stream, remote->loop_);
 	pa_stream_set_write_callback(stream, callback_stream_write, &stored);
 
 	if(pa_stream_connect_playback(stream, NULL, &attr, (pa_stream_flags)flags, NULL, NULL))
@@ -301,45 +282,45 @@ int win::audio_engine::play(apack &ap, int id, bool ambient, bool looping, float
 			break;
 		else if(state == PA_STREAM_FAILED)
 			raise("Stream connection failed");
-		pa_threaded_mainloop_wait(loop_);
+		pa_threaded_mainloop_wait(remote->loop_);
 	}
 
 	pa_cvolume volume;
 	pa_cvolume_init(&volume);
 	pa_cvolume_set(&volume, 2, PA_VOLUME_NORM);
-	pa_operation_unref(pa_context_set_sink_input_volume(context_, pa_stream_get_index(stream), &volume, NULL, NULL));
+	pa_operation_unref(pa_context_set_sink_input_volume(remote->context_, pa_stream_get_index(stream), &volume, NULL, NULL));
 
-	pa_operation_unref(pa_stream_cork(stream, 0, [](pa_stream*, int, void*){}, loop_));
+	pa_operation_unref(pa_stream_cork(stream, 0, [](pa_stream*, int, void*){}, remote->loop_));
 	while(pa_stream_is_corked(stream));
-	pa_threaded_mainloop_unlock(loop_);
+	pa_threaded_mainloop_unlock(remote->loop_);
 
 	return sid;
 }
 
 void win::audio_engine::pause()
 {
-	pa_threaded_mainloop_lock(loop_);
-	for(sound &snd : sounds_)
+	pa_threaded_mainloop_lock(remote->loop_);
+	for(sound &snd : remote->sounds_)
 		pa_operation_unref(pa_stream_cork(snd.stream, 1, NULL, NULL));
 
-	pa_threaded_mainloop_unlock(loop_);
+	pa_threaded_mainloop_unlock(remote->loop_);
 }
 
 void win::audio_engine::resume()
 {
-	pa_threaded_mainloop_lock(loop_);
+	pa_threaded_mainloop_lock(remote->loop_);
 
-	for(sound &snd : sounds_)
+	for(sound &snd : remote->sounds_)
 		pa_operation_unref(pa_stream_cork(snd.stream, 0, NULL, NULL));
 
-	pa_threaded_mainloop_unlock(loop_);
+	pa_threaded_mainloop_unlock(remote->loop_);
 }
 
 void win::audio_engine::pause(int id)
 {
-	pa_threaded_mainloop_lock(loop_);
+	pa_threaded_mainloop_lock(remote->loop_);
 
-	for(sound &snd : sounds_)
+	for(sound &snd : remote->sounds_)
 	{
 		if(id != snd.id)
 			continue;
@@ -350,14 +331,14 @@ void win::audio_engine::pause(int id)
 		break;
 	}
 
-	pa_threaded_mainloop_unlock(loop_);
+	pa_threaded_mainloop_unlock(remote->loop_);
 }
 
 void win::audio_engine::resume(int id)
 {
-	pa_threaded_mainloop_lock(loop_);
+	pa_threaded_mainloop_lock(remote->loop_);
 
-	for(sound &snd : sounds_)
+	for(sound &snd : remote->sounds_)
 	{
 		if(id != snd.id)
 			continue;
@@ -368,14 +349,14 @@ void win::audio_engine::resume(int id)
 		continue;
 	}
 
-	pa_threaded_mainloop_unlock(loop_);
+	pa_threaded_mainloop_unlock(remote->loop_);
 }
 
 void win::audio_engine::source(int id, float x, float y)
 {
-	pa_threaded_mainloop_lock(loop_);
+	pa_threaded_mainloop_lock(remote->loop_);
 
-	for(sound &snd : sounds_)
+	for(sound &snd : remote->sounds_)
 	{
 		if(snd.id != id)
 			continue;
@@ -385,28 +366,28 @@ void win::audio_engine::source(int id, float x, float y)
 
 		float volume_left;
 		float volume_right;
-		get_config(listener_x_, listener_y_, x, y, &volume_left, &volume_right);
+		get_config(remote->listener_x_, remote->listener_y_, x, y, &volume_left, &volume_right);
 
 		pa_cvolume volume;
 		volume.channels = 2;
 		volume.values[0] = PA_VOLUME_NORM * volume_left;
 		volume.values[1] = PA_VOLUME_NORM * volume_right;
 
-		pa_operation_unref(pa_context_set_sink_input_volume(context_, pa_stream_get_index(snd.stream), &volume, NULL, NULL));
+		pa_operation_unref(pa_context_set_sink_input_volume(remote->context_, pa_stream_get_index(snd.stream), &volume, NULL, NULL));
 		break;
 	}
 
-	pa_threaded_mainloop_unlock(loop_);
+	pa_threaded_mainloop_unlock(remote->loop_);
 }
 
 void win::audio_engine::listener(float x, float y)
 {
-	listener_x_ = x;
-	listener_y_ = y;
+	remote->listener_x_ = x;
+	remote->listener_y_ = y;
 
-	pa_threaded_mainloop_lock(loop_);
+	pa_threaded_mainloop_lock(remote->loop_);
 
-	for(sound &snd : sounds_)
+	for(sound &snd : remote->sounds_)
 	{
 		float volume_left;
 		float volume_right;
@@ -417,31 +398,15 @@ void win::audio_engine::listener(float x, float y)
 		volume.values[0] = PA_VOLUME_NORM * volume_left;
 		volume.values[1] = PA_VOLUME_NORM * volume_right;
 
-		pa_operation_unref(pa_context_set_sink_input_volume(context_, pa_stream_get_index(snd.stream), &volume, NULL, NULL));
+		pa_operation_unref(pa_context_set_sink_input_volume(remote->context_, pa_stream_get_index(snd.stream), &volume, NULL, NULL));
 	}
 
-	pa_threaded_mainloop_unlock(loop_);
-}
-
-// move the platform specific (pulseaudio) data members
-void win::audio_engine::move_platform(audio_engine &rhs)
-{
-	pa_threaded_mainloop_lock(rhs.loop_);
-	rhs.cleanup(true);
-	pa_threaded_mainloop_unlock(rhs.loop_);
-
-	sounds_ = std::move(rhs.sounds_);
-
-	context_ = rhs.context_;
-	loop_ = rhs.loop_;
-
-	rhs.context_ = NULL;
-	rhs.loop_ = NULL;
+	pa_threaded_mainloop_unlock(remote->loop_);
 }
 
 void win::audio_engine::cleanup(bool all)
 {
-	for(auto it = sounds_.begin(); it != sounds_.end();)
+	for(auto it = remote->sounds_.begin(); it != remote->sounds_.end();)
 	{
 		sound &snd = *it;
 
@@ -470,7 +435,7 @@ void win::audio_engine::cleanup(bool all)
 			if(!op_drain)
 				raise("Couldn't drain the stream");
 
-			pa_threaded_mainloop_unlock(loop_);
+			pa_threaded_mainloop_unlock(remote->loop_);
 
 			// wait for flush
 			while(pa_operation_get_state(op_flush) != PA_OPERATION_DONE);
@@ -480,36 +445,36 @@ void win::audio_engine::cleanup(bool all)
 			while(!snd.drained);
 			pa_operation_unref(op_drain);
 
-			pa_threaded_mainloop_lock(loop_);
+			pa_threaded_mainloop_lock(remote->loop_);
 		}
 
-		pa_threaded_mainloop_unlock(loop_);
+		pa_threaded_mainloop_unlock(remote->loop_);
 		while(!snd.drained);
-		pa_threaded_mainloop_lock(loop_);
+		pa_threaded_mainloop_lock(remote->loop_);
 
 		if(pa_stream_disconnect(snd.stream))
 			raise("Couldn't disconnect stream");
 		pa_stream_unref(snd.stream);
 
-		it = sounds_.erase(it);
+		it = remote->sounds_.erase(it);
 	}
 }
 
 void win::audio_engine::finalize()
 {
-	if(context_ == NULL)
+	if(!remote)
 		return;
 
-	pa_threaded_mainloop_lock(loop_);
+	pa_threaded_mainloop_lock(remote->loop_);
 	cleanup(true);
-	pa_threaded_mainloop_unlock(loop_);
+	pa_threaded_mainloop_unlock(remote->loop_);
 
-	pa_threaded_mainloop_stop(loop_);
-	pa_context_disconnect(context_);
-	pa_threaded_mainloop_free(loop_);
-	pa_context_unref(context_);
+	pa_threaded_mainloop_stop(remote->loop_);
+	pa_context_disconnect(remote->context_);
+	pa_threaded_mainloop_free(remote->loop_);
+	pa_context_unref(remote->context_);
 
-	context_ = NULL;
+	remote.reset();
 }
 
 #elif defined WINPLAT_WINDOWS
@@ -561,33 +526,22 @@ static void write_directsound(win::sound &snd)
 	snd.write_cursor = (snd.write_cursor + want_to_write) % SOUND_BUFFER_SIZE;
 }
 
-win::audio_engine::audio_engine()
-{
-	next_id_ = 1;
-	listener_x_ = 0.0f;
-	listener_y_ = 0.0f;
-	config_fn_ = default_sound_config_fn;
-
-	parent_ = NULL;
-	context_ = NULL;
-	primary_ = NULL;
-	last_poke_ = std::chrono::high_resolution_clock::now();
-}
-
 win::audio_engine::audio_engine(sound_config_fn fn, display *parent)
 {
-	parent->directsound_ = this;
-	parent_ = parent;
-	last_poke_ = std::chrono::high_resolution_clock::now();
-	next_id_ = 1;
-	listener_x_ = 0.0f;
-	listener_y_ = 0.0f;
-	config_fn_ = fn;
+	remote.reset(new audio_engine_remote);
 
-	if(DirectSoundCreate8(NULL, &context_, NULL) != DS_OK)
+	parent->remote->directsound_ = remote.get();
+	remote->parent_ = parent;
+	remote->last_poke_ = std::chrono::high_resolution_clock::now();
+	remote->next_id_ = 1;
+	remote->listener_x_ = 0.0f;
+	remote->listener_y_ = 0.0f;
+	remote->config_fn_ = fn;
+
+	if(DirectSoundCreate8(NULL, &remote->context_, NULL) != DS_OK)
 		throw exception("Could not initialize DirectSound");
 
-	if(context_->SetCooperativeLevel(parent->window_, DSSCL_PRIORITY) != DS_OK)
+	if(remote->context_->SetCooperativeLevel(parent->remote->window_, DSSCL_PRIORITY) != DS_OK)
 		throw exception("DirectSound: Could not set cooperation level");
 
 	DSBUFFERDESC buffer;
@@ -598,7 +552,7 @@ win::audio_engine::audio_engine(sound_config_fn fn, display *parent)
 	buffer.lpwfxFormat = NULL;
 	buffer.guid3DAlgorithm = GUID_NULL;
 
-	if(context_->CreateSoundBuffer(&buffer, &primary_, NULL) != DS_OK)
+	if(remote->context_->CreateSoundBuffer(&buffer, &remote->primary_, NULL) != DS_OK)
 		throw exception("DirectSound: Could not create the primary sound buffer");
 
 	WAVEFORMATEX format;
@@ -610,7 +564,7 @@ win::audio_engine::audio_engine(sound_config_fn fn, display *parent)
 	format.wBitsPerSample = 16;
 	format.cbSize = 0;
 
-	if(primary_->SetFormat(&format) != DS_OK)
+	if(remote->primary_->SetFormat(&format) != DS_OK)
 		throw exception("DirectSound: Could not set the primary buffer format");
 }
 
@@ -626,13 +580,13 @@ int win::audio_engine::play(apack &ap, int id, float x, float y, bool loop)
 
 int win::audio_engine::play(apack &ap, int id, bool ambient, bool looping, float x, float y)
 {
-	if(id >= ap.count_ || id < 0)
+	if(id >= ap.remote->count_ || id < 0)
 		throw exception("Invalid apack index " + std::to_string(id));
 
-	if(sounds_.size() >= MAX_SOUNDS)
+	if(remote->sounds_.size() >= MAX_SOUNDS)
 		return -1;
 
-	const unsigned long long size = ap.stored_[id].size.load();
+	const unsigned long long size = ap.remote->stored_[id].size.load();
 
 	WAVEFORMATEX format;
 	format.wFormatTag = WAVE_FORMAT_PCM;
@@ -652,14 +606,14 @@ int win::audio_engine::play(apack &ap, int id, bool ambient, bool looping, float
 	buffer.guid3DAlgorithm = GUID_NULL;
 
 	IDirectSoundBuffer *tmp;
-	if(context_->CreateSoundBuffer(&buffer, &tmp, NULL) != DS_OK)
+	if(remote->context_->CreateSoundBuffer(&buffer, &tmp, NULL) != DS_OK)
 		throw exception("DirectSound: Could not create temp buffer");
 
 	IDirectSoundBuffer8 *stream;
 	tmp->QueryInterface(IID_IDirectSoundBuffer8, (void**)&stream);
 	tmp->Release();
 
-	sound &snd = sounds_.emplace_back(next_id_++, looping, 0, ap.stored_[id].buffer.get(), &ap.stored_[id].size, ap.stored_[id].target_size, ambient, x, y, stream);
+	sound &snd = remote->sounds_.emplace_back(remote->next_id_++, looping, 0, ap.remote->stored_[id].buffer.get(), &ap.remote->stored_[id].size, ap.remote->stored_[id].target_size, ambient, x, y, stream);
 
 	write_directsound(snd);
 
@@ -690,50 +644,33 @@ void win::audio_engine::source(int, float, float)
 
 void win::audio_engine::listener(float x, float y)
 {
-	listener_x_ = x;
-	listener_y_ = y;
+	remote->listener_x_ = x;
+	remote->listener_y_ = y;
 }
 
-// move platform-specific (DirectSound) data members
-void win::audio_engine::move_platform(audio_engine &rhs)
-{
-	if(parent_ != NULL)
-		parent_->directsound_ = NULL;
-	parent_ = rhs.parent_;
-	rhs.parent_ = NULL;
-	parent_->directsound_ = this;
-
-	context_ = rhs.context_;
-	rhs.context_ = NULL;
-
-	primary_ = rhs.primary_;
-	sounds_ = std::move(rhs.sounds_);
-
-	last_poke_ = std::move(rhs.last_poke_);
-}
 
 void win::audio_engine::finalize()
 {
-	if(context_ == NULL)
+	if(!remote)
 		return;
 
 	cleanup();
-	primary_->Release();
-	context_->Release();
+	remote->primary_->Release();
+	remote->context_->Release();
 
-	context_ = NULL;
+	remote.reset();
 }
 
-void win::audio_engine::poke()
+void win::audio_engine::poke(audio_engine_remote *const remote)
 {
 	const auto now = std::chrono::high_resolution_clock::now();
 
-	if(std::chrono::duration<double, std::milli>(now - last_poke_).count() < 10)
+	if(std::chrono::duration<double, std::milli>(now - remote->last_poke_).count() < 10)
 		return;
 
-	last_poke_ = now;
+	remote->last_poke_ = now;
 
-	for(auto snd = sounds_.begin(); snd != sounds_.end();)
+	for(auto snd = remote->sounds_.begin(); snd != remote->sounds_.end();)
 	{
 		DWORD play_cursor = 0;
 		if(snd->stream->GetCurrentPosition(&play_cursor, NULL) != DS_OK)
@@ -746,7 +683,7 @@ void win::audio_engine::poke()
 		if(bytes_left > MAX_WRITE_SIZE && snd->start == snd->target_size)
 		{
 			snd->finalize();
-			snd = sounds_.erase(snd);
+			snd = remote->sounds_.erase(snd);
 			continue;
 		}
 
@@ -760,10 +697,10 @@ void win::audio_engine::poke()
 
 void win::audio_engine::cleanup()
 {
-	for(auto snd = sounds_.begin(); snd != sounds_.end();)
+	for(auto snd = remote->sounds_.begin(); snd != remote->sounds_.end();)
 	{
 		snd->finalize();
-		snd = sounds_.erase(snd);
+		snd = remote->sounds_.erase(snd);
 	}
 }
 
