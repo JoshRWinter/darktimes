@@ -14,6 +14,15 @@ static float verts[] =
 	0.5f, 0.5f
 };
 
+static int get_uniform(unsigned program, const char *name)
+{
+	auto result = glGetUniformLocation(program, name);
+	if (result == -1)
+		win::bug(std::string("No uniform ") + name);
+
+	return result;
+}
+
 Renderer::Renderer(int iwidth, int iheight, float left, float right, float bottom, float top, win::AssetRoll &roll)
 	: font_renderer(iwidth, iheight, left, right, bottom, top)
 	, font_debug(font_renderer, roll["font/NotoSansMono-Regular.ttf"], 0.25f)
@@ -30,12 +39,19 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	strcpy(fpsindicator, "0");
 
-	shader_wall = win::load_shaders(roll["shader/wall.vert"], roll["shader/wall.frag"]);
-	glGenVertexArrays(1, &vao_wall);
-	glGenBuffers(1, &vbo_wall);
+	shader.wall = win::load_shaders(roll["shader/wall.vert"], roll["shader/wall.frag"]);
+	glUseProgram(shader.wall);
 
-	glBindVertexArray(vao_wall);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_wall);
+	float matrix[16];
+	win::init_ortho(matrix, left, right, bottom, top);
+	uniform.wall.projection = get_uniform(shader.wall, "projection");
+	glUniformMatrix4fv(uniform.wall.projection, 1, false, matrix);
+
+	glGenVertexArrays(1, &vao.wall);
+	glGenBuffers(1, &vbo.wall);
+
+	glBindVertexArray(vao.wall);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo.wall);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, NULL);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
@@ -43,18 +59,18 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 
 Renderer::~Renderer()
 {
-	glDeleteBuffers(1, &vbo_wall);
-	glDeleteVertexArrays(1, &vao_wall);
-	glDeleteShader(shader_wall);
+	glDeleteBuffers(1, &vbo.wall);
+	glDeleteVertexArrays(1, &vao.wall);
+	glDeleteShader(shader.wall);
 }
 
 void Renderer::computeframe()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(shader_wall);
-	glBindVertexArray(vao_wall);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_wall);
+	glUseProgram(shader.wall);
+	glBindVertexArray(vao.wall);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo.wall);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	if (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - last_fps_calc_time).count() > 1000)

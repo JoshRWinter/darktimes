@@ -14,11 +14,19 @@ public:
 	void computeframe();
 
 private:
-	unsigned shader_wall;
-	unsigned vbo_wall;
-	unsigned vao_wall;
+	struct { unsigned wall; } shader;
+
+	struct { unsigned wall; } vao;
+
+	struct { unsigned wall; } vbo;
+
+	struct
+	{
+		struct { int projection; } wall;
+	} uniform;
 
 	win::FontRenderer font_renderer;
+
 	win::Font font_debug, font_ui;
 
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_fps_calc_time;
