@@ -255,7 +255,7 @@ void FontRenderer::draw(const Font &fnt, const char *text, float xpos, float ypo
 
 		if(text[i] == '\n')
 		{
-			yoffset += fnt.vertical;
+			yoffset -= fnt.vertical;
 			if(centered)
 				xoffset = xpos - (line_length(fnt, text, i + 1) / 2.0f);
 			else
