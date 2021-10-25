@@ -5,5 +5,5 @@ if [ $# -ne 1 ]; then
 	exit 1
 fi
 
-cd assets
+cd asset
 roll $1

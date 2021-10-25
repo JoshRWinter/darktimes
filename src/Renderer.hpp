@@ -9,9 +9,15 @@ public:
 	NOCOPYMOVE(Renderer);
 
 	Renderer(int, int, float, float, float, float, win::AssetRoll&);
+	~Renderer();
+
 	void computeframe();
 
 private:
+	unsigned shader_wall;
+	unsigned vbo_wall;
+	unsigned vao_wall;
+
 	win::FontRenderer font_renderer;
 	win::Font font_debug, font_ui;
 

@@ -1,2 +1,5 @@
 font/NotoSansMono-Regular.ttf
 font/CHE-THIS.TTF
+
+shader/wall.vert:z
+shader/wall.frag:z
