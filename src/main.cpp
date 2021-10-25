@@ -14,10 +14,7 @@ int main()
 	display.register_button_handler([&quit, &simulation_quit](win::Button button, bool press)
 	{
 		if (button == win::Button::ESC)
-		{
-			simulation_quit = true;
 			quit = true;
-		}
 	});
 
 	win::AssetRoll roll("assets");
@@ -33,6 +30,7 @@ int main()
 		display.swap();
 	}
 
+	simulation_quit = true;
 	simulation_thread.join();
 
 	return 0;
