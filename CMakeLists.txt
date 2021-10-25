@@ -6,6 +6,12 @@ set(executable Darktimes)
 
 set(sources
 	src/main.cpp
+	src/Renderer.cpp
+	src/WorldSimulation.cpp
+
+	src/Renderer.hpp
+	src/Darktimes.hpp
+	src/WorldSimulation.hpp
 )
 
 if(WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
