@@ -24,7 +24,7 @@ private:
 
 	struct
 	{
-		struct { int projection; } wall;
+		struct { int projection, rot; } wall;
 	} uniform;
 
 	win::FontRenderer font_renderer;

@@ -2,13 +2,16 @@
 
 uniform mat4 projection;
 
-layout (location = 0) in vec2 pos;
-layout (location = 1) in vec3 color;
+uniform float rotation;
 
-out vec3 fcolor;
+layout (location = 0) in vec2 pos;
+layout (location = 1) in vec2 texcoord;
+
+out vec2 ftexcoord;
 
 void main()
 {
-	fcolor = color;
-	gl_Position = projection * vec4(pos.xy, 0.0, 1.0);
+	mat4 rotate = mat4(cos(rotation), sin(rotation), 0.0, 0.0, -sin(rotation), cos(rotation), 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+	ftexcoord = texcoord;
+	gl_Position = projection * rotate * vec4(pos.xy, 0.0, 1.0);
 }
