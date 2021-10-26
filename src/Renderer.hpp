@@ -20,6 +20,8 @@ private:
 
 	struct { unsigned wall; } vbo;
 
+	struct { unsigned wall; } ebo;
+
 	struct
 	{
 		struct { int projection; } wall;
