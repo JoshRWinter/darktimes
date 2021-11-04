@@ -1,7 +1,7 @@
 #include <win.h>
 #include <GL/gl.h>
 
-#include "Renderer.hpp"
+#include "renderer.hpp"
 
 static float verts[] =
 {

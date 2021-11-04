@@ -1,7 +1,7 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include "Darktimes.hpp"
+#include "../darktimes.hpp"
 
 class Renderer
 {
@@ -20,9 +20,11 @@ private:
 
 	struct { unsigned wall; } vbo;
 
+	struct { unsigned wall; } ebo;
+
 	struct
 	{
-		struct { int projection; } wall;
+		struct { int projection, rot; } wall;
 	} uniform;
 
 	win::FontRenderer font_renderer;
