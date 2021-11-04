@@ -1,6 +1,8 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
+#include <vector>
+
 #include "../darktimes.hpp"
 
 class Renderer
@@ -11,16 +13,16 @@ public:
 	Renderer(int, int, float, float, float, float, win::AssetRoll&);
 	~Renderer();
 
+	void set_wall_verts(const std::vector<float>&);
 	void computeframe();
 
 private:
+	int wallvert_count;
+
 	struct { unsigned wall; } shader;
-
 	struct { unsigned wall; } vao;
-
 	struct { unsigned wall; } vbo;
-
-	struct { unsigned wall; } ebo;
+	//struct { unsigned wall; } ebo;
 
 	struct
 	{

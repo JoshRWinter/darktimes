@@ -24,8 +24,15 @@ int main()
 
 	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(str_level_data_sync));
 
+	std::unique_ptr<STR_LevelDataSyncObject> leveldata;
 	while(display.process() && !quit)
 	{
+		if (str_level_data_sync.dirty())
+		{
+			str_level_data_sync.get(leveldata);
+			renderer.set_wall_verts(leveldata->wall_verts);
+		}
+
 		renderer.computeframe();
 		display.swap();
 	}

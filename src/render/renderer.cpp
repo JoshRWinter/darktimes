@@ -3,17 +3,6 @@
 
 #include "renderer.hpp"
 
-static float verts[] =
-{
-	-0.5f, 0.5f,
-	0.5f, -0.5f,
-	-0.5f, -0.5f,
-
-	-0.5f, 0.5f,
-	0.5f, -0.5f,
-	0.5f, 0.5f
-};
-
 static int get_uniform(unsigned program, const char *name)
 {
 	auto result = glGetUniformLocation(program, name);
@@ -24,7 +13,8 @@ static int get_uniform(unsigned program, const char *name)
 }
 
 Renderer::Renderer(int iwidth, int iheight, float left, float right, float bottom, float top, win::AssetRoll &roll)
-	: font_renderer(iwidth, iheight, left, right, bottom, top)
+	: wallvert_count(0)
+	, font_renderer(iwidth, iheight, left, right, bottom, top)
 	, font_debug(font_renderer, roll["font/NotoSansMono-Regular.ttf"], 0.25f)
 	, font_ui(font_renderer, roll["font/CHE-THIS.TTF"], 0.7f)
 	, last_fps_calc_time(std::chrono::high_resolution_clock::now())
@@ -54,7 +44,6 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 	glBindBuffer(GL_ARRAY_BUFFER, vbo.wall);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, NULL);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 }
 
 Renderer::~Renderer()
@@ -64,6 +53,13 @@ Renderer::~Renderer()
 	glDeleteShader(shader.wall);
 }
 
+void Renderer::set_wall_verts(const std::vector<float> &wallverts)
+{
+	wallvert_count = wallverts.size();
+	glBindBuffer(GL_ARRAY_BUFFER, vbo.wall);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * wallvert_count, wallverts.data(), GL_STATIC_DRAW);
+}
+
 void Renderer::computeframe()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -71,7 +67,7 @@ void Renderer::computeframe()
 	glUseProgram(shader.wall);
 	glBindVertexArray(vao.wall);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo.wall);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLES, 0, wallvert_count / 2);
 
 	if (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - last_fps_calc_time).count() > 1000)
 	{

@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <mutex>
+#include <vector>
 
 #include "darktimes.hpp"
 
@@ -13,18 +14,18 @@ public:
 
 	LargeSyncObject() : isdirty(false) {}
 
-	void set(const T &object)
+	void set(T &&object)
 	{
 		std::lock_guard lock(mutex);
-		dirty = true;
+		isdirty = true;
 		resource.reset(new T);
-		(*resource) = object;
+		(*resource) = std::move(object);
 	}
 
 	void get(std::unique_ptr<T> &ret)
 	{
 		std::lock_guard lock(mutex);
-		dirty = false;
+		isdirty = false;
 		ret.reset(resource.release());
 	}
 
@@ -39,8 +40,9 @@ private:
 	std::mutex mutex;
 };
 
-class STR_LevelDataSyncObject
+struct STR_LevelDataSyncObject
 {
+	std::vector<float> wall_verts;
 };
 
 #endif

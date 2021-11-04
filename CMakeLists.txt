@@ -15,6 +15,9 @@ set(sources
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp
 
+	src/sim/levelmanager.cpp
+	src/sim/levelmanager.hpp
+
 	src/syncobject.hpp
 )
 
