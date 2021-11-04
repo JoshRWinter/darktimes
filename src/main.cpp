@@ -17,7 +17,7 @@ int main()
 			quit = true;
 	});
 
-	win::AssetRoll roll("assets");
+	win::AssetRoll roll("darktimes.bin");
 	Renderer renderer(display.width(), display.height(), -8.0, 8.0f, -4.5f, 4.5, roll);
 
 	LargeSyncObject<STR_LevelDataSyncObject> str_level_data_sync;
