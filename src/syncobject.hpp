@@ -14,12 +14,16 @@ public:
 
 	LargeSyncObject() : isdirty(false) {}
 
-	void set(T &&object)
+	T *prepare()
+	{
+		return new T;
+	}
+
+	void set(T *t)
 	{
 		std::lock_guard lock(mutex);
 		isdirty = true;
-		resource.reset(new T);
-		(*resource) = std::move(object);
+		resource.reset(t);
 	}
 
 	void get(std::unique_ptr<T> &ret)
