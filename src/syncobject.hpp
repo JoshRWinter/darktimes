@@ -47,6 +47,7 @@ private:
 struct STR_LevelDataSyncObject
 {
 	std::vector<float> wall_verts;
+	std::vector<float> floor_verts;
 };
 
 #endif

@@ -3,3 +3,8 @@ font/CHE-THIS.TTF
 
 shader/wall.vert:z
 shader/wall.frag:z
+shader/floor.vert:z
+shader/floor.frag:z
+
+texture/floor1.tga:z:c=svg;./svg2tga.sh 75 75 $$ %%
+texture/floor2.tga:z:c=svg;./svg2tga.sh 75 75 $$ %%

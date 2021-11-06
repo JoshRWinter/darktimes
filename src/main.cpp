@@ -1,6 +1,7 @@
 #include <win.h>
 #include <chrono>
 
+#include "assetmanager.hpp"
 #include "render/renderer.hpp"
 #include "sim/simulation.hpp"
 
@@ -18,19 +19,19 @@ int main()
 	});
 
 	win::AssetRoll roll("darktimes.bin");
-	Renderer renderer(display.width(), display.height(), -8.0, 8.0f, -4.5f, 4.5, roll);
+	AssetManager assetmanager(roll);
+	Renderer renderer(display.width(), display.height(), -8.0, 8.0f, -4.5f, 4.5, assetmanager);
 
 	LargeSyncObject<STR_LevelDataSyncObject> str_level_data_sync;
-
 	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(str_level_data_sync));
 
-	std::unique_ptr<STR_LevelDataSyncObject> leveldata;
 	while(display.process() && !quit)
 	{
 		if (str_level_data_sync.dirty())
 		{
+			std::unique_ptr<STR_LevelDataSyncObject> leveldata;
 			str_level_data_sync.get(leveldata);
-			renderer.set_wall_verts(leveldata->wall_verts);
+			renderer.set_level_data(leveldata->floor_verts, leveldata->wall_verts);
 		}
 
 		renderer.computeframe();

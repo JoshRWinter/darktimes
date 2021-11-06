@@ -9,6 +9,9 @@ set(sources
 
 	src/darktimes.hpp
 
+	src/assetmanager.cpp
+	src/assetmanager.hpp
+
 	src/render/renderer.cpp
 	src/render/renderer.hpp
 
