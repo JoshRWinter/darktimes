@@ -3,3 +3,6 @@ font/CHE-THIS.TTF
 
 shader/wall.vert:z
 shader/wall.frag:z
+
+shader/floor.vert:z
+shader/floor.frag:z

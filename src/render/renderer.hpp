@@ -19,15 +19,22 @@ public:
 private:
 	int wallvert_count;
 
-	struct { unsigned wall; } shader;
-	struct { unsigned wall; } vao;
-	struct { unsigned wall; } vbo;
-	//struct { unsigned wall; } ebo;
-
 	struct
 	{
-		struct { int projection, rot; } wall;
-	} uniform;
+		struct
+		{
+			unsigned shader;
+			unsigned vao, vbo;
+			int uniform_projection, uniform_rot;
+		} wall;
+
+		struct
+		{
+			unsigned shader;
+			unsigned vao, vbo;
+			int uniform_projection;
+		} floor;
+	} mode;
 
 	win::FontRenderer font_renderer;
 

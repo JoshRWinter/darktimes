@@ -12,6 +12,8 @@ static int get_uniform(unsigned program, const char *name)
 	return result;
 }
 
+unsigned tex1;
+
 Renderer::Renderer(int iwidth, int iheight, float left, float right, float bottom, float top, win::AssetRoll &roll)
 	: wallvert_count(0)
 	, font_renderer(iwidth, iheight, left, right, bottom, top)
@@ -29,34 +31,91 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	strcpy(fpsindicator, "0");
 
-	shader.wall = win::load_shaders(roll["shader/wall.vert"], roll["shader/wall.frag"]);
-	glUseProgram(shader.wall);
-
 	float matrix[16];
 	win::init_ortho(matrix, left, right, bottom, top);
-	uniform.wall.projection = get_uniform(shader.wall, "projection");
-	glUniformMatrix4fv(uniform.wall.projection, 1, false, matrix);
 
-	glGenVertexArrays(1, &vao.wall);
-	glGenBuffers(1, &vbo.wall);
+	// mode: wall
+	mode.wall.shader = win::load_shaders(roll["shader/wall.vert"], roll["shader/wall.frag"]);
+	glUseProgram(mode.wall.shader);
 
-	glBindVertexArray(vao.wall);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo.wall);
+	mode.wall.uniform_projection = get_uniform(mode.wall.shader, "projection");
+	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, matrix);
+
+	glGenVertexArrays(1, &mode.wall.vao);
+	glGenBuffers(1, &mode.wall.vbo);
+
+	glBindVertexArray(mode.wall.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, mode.wall.vbo);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, NULL);
+
+	// mode: floor
+	mode.floor.shader = win::load_shaders(roll["shader/floor.vert"], roll["shader/floor.frag"]);
+	glUseProgram(mode.floor.shader);
+
+	mode.floor.uniform_projection = get_uniform(mode.floor.shader, "projection");
+	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, matrix);
+
+	glGenVertexArrays(1, &mode.floor.vao);
+	glGenBuffers(1, &mode.floor.vbo);
+
+	glBindVertexArray(mode.floor.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, mode.floor.vbo);
+
+	float floorverts[] =
+	{
+		-2.0f, 2.0f, 0.0f, 1.0f,
+		-2.0f, -2.0, 0.0f, 0.0f,
+		2.0f, -2.0f, 1.0f, 0.0f,
+
+		-2.0f, 2.0f, 0.0f, 1.0f,
+		2.0f, -2.0f, 1.0f, 0.0f,
+		2.0f, 2.0f, 1.0f, 1.0f
+	};
+
+	unsigned char tex1pixels[] =
+	{
+		255, 255, 255, 255,
+		0, 255, 0, 255,
+		0, 255, 0, 255,
+		255, 255, 255, 255,
+
+		255, 255, 255, 255,
+		255, 0, 0, 255,
+		255, 0, 0, 255,
+		255, 255, 255, 255,
+	};
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, false, 16, NULL);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, false, 16, (void*)8);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(floorverts), floorverts, GL_STATIC_DRAW);
+
+	glGenTextures(1, &tex1);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, tex1);
+
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex1pixels);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, 2, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex1pixels);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 }
 
 Renderer::~Renderer()
 {
-	glDeleteBuffers(1, &vbo.wall);
-	glDeleteVertexArrays(1, &vao.wall);
-	glDeleteShader(shader.wall);
+	glDeleteBuffers(1, &mode.wall.vbo);
+	glDeleteVertexArrays(1, &mode.wall.vao);
+	glDeleteShader(mode.wall.shader);
+
+	glDeleteBuffers(1, &mode.floor.vbo);
+	glDeleteVertexArrays(1, &mode.floor.vao);
+	glDeleteShader(mode.floor.shader);
 }
 
 void Renderer::set_wall_verts(const std::vector<float> &wallverts)
 {
 	wallvert_count = wallverts.size();
-	glBindBuffer(GL_ARRAY_BUFFER, vbo.wall);
+	glBindBuffer(GL_ARRAY_BUFFER, mode.wall.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * wallvert_count, wallverts.data(), GL_STATIC_DRAW);
 }
 
@@ -64,9 +123,13 @@ void Renderer::computeframe()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(shader.wall);
-	glBindVertexArray(vao.wall);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo.wall);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, tex1);
+	glUseProgram(mode.floor.shader);
+	glBindVertexArray(mode.floor.vao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glUseProgram(mode.wall.shader);
+	glBindVertexArray(mode.wall.vao);
 	glDrawArrays(GL_TRIANGLES, 0, wallvert_count / 2);
 
 	if (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - last_fps_calc_time).count() > 1000)
