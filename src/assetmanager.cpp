@@ -30,8 +30,6 @@ std::vector<win::Targa> AssetManager::get_floor_textures()
 	{
 		auto item = win::Targa(roll[name]);
 
-		fprintf(stderr, "x=%d, y=%d\n", item.width(), item.height());
-
 		if (item.bpp() != 32)
 			bug(std::string(name) + " is not 32 bits");
 
