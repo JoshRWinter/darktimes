@@ -111,5 +111,5 @@ std::vector<float> LevelManager::get_wall_verts() const
 
 int LevelManager::random_int(int low, int high)
 {
-	return std::uniform_int_distribution(low, high)(mersenne);
+	return std::uniform_int_distribution<int>(low, high)(mersenne);
 }

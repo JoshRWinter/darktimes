@@ -21,14 +21,14 @@ public:
 
 	void set(T *t)
 	{
-		std::lock_guard lock(mutex);
+		std::lock_guard<std::mutex> lock(mutex);
 		isdirty = true;
 		resource.reset(t);
 	}
 
 	void get(std::unique_ptr<T> &ret)
 	{
-		std::lock_guard lock(mutex);
+		std::lock_guard<std::mutex> lock(mutex);
 		isdirty = false;
 		ret.reset(resource.release());
 	}
