@@ -8,8 +8,8 @@ static void set_level_data_sync(LargeSyncObject<STR_LevelDataSyncObject> &so, Le
 {
 	auto data = so.prepare();
 
-	data->wall_verts = levelmanager.get_wall_verts();
-	data->floor_verts = levelmanager.get_floor_verts();
+	data->walls = levelmanager.walls;
+	data->floors = levelmanager.floors;
 
 	so.set(data);
 }

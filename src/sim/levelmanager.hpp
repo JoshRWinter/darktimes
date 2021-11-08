@@ -16,9 +16,10 @@ struct LevelWall
 
 struct LevelFloor
 {
-	LevelFloor(float x, float y, float w, float h)
-		: x(x), y(y), w(w), h(h) {}
+	LevelFloor(int texture, float x, float y, float w, float h)
+		: texture(texture), x(x), y(y), w(w), h(h) {}
 
+	int texture;
 	float x, y, w, h;
 };
 
@@ -29,15 +30,14 @@ public:
 
 	LevelManager();
 	void reset();
-	std::vector<float> get_wall_verts() const;
-	std::vector<float> get_floor_verts();
+
+	std::vector<LevelFloor> floors;
+	std::vector<LevelWall> walls;
 
 private:
 	int random_int(int, int);
 
 	std::mt19937 mersenne;
-	std::vector<LevelFloor> floors;
-	std::vector<LevelWall> walls;
 };
 
 #endif

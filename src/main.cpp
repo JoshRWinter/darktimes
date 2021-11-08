@@ -31,7 +31,7 @@ int main()
 		{
 			std::unique_ptr<STR_LevelDataSyncObject> leveldata;
 			str_level_data_sync.get(leveldata);
-			renderer.set_level_data(leveldata->floor_verts, leveldata->wall_verts);
+			renderer.set_level_data(leveldata->floors, leveldata->walls);
 		}
 
 		renderer.computeframe();

@@ -5,6 +5,7 @@
 
 #include "../darktimes.hpp"
 #include "../assetmanager.hpp"
+#include "../sim/levelmanager.hpp"
 
 class Renderer
 {
@@ -14,7 +15,7 @@ public:
 	Renderer(int, int, float, float, float, float, AssetManager&);
 	~Renderer();
 
-	void set_level_data(const std::vector<float>&, const std::vector<float>&);
+	void set_level_data(const std::vector<LevelFloor>&, const std::vector<LevelWall>&);
 	void computeframe();
 
 private:

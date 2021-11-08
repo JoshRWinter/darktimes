@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "darktimes.hpp"
+#include "sim/levelmanager.hpp"
 
 template <typename T> class LargeSyncObject
 {
@@ -46,8 +47,8 @@ private:
 
 struct STR_LevelDataSyncObject
 {
-	std::vector<float> wall_verts;
-	std::vector<float> floor_verts;
+	std::vector<LevelFloor> floors;
+	std::vector<LevelWall> walls;
 };
 
 #endif

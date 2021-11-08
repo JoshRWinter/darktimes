@@ -12,6 +12,77 @@ static int get_uniform(unsigned program, const char *name)
 	return result;
 }
 
+static std::vector<float> get_floor_verts(const std::vector<LevelFloor> &floors)
+{
+	std::vector<float> verts;
+
+	for (const auto &floor : floors)
+	{
+		const float x_magnitude = floor.w / AssetManager::floor_texture_tile_size;
+		const float y_magnitude = floor.h / AssetManager::floor_texture_tile_size;
+
+		verts.push_back(floor.x); verts.push_back(floor.y + floor.h); verts.push_back(0.0f); verts.push_back(y_magnitude); verts.push_back(floor.texture);
+		verts.push_back(floor.x); verts.push_back(floor.y); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(floor.texture);
+		verts.push_back(floor.x + floor.w); verts.push_back(floor.y); verts.push_back(x_magnitude); verts.push_back(0.0f); verts.push_back(floor.texture);
+
+		verts.push_back(floor.x); verts.push_back(floor.y + floor.h); verts.push_back(0.0f); verts.push_back(y_magnitude); verts.push_back(floor.texture);
+		verts.push_back(floor.x + floor.w); verts.push_back(floor.y); verts.push_back(x_magnitude); verts.push_back(0.0f); verts.push_back(floor.texture);
+		verts.push_back(floor.x + floor.w); verts.push_back(floor.y + floor.h); verts.push_back(x_magnitude); verts.push_back(y_magnitude); verts.push_back(floor.texture);
+	}
+
+	return verts;
+}
+
+static std::vector<float> get_wall_verts(const std::vector<LevelWall> &walls)
+{
+	std::vector<float> verts;
+
+	for (const auto &line : walls)
+	{
+		if (line.ax == line.bx && line.ay == line.by)
+			bug("invalid line");
+
+		// determine orientation
+		const float xdist = std::fabs(line.ax - line.bx);
+		const float ydist = std::fabs(line.ay - line.by);
+
+		const bool horizontal = xdist > ydist ? true : false;
+
+		if (horizontal)
+		{
+			const float leftpoint_x = std::min(line.ax, line.bx);
+			const float leftpoint_y = leftpoint_x == line.ax ? line.ay : line.by;
+			const float rightpoint_x = std::max(line.ax, line.bx);
+			const float rightpoint_y = rightpoint_x == line.ax ? line.ay : line.by;
+
+			verts.push_back(leftpoint_x); verts.push_back(leftpoint_y + LevelWall::HALFWIDTH);
+			verts.push_back(leftpoint_x); verts.push_back(leftpoint_y - LevelWall::HALFWIDTH);
+			verts.push_back(rightpoint_x); verts.push_back(rightpoint_y - LevelWall::HALFWIDTH);
+
+			verts.push_back(leftpoint_x); verts.push_back(leftpoint_y + LevelWall::HALFWIDTH);
+			verts.push_back(rightpoint_x); verts.push_back(rightpoint_y - LevelWall::HALFWIDTH);
+			verts.push_back(rightpoint_x); verts.push_back(rightpoint_y + LevelWall::HALFWIDTH);
+		}
+		else
+		{
+			const float upperpoint_y = std::max(line.ay, line.by);
+			const float upperpoint_x = upperpoint_y == line.ay ? line.ax : line.bx;
+			const float bottompoint_y = std::min(line.ay, line.by);
+			const float bottompoint_x = bottompoint_y == line.ay ? line.ax : line.bx;
+
+			verts.push_back(upperpoint_x - LevelWall::HALFWIDTH); verts.push_back(upperpoint_y);
+			verts.push_back(bottompoint_x - LevelWall::HALFWIDTH); verts.push_back(bottompoint_y);
+			verts.push_back(bottompoint_x + LevelWall::HALFWIDTH); verts.push_back(bottompoint_y);
+
+			verts.push_back(upperpoint_x - LevelWall::HALFWIDTH); verts.push_back(upperpoint_y);
+			verts.push_back(bottompoint_x + LevelWall::HALFWIDTH); verts.push_back(bottompoint_y);
+			verts.push_back(upperpoint_x + LevelWall::HALFWIDTH); verts.push_back(upperpoint_y);
+		}
+	}
+
+	return verts;
+}
+
 Renderer::Renderer(int iwidth, int iheight, float left, float right, float bottom, float top, AssetManager &assetmanager)
 	: font_renderer(iwidth, iheight, left, right, bottom, top)
 	, font_debug(font_renderer, assetmanager["font/NotoSansMono-Regular.ttf"], 0.25f)
@@ -98,12 +169,14 @@ Renderer::~Renderer()
 	glDeleteShader(mode.floor.shader);
 }
 
-void Renderer::set_level_data(const std::vector<float> &floor_verts, const std::vector<float> &wall_verts)
+void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls)
 {
+	const auto &floor_verts = get_floor_verts(floors);
 	mode.floor.floorvert_count = floor_verts.size();
 	glBindBuffer(GL_ARRAY_BUFFER, mode.floor.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mode.floor.floorvert_count, floor_verts.data(), GL_STATIC_DRAW);
 
+	const auto &wall_verts = get_wall_verts(walls);
 	mode.wall.wallvert_count = wall_verts.size();
 	glBindBuffer(GL_ARRAY_BUFFER, mode.wall.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mode.wall.wallvert_count, wall_verts.data(), GL_STATIC_DRAW);
