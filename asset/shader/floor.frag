@@ -7,5 +7,6 @@ uniform sampler2DArray tex;
 
 void main()
 {
-	color = texture(tex, ftexcoord);
+	vec4 pix = texture(tex, ftexcoord);
+	color = vec4(pix.rgb, pix.a / 2);
 }

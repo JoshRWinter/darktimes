@@ -20,7 +20,7 @@ int main()
 
 	win::AssetRoll roll("darktimes.bin");
 	AssetManager assetmanager(roll);
-	Renderer renderer(display.width(), display.height(), -8.0, 8.0f, -4.5f, 4.5, assetmanager);
+	Renderer renderer(display.width(), display.height(), -64.0f, 64.0f, -36.0f, 36.0f, assetmanager);
 
 	LargeSyncObject<STR_LevelDataSyncObject> str_level_data_sync;
 	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(str_level_data_sync));
