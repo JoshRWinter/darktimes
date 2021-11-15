@@ -49,6 +49,8 @@ struct STR_LevelDataSyncObject
 {
 	std::vector<LevelFloor> floors;
 	std::vector<LevelWall> walls;
+	std::vector<LevelProp> props;
+	int seed;
 };
 
 #endif

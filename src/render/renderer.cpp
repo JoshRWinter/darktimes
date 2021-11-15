@@ -33,51 +33,44 @@ static std::vector<float> get_floor_verts(const std::vector<LevelFloor> &floors)
 	return verts;
 }
 
+static void get_quad_verts(float x, float y, float w, float h, std::array<float, 12> &verts)
+{
+	verts[0] = x; verts[1] = y + h;
+	verts[2] = x; verts[3] = y;
+	verts[4] = x + w; verts[5] = y;
+
+	verts[6] = x; verts[7] = y + h;
+	verts[8] = x + w; verts[9] = y;
+	verts[10] = x + w; verts[11] = y + h;
+}
+
 static std::vector<float> get_wall_verts(const std::vector<LevelWall> &walls)
 {
 	std::vector<float> verts;
 
-	for (const auto &line : walls)
+	for (const auto &wall : walls)
 	{
-		if (line.ax == line.bx && line.ay == line.by)
-			bug("invalid line");
+		std::array<float, 12> qverts;
+		get_quad_verts(wall.x, wall.y, wall.w, wall.h, qverts);
 
-		// determine orientation
-		const float xdist = std::fabs(line.ax - line.bx);
-		const float ydist = std::fabs(line.ay - line.by);
+		for (auto f : qverts)
+			verts.push_back(f);
+	}
 
-		const bool horizontal = xdist > ydist ? true : false;
+	return verts;
+}
 
-		if (horizontal)
-		{
-			const float leftpoint_x = std::min(line.ax, line.bx);
-			const float leftpoint_y = leftpoint_x == line.ax ? line.ay : line.by;
-			const float rightpoint_x = std::max(line.ax, line.bx);
-			const float rightpoint_y = rightpoint_x == line.ax ? line.ay : line.by;
+static std::vector<float> get_prop_verts(const std::vector<LevelProp> &props)
+{
+	std::vector<float> verts;
 
-			verts.push_back(leftpoint_x); verts.push_back(leftpoint_y + LevelWall::HALFWIDTH);
-			verts.push_back(leftpoint_x); verts.push_back(leftpoint_y - LevelWall::HALFWIDTH);
-			verts.push_back(rightpoint_x); verts.push_back(rightpoint_y - LevelWall::HALFWIDTH);
+	for (const auto &prop : props)
+	{
+		std::array<float, 12> qverts;
+		get_quad_verts(prop.x, prop.y, prop.w, prop.h, qverts);
 
-			verts.push_back(leftpoint_x); verts.push_back(leftpoint_y + LevelWall::HALFWIDTH);
-			verts.push_back(rightpoint_x); verts.push_back(rightpoint_y - LevelWall::HALFWIDTH);
-			verts.push_back(rightpoint_x); verts.push_back(rightpoint_y + LevelWall::HALFWIDTH);
-		}
-		else
-		{
-			const float upperpoint_y = std::max(line.ay, line.by);
-			const float upperpoint_x = upperpoint_y == line.ay ? line.ax : line.bx;
-			const float bottompoint_y = std::min(line.ay, line.by);
-			const float bottompoint_x = bottompoint_y == line.ay ? line.ax : line.bx;
-
-			verts.push_back(upperpoint_x - LevelWall::HALFWIDTH); verts.push_back(upperpoint_y);
-			verts.push_back(bottompoint_x - LevelWall::HALFWIDTH); verts.push_back(bottompoint_y);
-			verts.push_back(bottompoint_x + LevelWall::HALFWIDTH); verts.push_back(bottompoint_y);
-
-			verts.push_back(upperpoint_x - LevelWall::HALFWIDTH); verts.push_back(upperpoint_y);
-			verts.push_back(bottompoint_x + LevelWall::HALFWIDTH); verts.push_back(bottompoint_y);
-			verts.push_back(upperpoint_x + LevelWall::HALFWIDTH); verts.push_back(upperpoint_y);
-		}
+		for (auto f : qverts)
+			verts.push_back(f);
 	}
 
 	return verts;
@@ -101,7 +94,6 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 
 	float matrix[16];
 	win::init_ortho(matrix, left, right, bottom, top);
-
 
 	// mode: wall
 	mode.wall.wallvert_count = 0;
@@ -155,6 +147,23 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 20, NULL);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, false, 20, (void*)8);
+
+	// mode: prop
+	mode.prop.propvert_count = 0;
+
+	mode.prop.shader = win::load_shaders(assetmanager["shader/prop.vert"], assetmanager["shader/prop.frag"]);
+	glUseProgram(mode.prop.shader);
+	mode.prop.uniform_projection = get_uniform(mode.prop.shader, "projection");
+	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, matrix);
+
+	glGenVertexArrays(1, &mode.prop.vao);
+	glBindVertexArray(mode.prop.vao);
+
+	glGenBuffers(1, &mode.prop.vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, mode.prop.vbo);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, NULL);
 }
 
 Renderer::~Renderer()
@@ -167,10 +176,15 @@ Renderer::~Renderer()
 	glDeleteBuffers(1, &mode.floor.vbo);
 	glDeleteVertexArrays(1, &mode.floor.vao);
 	glDeleteShader(mode.floor.shader);
+
+	glDeleteBuffers(1, &mode.prop.vbo);
+	glDeleteVertexArrays(1, &mode.prop.vao);
+	glDeleteShader(mode.prop.shader);
 }
 
-void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls)
+void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props, int seed)
 {
+	levelseed = std::to_string(seed);
 	const auto &floor_verts = get_floor_verts(floors);
 	mode.floor.floorvert_count = floor_verts.size();
 	glBindBuffer(GL_ARRAY_BUFFER, mode.floor.vbo);
@@ -180,6 +194,12 @@ void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::
 	mode.wall.wallvert_count = wall_verts.size();
 	glBindBuffer(GL_ARRAY_BUFFER, mode.wall.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mode.wall.wallvert_count, wall_verts.data(), GL_STATIC_DRAW);
+
+	const auto &prop_verts = get_prop_verts(props);
+	mode.prop.propvert_count = prop_verts.size();
+	//win::bug("got size of " + std::to_string(prop_verts.size()));
+	glBindBuffer(GL_ARRAY_BUFFER, mode.prop.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mode.prop.propvert_count, prop_verts.data(), GL_STATIC_DRAW);
 }
 
 void Renderer::computeframe()
@@ -195,6 +215,10 @@ void Renderer::computeframe()
 	glBindVertexArray(mode.wall.vao);
 	glDrawArrays(GL_TRIANGLES, 0, mode.wall.wallvert_count / 2);
 
+	glUseProgram(mode.prop.shader);
+	glBindVertexArray(mode.prop.vao);
+	glDrawArrays(GL_TRIANGLES, 0, mode.prop.propvert_count / 2);
+
 	if (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - last_fps_calc_time).count() > 1000)
 	{
 		snprintf(fpsindicator, sizeof(fpsindicator), "%d", accumulated_fps);
@@ -205,10 +229,30 @@ void Renderer::computeframe()
 
 	font_renderer.draw(font_debug, fpsindicator, left + 0.05f, top - font_debug.size(), win::Color(1.0f, 1.0f, 0.0f, 1.0f));
 	font_renderer.draw(font_ui, "Dark Times", 0.0f, top - font_ui.size(), win::Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+	font_renderer.draw(font_debug, levelseed.c_str(), 0.0f, 0.0f, win::Color(1.0f, 1.0f, 0.0f, 1.0f));
 
 #ifndef NDEBUG
 	auto error = glGetError();
 	if (error != 0)
 		win::bug("GL error " + std::to_string(error));
 #endif
+}
+
+void Renderer::set_center(float x, float y)
+{
+	const float factor = 1.0f;
+	const float left = (-16.0f * factor) + x;
+	const float right = (16.0f * factor) + x;
+	const float bottom = (-9.0f * factor) + y;
+	const float top = (9.0f * factor) + y;
+
+	float matrix[16];
+	win::init_ortho(matrix, left, right, bottom, top);
+
+	glUseProgram(mode.floor.shader);
+	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, matrix);
+	glUseProgram(mode.wall.shader);
+	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, matrix);
+	glUseProgram(mode.prop.shader);
+	glUniformMatrix4fv(mode.prop.uniform_projection, 1, false, matrix);
 }
