@@ -33,51 +33,28 @@ static std::vector<float> get_floor_verts(const std::vector<LevelFloor> &floors)
 	return verts;
 }
 
+static void get_quad_verts(float x, float y, float w, float h, std::array<float, 12> &verts)
+{
+	verts[0] = x; verts[1] = y + h;
+	verts[2] = x; verts[3] = y;
+	verts[4] = x + w; verts[5] = y;
+
+	verts[6] = x; verts[7] = y + h;
+	verts[8] = x + w; verts[9] = y;
+	verts[10] = x + w; verts[11] = y + h;
+}
+
 static std::vector<float> get_wall_verts(const std::vector<LevelWall> &walls)
 {
 	std::vector<float> verts;
 
-	for (const auto &line : walls)
+	for (const auto &wall : walls)
 	{
-		if (line.ax == line.bx && line.ay == line.by)
-			bug("invalid line");
+		std::array<float, 12> qverts;
+		get_quad_verts(wall.x, wall.y, wall.w, wall.h, qverts);
 
-		// determine orientation
-		const float xdist = std::fabs(line.ax - line.bx);
-		const float ydist = std::fabs(line.ay - line.by);
-
-		const bool horizontal = xdist > ydist ? true : false;
-
-		if (horizontal)
-		{
-			const float leftpoint_x = std::min(line.ax, line.bx);
-			const float leftpoint_y = leftpoint_x == line.ax ? line.ay : line.by;
-			const float rightpoint_x = std::max(line.ax, line.bx);
-			const float rightpoint_y = rightpoint_x == line.ax ? line.ay : line.by;
-
-			verts.push_back(leftpoint_x); verts.push_back(leftpoint_y + LevelWall::HALFWIDTH);
-			verts.push_back(leftpoint_x); verts.push_back(leftpoint_y - LevelWall::HALFWIDTH);
-			verts.push_back(rightpoint_x); verts.push_back(rightpoint_y - LevelWall::HALFWIDTH);
-
-			verts.push_back(leftpoint_x); verts.push_back(leftpoint_y + LevelWall::HALFWIDTH);
-			verts.push_back(rightpoint_x); verts.push_back(rightpoint_y - LevelWall::HALFWIDTH);
-			verts.push_back(rightpoint_x); verts.push_back(rightpoint_y + LevelWall::HALFWIDTH);
-		}
-		else
-		{
-			const float upperpoint_y = std::max(line.ay, line.by);
-			const float upperpoint_x = upperpoint_y == line.ay ? line.ax : line.bx;
-			const float bottompoint_y = std::min(line.ay, line.by);
-			const float bottompoint_x = bottompoint_y == line.ay ? line.ax : line.bx;
-
-			verts.push_back(upperpoint_x - LevelWall::HALFWIDTH); verts.push_back(upperpoint_y);
-			verts.push_back(bottompoint_x - LevelWall::HALFWIDTH); verts.push_back(bottompoint_y);
-			verts.push_back(bottompoint_x + LevelWall::HALFWIDTH); verts.push_back(bottompoint_y);
-
-			verts.push_back(upperpoint_x - LevelWall::HALFWIDTH); verts.push_back(upperpoint_y);
-			verts.push_back(bottompoint_x + LevelWall::HALFWIDTH); verts.push_back(bottompoint_y);
-			verts.push_back(upperpoint_x + LevelWall::HALFWIDTH); verts.push_back(upperpoint_y);
-		}
+		for (auto f : qverts)
+			verts.push_back(f);
 	}
 
 	return verts;
@@ -101,7 +78,6 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 
 	float matrix[16];
 	win::init_ortho(matrix, left, right, bottom, top);
-
 
 	// mode: wall
 	mode.wall.wallvert_count = 0;
@@ -191,15 +167,17 @@ void Renderer::computeframe()
 	glBindVertexArray(mode.floor.vao);
 	glDrawArrays(GL_TRIANGLES, 0, mode.floor.floorvert_count / 4);
 
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glUseProgram(mode.wall.shader);
 	glBindVertexArray(mode.wall.vao);
 	glDrawArrays(GL_TRIANGLES, 0, mode.wall.wallvert_count / 2);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	if (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - last_fps_calc_time).count() > 1000)
 	{
 		snprintf(fpsindicator, sizeof(fpsindicator), "%d", accumulated_fps);
 		accumulated_fps = 0;
-		last_fps_calc_time = std::chrono::high_resolution_clock::now();
+		//last_fps_calc_time = std::chrono::high_resolution_clock::now();
 	}
 	else ++accumulated_fps;
 

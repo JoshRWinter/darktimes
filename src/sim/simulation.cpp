@@ -8,7 +8,7 @@ static void set_level_data_sync(LargeSyncObject<STR_LevelDataSyncObject> &so, Le
 {
 	auto data = so.prepare();
 
-	//data->walls = levelmanager.walls;
+	data->walls = levelmanager.walls;
 	data->floors = levelmanager.floors;
 
 	so.set(data);
@@ -21,9 +21,12 @@ void simulation(std::atomic<bool>& stop, LargeSyncObject<STR_LevelDataSyncObject
 
 	while(!stop)
 	{
-		std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(1800));
+		//std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(1800));
+		std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(10));
 
+		/*
 		level_manager.reset();
 		set_level_data_sync(str_level_data_sync, level_manager);
+		*/
 	}
 }

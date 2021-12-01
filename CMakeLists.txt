@@ -14,6 +14,10 @@ set(sources
 
 	src/render/renderer.cpp
 	src/render/renderer.hpp
+	asset/shader/wall.vert
+	asset/shader/wall.frag
+	asset/shader/floor.vert
+	asset/shader/floor.frag
 
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp
