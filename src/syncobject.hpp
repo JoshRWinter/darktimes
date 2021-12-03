@@ -49,6 +49,7 @@ struct STR_LevelDataSyncObject
 {
 	std::vector<LevelFloor> floors;
 	std::vector<LevelWall> walls;
+	int seed;
 };
 
 #endif

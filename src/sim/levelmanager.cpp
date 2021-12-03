@@ -10,7 +10,7 @@ static bool float_equals(float a, float b, float tolerance = 0.005f)
 	return std::fabs(a - b) < tolerance;
 }
 
-static std::vector<LevelFloorConnector> get_connectors(const std::vector<LevelFloorConnector> &connectors, LevelFloorConnector::Side side)
+static std::vector<LevelFloorConnector> get_connectors(const std::vector<LevelFloorConnector> &connectors, LevelSide side)
 {
 	std::vector<LevelFloorConnector> found;
 
@@ -26,46 +26,88 @@ static std::vector<LevelFloorConnector> get_connectors(const std::vector<LevelFl
 	return found;
 }
 
-static std::array<LevelFloorConnector::Side, 4> enumerate_connector_sides()
+static std::array<LevelSide, 4> enumerate_connector_sides()
 {
-	std::array<LevelFloorConnector::Side, 4> sides;
+	std::array<LevelSide, 4> sides;
 
-	sides.at(0) = LevelFloorConnector::Side::LEFT;
-	sides.at(1) = LevelFloorConnector::Side::RIGHT;
-	sides.at(2) = LevelFloorConnector::Side::BOTTOM;
-	sides.at(3) = LevelFloorConnector::Side::TOP;
+	sides.at(0) = LevelSide::LEFT;
+	sides.at(1) = LevelSide::RIGHT;
+	sides.at(2) = LevelSide::BOTTOM;
+	sides.at(3) = LevelSide::TOP;
 
 	return sides;
 }
 
-LevelManager::LevelManager(int seed)
-	: mersenne(seed)
+static LevelSide flip(LevelSide side)
 {
-	reset();
+	switch (side)
+	{
+	case LevelSide::LEFT:
+		return LevelSide::RIGHT;
+	case LevelSide::RIGHT:
+		return LevelSide::LEFT;
+	case LevelSide::BOTTOM:
+		return LevelSide::TOP;
+	case LevelSide::TOP:
+		return LevelSide::BOTTOM;
+	}
+
+	win::bug("no side");
 }
 
-void LevelManager::reset()
+LevelManager::LevelManager(int seed)
+	: mersenne(seed)
+	, seed(seed)
 {
-	floors.emplace_back(random_int(0, 1), -1.0f, -1.0f, 2.0f, 2.0f);
+	generate();
+}
 
-	generate_grid();
+void LevelManager::generate()
+{
+	reset();
+
+	while (!generate_grid()) reset();
+
+	prune();
 
 	generate_walls();
 }
 
-void LevelManager::generate_grid()
+void LevelManager::reset()
 {
-	const int horizontal_tiles = 5;random_int(3, 6);
-	const int vertical_tiles = 5;random_int(3, 6);
-	const float tile_width = 2.8f;
-	const float tile_height = 2.8f;
+	floors.clear();
+	walls.clear();
+	floors.emplace_back(random_int(0, 1), -1.0f, -1.0f, 2.0f, 2.0f);
+}
 
-	LevelFloor *head = &floors.at(0);
+void LevelManager::prune()
+{
+	for (auto floor = floors.begin(); floor != floors.end();)
+	{
+		if (floor->connectors.empty())
+		{
+			floor = floors.erase(floor);
+			continue;
+		}
+
+		++floor;
+	}
+}
+
+bool LevelManager::generate_grid()
+{
+	const int horizontal_tiles = random_int(3, 6);
+	const int vertical_tiles = random_int(3, 6);
+	const float tile_width = random_real(2.6f, 3.5f);
+	const float tile_height = random_real(2.6f, 3.5f);
+
+	//LevelFloor *head = &floors.at(0);
 
 	float start_x = -4.0f;
-	float start_y = head->y + head->h;
+	float start_y = floors.at(0).y + floors.at(0).h;
 	const float initial_start_y = start_y;
 
+	int floors_added = 0;
 	for (int i = 0; i < horizontal_tiles; ++i)
 	{
 		for (int j = 0; j < vertical_tiles; ++j)
@@ -75,33 +117,85 @@ void LevelManager::generate_grid()
 
 			LevelFloor floor(random_int(0, 1), start_x, start_y, long_horizontal ? tile_width * 2.0f : tile_width, long_vertical ? tile_height * 2.0f : tile_height);
 
-			/*
-			if (!floor.collide(floors))
-				win::bug("floor collision!");
-
-			if (!connect(floor, *head))
-				win::bug("no connection");
-				*/
+			if (floor.collide(floors))
+				continue;
 
 			floors.push_back(floor);
-			head = &floors.at(floors.size() - 1);
+			++floors_added;
 
-			/*
-			if (long_horizontal)
-				++i;
-			if (long_vertical)
-				++j;
-				*/
-
-			start_y += head->h;
+			start_y += floors.at(floors.size() - 1).h;
 		}
+
 		start_y = initial_start_y;
-		start_x += head->w;
+		start_x += floors.at(floors.size() - 1).w;
 	}
+
+	auto head = find_neighbor(floors.at(0), LevelSide::TOP);
+	if (head == NULL) return false;
+	if (!connect(floors.at(0), *head)) return false;
+	LevelSide camefrom = LevelSide::BOTTOM;
+
+	std::stack<LevelFloor*> heads;
+	heads.push(head);
+
+	for (int i = 0; i < floors_added; ++i)
+	{
+		head = heads.top();
+		bool success = false;
+
+		for (int attempt = 0; attempt < 2; ++attempt)
+		{
+			LevelSide dir = camefrom;
+			while (dir == camefrom)
+				dir = random_side();
+
+			LevelFloor *const partner = find_neighbor(*head, dir);
+			if (partner == NULL)
+				continue;
+
+			if (connect(*head, *partner))
+			{
+				heads.push(partner);
+				camefrom = flip(dir);
+				success = true;
+				break;
+			}
+		}
+
+		if (!success)
+		{
+			heads.pop();
+			if (heads.empty())
+				break;
+		}
+	}
+
+	return true;
 }
 
-void LevelManager::generate_linear()
+bool LevelManager::generate_linear()
 {
+	return false;
+}
+
+LevelFloor *LevelManager::find_neighbor(LevelFloor& floor, LevelSide side)
+{
+	for (auto &f : floors)
+	{
+		if (&floor == &f)
+			continue;
+
+		LevelFloorConnector c1;
+		LevelFloorConnector c2;
+
+		if (can_connect(floor, f, c1, c2))
+		{
+			if (c1.side == side)
+				return &f;
+		}
+	}
+
+	return NULL;
 }
 
 void LevelManager::generate_walls()
@@ -112,9 +206,9 @@ void LevelManager::generate_walls()
 		{
 			auto connectors	= get_connectors(floor.connectors, side);
 
-			if (side == LevelFloorConnector::Side::BOTTOM || side == LevelFloorConnector::Side::TOP)
+			if (side == LevelSide::BOTTOM || side == LevelSide::TOP)
 			{
-				const float y = side == LevelFloorConnector::Side::BOTTOM ? floor.y - LevelWall::HALFWIDTH : ((floor.y + floor.h) - LevelWall::HALFWIDTH);
+				const float y = side == LevelSide::BOTTOM ? floor.y - LevelWall::HALFWIDTH : ((floor.y + floor.h) - LevelWall::HALFWIDTH);
 				float startx = floor.x;
 
 				walls.emplace_back(startx, y, connectors.size() > 0 ? (connectors.at(0).start - startx) : floor.w, LevelWall::WIDTH);
@@ -131,7 +225,7 @@ void LevelManager::generate_walls()
 			}
 			else
 			{
-				const float x = side == LevelFloorConnector::Side::LEFT ? floor.x - LevelWall::HALFWIDTH : ((floor.x + floor.w) - LevelWall::HALFWIDTH);
+				const float x = side == LevelSide::LEFT ? floor.x - LevelWall::HALFWIDTH : ((floor.x + floor.w) - LevelWall::HALFWIDTH);
 				float starty = floor.y;
 
 				walls.emplace_back(x, starty, LevelWall::WIDTH, connectors.size() > 0 ? (connectors.at(0).start - starty) : floor.h);
@@ -167,18 +261,37 @@ float LevelManager::random_real(float low, float high)
 	return std::uniform_real_distribution<float>(low, high)(mersenne);
 }
 
-bool LevelManager::connect(LevelFloor &floor1, LevelFloor &floor2)
+LevelSide LevelManager::random_side()
+{
+	const int i = random_int(0, 3);
+
+	switch (i)
+	{
+	case 0:
+		return LevelSide::LEFT;
+	case 1:
+		return LevelSide::RIGHT;
+	case 2:
+		return LevelSide::BOTTOM;
+	case 3:
+		return LevelSide::TOP;
+	}
+
+	win::bug("no side");
+}
+
+bool LevelManager::can_connect(LevelFloor &floor1, LevelFloor &floor2, LevelFloorConnector &c1, LevelFloorConnector &c2)
 {
 	// determine which side floor 2 is on, relative to floor 1
-	LevelFloorConnector::Side side;
+	LevelSide side;
 	if (float_equals(floor1.x + floor1.w, floor2.x)) // right?
-		side = LevelFloorConnector::Side::RIGHT;
+		side = LevelSide::RIGHT;
 	else if (float_equals(floor1.x, floor2.x + floor2.w)) // left?
-		side = LevelFloorConnector::Side::LEFT;
+		side = LevelSide::LEFT;
 	else if (float_equals(floor1.y, floor2.y + floor2.h)) // bottom?
-		side = LevelFloorConnector::Side::BOTTOM;
+		side = LevelSide::BOTTOM;
 	else if (float_equals(floor1.y + floor1.h, floor2.y)) // top?
-		side = LevelFloorConnector::Side::TOP;
+		side = LevelSide::TOP;
 	else
 		return false;
 
@@ -186,7 +299,7 @@ bool LevelManager::connect(LevelFloor &floor1, LevelFloor &floor2)
 	const float DOOR_LENGTH = 1.0f;
 
 	float start, stop;
-	if (side == LevelFloorConnector::Side::BOTTOM || side == LevelFloorConnector::Side::TOP)
+	if (side == LevelSide::BOTTOM || side == LevelSide::TOP)
 	{
 		const float farleft = std::max(floor1.x, floor2.x);
 		const float farright = std::min(floor1.x + floor1.w, floor2.x + floor2.w);
@@ -196,7 +309,7 @@ bool LevelManager::connect(LevelFloor &floor1, LevelFloor &floor2)
 		start = ((farright + farleft) / 2.0f) - (DOOR_LENGTH / 2.0f);
 		stop = start + DOOR_LENGTH;
 	}
-	else if (side == LevelFloorConnector::Side::LEFT || side == LevelFloorConnector::Side::RIGHT)
+	else if (side == LevelSide::LEFT || side == LevelSide::RIGHT)
 	{
 		const float lower = std::max(floor1.y, floor2.y);
 		const float upper = std::min(floor1.y + floor1.h, floor2.y + floor2.h);
@@ -208,35 +321,50 @@ bool LevelManager::connect(LevelFloor &floor1, LevelFloor &floor2)
 		stop = start + DOOR_LENGTH;
 	}
 
-	LevelFloorConnector::Side flipside;
+	LevelSide flipside;
 	switch (side)
 	{
-	case LevelFloorConnector::Side::TOP:
-		flipside = LevelFloorConnector::Side::BOTTOM;
+	case LevelSide::TOP:
+		flipside = LevelSide::BOTTOM;
 		break;
-	case LevelFloorConnector::Side::BOTTOM:
-		flipside = LevelFloorConnector::Side::TOP;
+	case LevelSide::BOTTOM:
+		flipside = LevelSide::TOP;
 		break;
-	case LevelFloorConnector::Side::LEFT:
-		flipside = LevelFloorConnector::Side::RIGHT;
+	case LevelSide::LEFT:
+		flipside = LevelSide::RIGHT;
 		break;
-	case LevelFloorConnector::Side::RIGHT:
-		flipside = LevelFloorConnector::Side::LEFT;
+	case LevelSide::RIGHT:
+		flipside = LevelSide::LEFT;
 		break;
 	}
 
-	LevelFloorConnector floor1_connector(&floor2, side, start, stop);
-	LevelFloorConnector floor2_connector(&floor1, flipside, start, stop);
+	LevelFloorConnector floor1_connector(side, start, stop);
+	LevelFloorConnector floor2_connector(flipside, start, stop);
 
 	if (floor1_connector.collide(floor1.connectors, 0.5f))
 		return false;
 	if (floor2_connector.collide(floor2.connectors, 0.5f))
 		return false;
 
-	floor1.connectors.push_back(floor1_connector);
-	floor2.connectors.push_back(floor2_connector);
+	c1 = floor1_connector;
+	c2 = floor2_connector;
 
 	return true;
+}
+
+bool LevelManager::connect(LevelFloor &floor1, LevelFloor &floor2)
+{
+	LevelFloorConnector floor1_connector;
+	LevelFloorConnector floor2_connector;
+
+	if (can_connect(floor1, floor2, floor1_connector, floor2_connector))
+	{
+		floor1.connectors.push_back(floor1_connector);
+		floor2.connectors.push_back(floor2_connector);
+		return true;
+	}
+
+	return false;
 }
 
 bool LevelManager::test_floor(const std::vector<LevelFloor> &floors, const LevelFloor &floor)

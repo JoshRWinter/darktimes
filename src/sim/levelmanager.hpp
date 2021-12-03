@@ -3,9 +3,16 @@
 
 #include <vector>
 #include <random>
-#include <list>
 
 #include "../darktimes.hpp"
+
+enum class LevelSide
+{
+	LEFT,
+	RIGHT,
+	BOTTOM,
+	TOP
+};
 
 struct LevelWall
 {
@@ -21,13 +28,10 @@ struct LevelWall
 struct LevelFloor;
 struct LevelFloorConnector
 {
-	enum class Side
-	{
-		LEFT, RIGHT, BOTTOM, TOP
-	};
+	LevelFloorConnector() = default;
 
-	LevelFloorConnector(LevelFloor *link, Side side, float start, float stop)
-		: side(side), link(link), start(start), stop(stop) {}
+	LevelFloorConnector(LevelSide side, float start, float stop)
+		: side(side), start(start), stop(stop) {}
 
 	bool collide(const LevelFloorConnector &rhs, float padding) const
 	{
@@ -52,8 +56,7 @@ struct LevelFloorConnector
 		return false;
 	}
 
-	LevelFloor *link;
-	Side side;
+	LevelSide side;
 	float start, stop;
 };
 
@@ -63,7 +66,7 @@ struct LevelFloor
 		: texture(texture), x(x), y(y), w(w), h(h) {}
 
 	bool collide(const LevelFloor &rhs) const { return x + w > rhs.x && x < rhs.x + rhs.w && y + h > rhs.y && y < rhs.y + rhs.h; }
-	bool collide(const std::list<LevelFloor> &rhs) const
+	bool collide(const std::vector<LevelFloor> &rhs) const
 	{
 		for (const auto &x : rhs)
 			if (collide(x))
@@ -83,19 +86,25 @@ public:
 	NOCOPYMOVE(LevelManager);
 
 	LevelManager(int);
-	void reset();
+	void generate();
 
 	std::vector<LevelFloor> floors;
 	std::vector<LevelWall> walls;
+	const int seed;
 
 private:
 	int random_int(int, int);
 	float random_real(float, float);
+	LevelSide random_side();
 
-	void generate_grid();
-	void generate_linear();
+	bool generate_grid();
+	bool generate_linear();
+	void reset();
+	void prune();
 
-	bool connect(LevelFloor&, LevelFloor&);
+	static bool can_connect(LevelFloor&, LevelFloor&, LevelFloorConnector&, LevelFloorConnector&);
+	static bool connect(LevelFloor&, LevelFloor&);
+	LevelFloor *find_neighbor(LevelFloor&, LevelSide);
 	void generate_walls();
 	static bool test_floor(const std::vector<LevelFloor>&, const LevelFloor&);
 

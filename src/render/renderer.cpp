@@ -145,8 +145,9 @@ Renderer::~Renderer()
 	glDeleteShader(mode.floor.shader);
 }
 
-void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls)
+void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, int seed)
 {
+	levelseed = std::to_string(seed);
 	const auto &floor_verts = get_floor_verts(floors);
 	mode.floor.floorvert_count = floor_verts.size();
 	glBindBuffer(GL_ARRAY_BUFFER, mode.floor.vbo);
@@ -171,22 +172,39 @@ void Renderer::computeframe()
 	glUseProgram(mode.wall.shader);
 	glBindVertexArray(mode.wall.vao);
 	glDrawArrays(GL_TRIANGLES, 0, mode.wall.wallvert_count / 2);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	if (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - last_fps_calc_time).count() > 1000)
 	{
 		snprintf(fpsindicator, sizeof(fpsindicator), "%d", accumulated_fps);
 		accumulated_fps = 0;
-		//last_fps_calc_time = std::chrono::high_resolution_clock::now();
+		last_fps_calc_time = std::chrono::high_resolution_clock::now();
 	}
 	else ++accumulated_fps;
 
 	font_renderer.draw(font_debug, fpsindicator, left + 0.05f, top - font_debug.size(), win::Color(1.0f, 1.0f, 0.0f, 1.0f));
 	font_renderer.draw(font_ui, "Dark Times", 0.0f, top - font_ui.size(), win::Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+	font_renderer.draw(font_debug, levelseed.c_str(), 0.0f, 0.0f, win::Color(1.0f, 1.0f, 0.0f, 1.0f));
 
 #ifndef NDEBUG
 	auto error = glGetError();
 	if (error != 0)
 		win::bug("GL error " + std::to_string(error));
 #endif
+}
+
+void Renderer::set_center(float x, float y)
+{
+	const float left = -16.0f + x;
+	const float right = 16.0f + x;
+	const float bottom = -9.0f + y;
+	const float top = 9.0f + y;
+
+	float matrix[16];
+	win::init_ortho(matrix, left, right, bottom, top);
+
+	glUseProgram(mode.floor.shader);
+	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, matrix);
+	glUseProgram(mode.wall.shader);
+	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, matrix);
 }

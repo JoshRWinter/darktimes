@@ -15,8 +15,9 @@ public:
 	Renderer(int, int, float, float, float, float, AssetManager&);
 	~Renderer();
 
-	void set_level_data(const std::vector<LevelFloor>&, const std::vector<LevelWall>&);
+	void set_level_data(const std::vector<LevelFloor>&, const std::vector<LevelWall>&, int);
 	void computeframe();
+	void set_center(float, float);
 
 private:
 	struct
@@ -38,6 +39,8 @@ private:
 			int floorvert_count;
 		} floor;
 	} mode;
+
+	std::string levelseed;
 
 	win::FontRenderer font_renderer;
 	win::Font font_debug, font_ui;
