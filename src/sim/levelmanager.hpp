@@ -65,7 +65,7 @@ struct LevelFloor
 	LevelFloor(int texture, float x, float y, float w, float h)
 		: texture(texture), x(x), y(y), w(w), h(h) {}
 
-	bool collide(const LevelFloor &rhs) const { return x + w > rhs.x && x < rhs.x + rhs.w && y + h > rhs.y && y < rhs.y + rhs.h; }
+	bool collide(const LevelFloor &rhs, float tolerance = 0.05f) const { return x + w > rhs.x + tolerance && x < (rhs.x + rhs.w) - tolerance && y + h > rhs.y + tolerance && y < (rhs.y + rhs.h) - tolerance; }
 	bool collide(const std::vector<LevelFloor> &rhs) const
 	{
 		for (const auto &x : rhs)
@@ -97,14 +97,15 @@ private:
 	float random_real(float, float);
 	LevelSide random_side();
 
-	bool generate_grid();
-	bool generate_linear();
+	std::vector<LevelFloor> generate_grid();
+	std::vector<LevelFloor> generate_linear();
 	void reset();
-	void prune();
 
-	static bool can_connect(LevelFloor&, LevelFloor&, LevelFloorConnector&, LevelFloorConnector&);
+	bool generate_impl();
+	static std::vector<LevelFloor> prune(const std::vector<LevelFloor>&);
+	static bool can_connect(const LevelFloor&, const LevelFloor&, LevelFloorConnector&, LevelFloorConnector&);
 	static bool connect(LevelFloor&, LevelFloor&);
-	LevelFloor *find_neighbor(LevelFloor&, LevelSide);
+	static std::vector<LevelFloor*> find_neighbors(std::vector<LevelFloor>&, LevelFloor&, LevelSide);
 	void generate_walls();
 	static bool test_floor(const std::vector<LevelFloor>&, const LevelFloor&);
 
