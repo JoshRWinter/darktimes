@@ -98,7 +98,7 @@ private:
 	LevelSide random_side();
 
 	std::vector<LevelFloor> generate_grid(const LevelFloor&, LevelSide);
-	std::vector<LevelFloor> generate_linear();
+	std::vector<LevelFloor> generate_linear(const LevelFloor&, LevelSide);
 	void reset();
 
 	bool generate_impl();

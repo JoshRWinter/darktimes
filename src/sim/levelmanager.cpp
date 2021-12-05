@@ -227,9 +227,23 @@ std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floo
 	return generated;
 }
 
-std::vector<LevelFloor> LevelManager::generate_linear()
+std::vector<LevelFloor> LevelManager::generate_linear(const LevelFloor &start_floor, const LevelSide start_side)
 {
-	return std::vector<LevelFloor>();
+	std::vector<LevelFloor> generated;
+
+	const int count = random_int(0, 3) == 0 ? random_int(20, 30) : random_int(5, 15);
+	std::stack<int> heads;
+
+	for (int num = 0; num < count; ++num)
+	{
+		LevelFloor *const head = num == 0 ? NULL : &generated.at(heads.top());
+		for (int attempt = 0; attempt < 6; ++attempt)
+		{
+			const LevelSide side = num == 0 ? start_side : random_side();
+		}
+	}
+
+	return generated;
 }
 
 std::vector<LevelFloor*> LevelManager::find_neighbors(std::vector<LevelFloor> &floors, const LevelFloor& floor, LevelSide side)
