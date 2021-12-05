@@ -22,12 +22,9 @@ void simulation(std::atomic<bool>& stop, LargeSyncObject<STR_LevelDataSyncObject
 
 	while(!stop)
 	{
-		//std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(1800));
-		std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(10));
+		std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(100));
 
-		/*
-		level_manager.reset();
+		level_manager.generate();
 		set_level_data_sync(str_level_data_sync, level_manager);
-		*/
 	}
 }

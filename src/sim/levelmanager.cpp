@@ -74,7 +74,15 @@ void LevelManager::generate()
 bool LevelManager::generate_impl()
 {
 	std::vector<LevelFloor> generated;
-	while ((generated = prune(generate_grid())).size() < 4);
+	LevelFloor &start_floor = floors.at(random_int(0, floors.size() - 1));
+	LevelSide start_side = random_side();
+	do
+	{
+		auto &start = floors.at(random_int(0, floors.size() - 1));
+		generated = prune(generate_grid(start_floor, start_side));
+	} while (generated.size() < 4);
+
+	connect(start_floor, *find_neighbors(generated, start_floor, start_side).at(0));
 
 	for (const auto &floor : generated)
 		floors.push_back(floor);
@@ -102,10 +110,9 @@ std::vector<LevelFloor> LevelManager::prune(const std::vector<LevelFloor> &floor
 	return pruned;
 }
 
-std::vector<LevelFloor> LevelManager::generate_grid()
+std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floor, LevelSide start_side)
 {
 	std::vector<LevelFloor> generated;
-	LevelFloor &start_floor = floors.at(random_int(std::max(0, ((int)floors.size()) - 10), floors.size() - 1));
 
 	const int horizontal_tiles = random_int(3, 6);
 	const int vertical_tiles = random_int(3, 6);
@@ -113,7 +120,6 @@ std::vector<LevelFloor> LevelManager::generate_grid()
 	const float tile_height = random_real(2.6f, 3.5f);
 
 	float start_x, start_y;
-	const LevelSide start_side = random_side();
 	if (start_side == LevelSide::TOP)
 	{
 		start_x = (start_floor.x + (start_floor.w / 2.0f)) - ((horizontal_tiles * tile_width) / 2.0f);
@@ -179,7 +185,7 @@ std::vector<LevelFloor> LevelManager::generate_grid()
 	if (neighbors.empty())
 		return generated;
 	auto neighbor = neighbors.at(random_int(0, neighbors.size() - 1));
-	if (!connect(start_floor, *neighbor)) return generated;
+	//if (!connect(start_floor, *neighbor)) return generated;
 	LevelSide camefrom = flip(start_side);
 
 	std::stack<LevelFloor*> heads;
@@ -226,7 +232,7 @@ std::vector<LevelFloor> LevelManager::generate_linear()
 	return std::vector<LevelFloor>();
 }
 
-std::vector<LevelFloor*> LevelManager::find_neighbors(std::vector<LevelFloor> &floors, LevelFloor& floor, LevelSide side)
+std::vector<LevelFloor*> LevelManager::find_neighbors(std::vector<LevelFloor> &floors, const LevelFloor& floor, LevelSide side)
 {
 	std::vector<LevelFloor*> matches;
 

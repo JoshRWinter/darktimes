@@ -97,7 +97,7 @@ private:
 	float random_real(float, float);
 	LevelSide random_side();
 
-	std::vector<LevelFloor> generate_grid();
+	std::vector<LevelFloor> generate_grid(const LevelFloor&, LevelSide);
 	std::vector<LevelFloor> generate_linear();
 	void reset();
 
@@ -105,7 +105,7 @@ private:
 	static std::vector<LevelFloor> prune(const std::vector<LevelFloor>&);
 	static bool can_connect(const LevelFloor&, const LevelFloor&, LevelFloorConnector&, LevelFloorConnector&);
 	static bool connect(LevelFloor&, LevelFloor&);
-	static std::vector<LevelFloor*> find_neighbors(std::vector<LevelFloor>&, LevelFloor&, LevelSide);
+	static std::vector<LevelFloor*> find_neighbors(std::vector<LevelFloor>&, const LevelFloor&, LevelSide);
 	void generate_walls();
 	static bool test_floor(const std::vector<LevelFloor>&, const LevelFloor&);
 
