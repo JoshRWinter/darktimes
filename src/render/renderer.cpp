@@ -195,10 +195,11 @@ void Renderer::computeframe()
 
 void Renderer::set_center(float x, float y)
 {
-	const float left = -16.0f + x;
-	const float right = 16.0f + x;
-	const float bottom = -9.0f + y;
-	const float top = 9.0f + y;
+	const float factor = 2.0f;
+	const float left = (-16.0f * factor) + x;
+	const float right = (16.0f * factor) + x;
+	const float bottom = (-9.0f * factor) + y;
+	const float top = (9.0f * factor) + y;
 
 	float matrix[16];
 	win::init_ortho(matrix, left, right, bottom, top);

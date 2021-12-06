@@ -102,6 +102,7 @@ private:
 	void reset();
 
 	bool generate_impl();
+	int find_start_candidate(const std::vector<LevelFloor>&, int);
 	static std::vector<LevelFloor> prune(const std::vector<LevelFloor>&);
 	static bool can_connect(const LevelFloor&, const LevelFloor&, LevelFloorConnector&, LevelFloorConnector&);
 	static bool connect(LevelFloor&, LevelFloor&);
