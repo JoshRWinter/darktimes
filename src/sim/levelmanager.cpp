@@ -70,6 +70,7 @@ void LevelManager::generate()
 	while (!generate_impl()) reset();
 
 	generate_walls();
+	generate_props();
 }
 
 bool LevelManager::generate_impl()
@@ -77,7 +78,7 @@ bool LevelManager::generate_impl()
 	floors.emplace_back(random_int(0, 1), -1.0f, -1.0f, 2.0f, 2.0f);
 
 	bool first = true;
-	while (floors.size() < 100)
+	while (floors.size() < 50)
 	{
 		std::vector<LevelFloor> generated;
 		int attempts = 0;
@@ -138,7 +139,7 @@ int LevelManager::find_start_candidate(const std::vector<LevelFloor> &floors, co
 	if (floors.size() == 1)
 		return 0;
 
-	const int low = std::max(1, ((int)floors.size()) - 15);
+	const int low = std::max(1, ((int)floors.size()) - 8);
 	const int high = floors.size() - 1;
 
 	std::vector<int> one_conn;
@@ -459,6 +460,52 @@ void LevelManager::generate_walls()
 						starty = connectors.at(i + 1).stop;
 				}
 			}
+		}
+	}
+}
+
+void LevelManager::generate_props()
+{
+	auto generate_excluder = [](const LevelFloor &f, const LevelFloorConnector &c)
+	{
+		const float excluder_half_width = 1.0f;
+		const float excluder_width = excluder_half_width * 2.0f;
+
+		float x, y, w, h;
+		switch (c.side)
+		{
+		case LevelSide::LEFT:
+			x = (c.side == LevelSide::RIGHT ? f.x + f.w : f.x) - excluder_half_width;
+			y = c.start;
+			w = excluder_width;
+			h = c.stop - c.start;
+			break;
+		case LevelSide::TOP:
+			x = c.start;
+			y = (c.side == LevelSide::TOP ? f.y + f.h : f.y) - excluder_half_width;
+			w = c.stop - c.start;
+			h = excluder_width;
+			break;
+		case LevelSide::BOTTOM:
+		case LevelSide::RIGHT:
+			win::bug("invalid");
+		}
+
+		return LevelProp(false, x, y, w, h);
+	};
+
+	for (const auto &floor : floors)
+	{
+
+		const float w = 0.5f;
+		const float h = 0.5f;
+
+		//props.emplace_back(true, (floor.x + (floor.w / 2.0f)) - (w / 2.0f), (floor.y + (floor.h / 2.0f)) - (h / 2.0f), w, h);
+
+		for (const auto &c : floor.connectors)
+		{
+			if (c.side == LevelSide::LEFT || c.side == LevelSide::TOP)
+				props.push_back(generate_excluder(floor, c));
 		}
 	}
 }

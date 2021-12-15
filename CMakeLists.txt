@@ -18,6 +18,8 @@ set(sources
 	asset/shader/wall.frag
 	asset/shader/floor.vert
 	asset/shader/floor.frag
+	asset/shader/prop.vert
+	asset/shader/prop.frag
 
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp

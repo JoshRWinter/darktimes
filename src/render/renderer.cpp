@@ -60,6 +60,22 @@ static std::vector<float> get_wall_verts(const std::vector<LevelWall> &walls)
 	return verts;
 }
 
+static std::vector<float> get_prop_verts(const std::vector<LevelProp> &props)
+{
+	std::vector<float> verts;
+
+	for (const auto &prop : props)
+	{
+		std::array<float, 12> qverts;
+		get_quad_verts(prop.x, prop.y, prop.w, prop.h, qverts);
+
+		for (auto f : qverts)
+			verts.push_back(f);
+	}
+
+	return verts;
+}
+
 Renderer::Renderer(int iwidth, int iheight, float left, float right, float bottom, float top, AssetManager &assetmanager)
 	: font_renderer(iwidth, iheight, left, right, bottom, top)
 	, font_debug(font_renderer, assetmanager["font/NotoSansMono-Regular.ttf"], 0.25f)
@@ -131,6 +147,23 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 20, NULL);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, false, 20, (void*)8);
+
+	// mode: prop
+	mode.prop.propvert_count = 0;
+
+	mode.prop.shader = win::load_shaders(assetmanager["shader/prop.vert"], assetmanager["shader/prop.frag"]);
+	glUseProgram(mode.prop.shader);
+	mode.prop.uniform_projection = get_uniform(mode.prop.shader, "projection");
+	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, matrix);
+
+	glGenVertexArrays(1, &mode.prop.vao);
+	glBindVertexArray(mode.prop.vao);
+
+	glGenBuffers(1, &mode.prop.vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, mode.prop.vbo);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, NULL);
 }
 
 Renderer::~Renderer()
@@ -143,9 +176,13 @@ Renderer::~Renderer()
 	glDeleteBuffers(1, &mode.floor.vbo);
 	glDeleteVertexArrays(1, &mode.floor.vao);
 	glDeleteShader(mode.floor.shader);
+
+	glDeleteBuffers(1, &mode.prop.vbo);
+	glDeleteVertexArrays(1, &mode.prop.vao);
+	glDeleteShader(mode.prop.shader);
 }
 
-void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, int seed)
+void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props, int seed)
 {
 	levelseed = std::to_string(seed);
 	const auto &floor_verts = get_floor_verts(floors);
@@ -157,6 +194,12 @@ void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::
 	mode.wall.wallvert_count = wall_verts.size();
 	glBindBuffer(GL_ARRAY_BUFFER, mode.wall.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mode.wall.wallvert_count, wall_verts.data(), GL_STATIC_DRAW);
+
+	const auto &prop_verts = get_prop_verts(props);
+	mode.prop.propvert_count = prop_verts.size();
+	//win::bug("got size of " + std::to_string(prop_verts.size()));
+	glBindBuffer(GL_ARRAY_BUFFER, mode.prop.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mode.prop.propvert_count, prop_verts.data(), GL_STATIC_DRAW);
 }
 
 void Renderer::computeframe()
@@ -168,11 +211,13 @@ void Renderer::computeframe()
 	glBindVertexArray(mode.floor.vao);
 	glDrawArrays(GL_TRIANGLES, 0, mode.floor.floorvert_count / 4);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glUseProgram(mode.wall.shader);
 	glBindVertexArray(mode.wall.vao);
 	glDrawArrays(GL_TRIANGLES, 0, mode.wall.wallvert_count / 2);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	glUseProgram(mode.prop.shader);
+	glBindVertexArray(mode.prop.vao);
+	glDrawArrays(GL_TRIANGLES, 0, mode.prop.propvert_count / 2);
 
 	if (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - last_fps_calc_time).count() > 1000)
 	{
@@ -195,7 +240,7 @@ void Renderer::computeframe()
 
 void Renderer::set_center(float x, float y)
 {
-	const float factor = 2.0f;
+	const float factor = 1.0f;
 	const float left = (-16.0f * factor) + x;
 	const float right = (16.0f * factor) + x;
 	const float bottom = (-9.0f * factor) + y;
@@ -208,4 +253,6 @@ void Renderer::set_center(float x, float y)
 	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, matrix);
 	glUseProgram(mode.wall.shader);
 	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, matrix);
+	glUseProgram(mode.prop.shader);
+	glUniformMatrix4fv(mode.prop.uniform_projection, 1, false, matrix);
 }

@@ -40,7 +40,7 @@ int main()
 	float x = 0.0f, y = 0.0f;
 	while(display.process() && !quit)
 	{
-		const float scoot = 0.1f;
+		const float scoot = 0.4f;
 		if (up) y += scoot;
 		if (down) y -= scoot;
 		if (left) x -= scoot;
@@ -50,7 +50,7 @@ int main()
 		{
 			std::unique_ptr<STR_LevelDataSyncObject> leveldata;
 			str_level_data_sync.get(leveldata);
-			renderer.set_level_data(leveldata->floors, leveldata->walls, leveldata->seed);
+			renderer.set_level_data(leveldata->floors, leveldata->walls, leveldata->props, leveldata->seed);
 		}
 
 		renderer.computeframe();

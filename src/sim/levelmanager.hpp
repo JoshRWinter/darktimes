@@ -6,6 +6,15 @@
 
 #include "../darktimes.hpp"
 
+struct LevelProp
+{
+	LevelProp(bool collide, float x, float y, float w, float h)
+		: collide(collide), x(x), y(y), w(w), h(h) {}
+
+	bool collide;
+	float x, y, w, h;
+};
+
 enum class LevelSide
 {
 	LEFT,
@@ -90,6 +99,7 @@ public:
 
 	std::vector<LevelFloor> floors;
 	std::vector<LevelWall> walls;
+	std::vector<LevelProp> props;
 	const int seed;
 
 private:
@@ -108,6 +118,7 @@ private:
 	static bool connect(LevelFloor&, LevelFloor&);
 	static std::vector<LevelFloor*> find_neighbors(std::vector<LevelFloor>&, const LevelFloor&, LevelSide);
 	void generate_walls();
+	void generate_props();
 	static bool test_floor(const std::vector<LevelFloor>&, const LevelFloor&);
 
 	std::mt19937 mersenne;

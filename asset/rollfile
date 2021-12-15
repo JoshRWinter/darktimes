@@ -5,6 +5,8 @@ shader/wall.vert:z
 shader/wall.frag:z
 shader/floor.vert:z
 shader/floor.frag:z
+shader/prop.vert:z
+shader/prop.frag:z
 
 texture/floor1.tga:z:c=svg;./svg2tga.sh 50 50 $$ %%
 texture/floor2.tga:z:c=svg;./svg2tga.sh 50 50 $$ %%

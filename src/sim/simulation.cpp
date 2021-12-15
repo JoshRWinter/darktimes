@@ -10,6 +10,7 @@ static void set_level_data_sync(LargeSyncObject<STR_LevelDataSyncObject> &so, Le
 
 	data->walls = levelmanager.walls;
 	data->floors = levelmanager.floors;
+	data->props = levelmanager.props;
 	data->seed = levelmanager.seed;
 
 	so.set(data);
