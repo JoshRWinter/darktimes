@@ -11,23 +11,23 @@ set(sources
 
 	src/assetmanager.cpp
 	src/assetmanager.hpp
+	src/syncobject.hpp
 
 	src/render/renderer.cpp
 	src/render/renderer.hpp
+
+	src/sim/simulation.cpp
+	src/sim/simulation.hpp
+	src/sim/levelmanager.cpp
+	src/sim/levelmanager.hpp
+
+	asset/recipe
 	asset/shader/wall.vert
 	asset/shader/wall.frag
 	asset/shader/floor.vert
 	asset/shader/floor.frag
 	asset/shader/prop.vert
 	asset/shader/prop.frag
-
-	src/sim/simulation.cpp
-	src/sim/simulation.hpp
-
-	src/sim/levelmanager.cpp
-	src/sim/levelmanager.hpp
-
-	src/syncobject.hpp
 )
 
 if(WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))

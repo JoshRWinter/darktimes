@@ -7,7 +7,11 @@
 
 int main()
 {
+#ifndef NDEBUG
+	win::Display display("debug_window", 1600, 900, false);
+#else
 	win::Display display("Darktimes", 1600, 900, false);
+#endif
 	display.vsync(true);
 
 	bool quit = false;

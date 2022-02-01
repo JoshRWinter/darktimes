@@ -1,0 +1,14 @@
+font/NotoSansMono-Regular.ttf
+font/CHE-THIS.TTF
+
+shader/wall.vert z
+shader/wall.frag z
+shader/floor.vert z
+shader/floor.frag z
+shader/prop.vert z
+shader/prop.frag z
+
+svg2tga {
+	texture/floor1.svg 50 50
+	texture/floor2.svg 50 50
+}
