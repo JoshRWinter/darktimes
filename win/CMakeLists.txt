@@ -4,28 +4,30 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/CMakeModule
 set(CMAKE_CXX_STANDARD 17)
 
 add_library(win STATIC
-	src/Sound.cpp
-	src/Atlas.cpp
-	src/SoundEngine.cpp
-	src/SoundBank.cpp
-	src/Display.cpp
-	src/Font.cpp
-	src/AssetRoll.cpp
-	src/AssetRollStreamRaw.cpp
-	src/AssetRollStreamCompressed.cpp
-	src/Targa.cpp
-	src/Utility.cpp
+	src/sound.cpp
+	src/atlas.cpp
+	src/soundengine_linux.cpp
+	src/soundengine_windows.cpp
+	src/soundbank.cpp
+	src/display_linux.cpp
+	src/display_windows.cpp
+	src/font.cpp
+	src/assetroll.cpp
+	src/assetrollstreamraw.cpp
+	src/assetrollstreamcompressed.cpp
+	src/targa.cpp
+	src/utility.cpp
 
-	src/Sound.h
-	src/Atlas.h
-	src/SoundEngine.h
-	src/SoundBank.h
-	src/Display.h
-	src/Font.h
-	src/AssetRoll.h
-	src/Targa.h
-	src/Utility.h
-	src/event.h
+	src/sound.hpp
+	src/atlas.hpp
+	src/soundengine.hpp
+	src/soundbank.hpp
+	src/display.hpp
+	src/font.hpp
+	src/assetroll.hpp
+	src/targa.hpp
+	src/utility.hpp
+	src/event.hpp
 	src/objectpool.hpp
 	)
 
@@ -43,6 +45,7 @@ if(WIN32)
 		include/ogg
 		include/vorbis
 		include/zlib
+		glm
 		)
 
 	target_link_libraries(win
@@ -75,6 +78,7 @@ else()
 		include
 		PRIVATE
 		${FREETYPE_INCLUDE_DIRS}
+		glm
 		)
 
 	target_link_libraries(win

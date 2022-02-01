@@ -10,7 +10,7 @@ class AssetManager
 	NOCOPYMOVE(AssetManager);
 public:
 	AssetManager(win::AssetRoll&);
-	win::AssetRollStream operator[](const char*);
+	win::Stream operator[](const char*);
 
 	int floor_texture_count() const;
 	std::vector<win::Targa> get_floor_textures();

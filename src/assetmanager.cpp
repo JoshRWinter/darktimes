@@ -9,7 +9,7 @@ static std::vector<const char*> floor_texture_names =
 AssetManager::AssetManager(win::AssetRoll &roll)
 	: roll(roll) {}
 
-win::AssetRollStream AssetManager::operator[](const char *name)
+win::Stream AssetManager::operator[](const char *name)
 {
 	return roll[name];
 }
