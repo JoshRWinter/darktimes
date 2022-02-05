@@ -1,5 +1,6 @@
 #include <cmath>
 #include <stack>
+#include <algorithm>
 
 #include "../darktimes.hpp"
 #include "../assetmanager.hpp"

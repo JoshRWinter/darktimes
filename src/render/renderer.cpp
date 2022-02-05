@@ -1,5 +1,14 @@
-#include <win.h>
-#include <GL/gl.h>
+#include <chrono>
+#include <string.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <win/win.hpp>
+#include <win/gl.hpp>
+#include <win/targa.hpp>
+#include <win/utility.hpp>
 
 #include "renderer.hpp"
 
@@ -77,7 +86,7 @@ static std::vector<float> get_prop_verts(const std::vector<LevelProp> &props)
 }
 
 Renderer::Renderer(int iwidth, int iheight, float left, float right, float bottom, float top, AssetManager &assetmanager)
-	: font_renderer(iwidth, iheight, left, right, bottom, top)
+	: font_renderer(win::IDimensions2D(iwidth, iheight), win::FScreenArea(left, right, bottom, top))
 	, font_debug(font_renderer, assetmanager["font/NotoSansMono-Regular.ttf"], 0.25f)
 	, font_ui(font_renderer, assetmanager["font/CHE-THIS.TTF"], 0.7f)
 	, last_fps_calc_time(std::chrono::high_resolution_clock::now())
@@ -92,16 +101,15 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	strcpy(fpsindicator, "0");
 
-	float matrix[16];
-	win::init_ortho(matrix, left, right, bottom, top);
+	const glm::mat4 projection_matrix = glm::ortho(left, right, bottom, top);
 
 	// mode: wall
 	mode.wall.wallvert_count = 0;
-	mode.wall.shader = win::load_shaders(assetmanager["shader/wall.vert"], assetmanager["shader/wall.frag"]);
+	mode.wall.shader = win::load_gl_shaders(assetmanager["shader/wall.vert"], assetmanager["shader/wall.frag"]);
 	glUseProgram(mode.wall.shader);
 
 	mode.wall.uniform_projection = get_uniform(mode.wall.shader, "projection");
-	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, matrix);
+	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
 
 	glGenVertexArrays(1, &mode.wall.vao);
 	glGenBuffers(1, &mode.wall.vbo);
@@ -131,11 +139,11 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, floortargas.at(0).width(), floortargas.at(0).height(), floortargas.size(), 0, GL_BGRA, GL_UNSIGNED_BYTE, floortexture_data.get());
 
-	mode.floor.shader = win::load_shaders(assetmanager["shader/floor.vert"], assetmanager["shader/floor.frag"]);
+	mode.floor.shader = win::load_gl_shaders(assetmanager["shader/floor.vert"], assetmanager["shader/floor.frag"]);
 	glUseProgram(mode.floor.shader);
 
 	mode.floor.uniform_projection = get_uniform(mode.floor.shader, "projection");
-	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, matrix);
+	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
 
 	glGenVertexArrays(1, &mode.floor.vao);
 	glGenBuffers(1, &mode.floor.vbo);
@@ -151,10 +159,10 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 	// mode: prop
 	mode.prop.propvert_count = 0;
 
-	mode.prop.shader = win::load_shaders(assetmanager["shader/prop.vert"], assetmanager["shader/prop.frag"]);
+	mode.prop.shader = win::load_gl_shaders(assetmanager["shader/prop.vert"], assetmanager["shader/prop.frag"]);
 	glUseProgram(mode.prop.shader);
 	mode.prop.uniform_projection = get_uniform(mode.prop.shader, "projection");
-	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, matrix);
+	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
 
 	glGenVertexArrays(1, &mode.prop.vao);
 	glBindVertexArray(mode.prop.vao);
@@ -246,13 +254,12 @@ void Renderer::set_center(float x, float y)
 	const float bottom = (-9.0f * factor) + y;
 	const float top = (9.0f * factor) + y;
 
-	float matrix[16];
-	win::init_ortho(matrix, left, right, bottom, top);
+	const glm::mat4 projection_matrix = glm::ortho(left, right, bottom, top);
 
 	glUseProgram(mode.floor.shader);
-	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, matrix);
+	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
 	glUseProgram(mode.wall.shader);
-	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, matrix);
+	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
 	glUseProgram(mode.prop.shader);
-	glUniformMatrix4fv(mode.prop.uniform_projection, 1, false, matrix);
+	glUniformMatrix4fv(mode.prop.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
 }

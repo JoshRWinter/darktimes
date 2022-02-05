@@ -1,5 +1,8 @@
-#include <win.h>
 #include <chrono>
+#include <thread>
+
+#include <win/display.hpp>
+#include <win/assetroll.hpp>
 
 #include "assetmanager.hpp"
 #include "render/renderer.hpp"
@@ -30,16 +33,16 @@ int main()
 	bool up = false, down = false, left = false, right = false;
 	display.register_button_handler([&quit, &up, &down, &left, &right](win::Button button, bool press)
 	{
-		if (button == win::Button::ESC)
+		if (button == win::Button::esc)
 			quit = true;
 
-		else if (button == win::Button::UP)
+		else if (button == win::Button::up)
 			up = press;
-		else if (button == win::Button::DOWN)
+		else if (button == win::Button::down)
 			down = press;
-		else if (button == win::Button::LEFT)
+		else if (button == win::Button::left)
 			left = press;
-		else if (button == win::Button::RIGHT)
+		else if (button == win::Button::right)
 			right = press;
 	});
 
@@ -47,7 +50,7 @@ int main()
 	{
 		switch (event)
 		{
-		case win::WindowEvent::CLOSE:
+		case win::WindowEvent::close:
 			quit = true;
 			break;
 		default: break;

@@ -3,6 +3,9 @@
 
 #include <vector>
 
+#include <win/font.hpp>
+#include <win/fontrenderer.hpp>
+
 #include "../darktimes.hpp"
 #include "../assetmanager.hpp"
 #include "../sim/levelmanager.hpp"

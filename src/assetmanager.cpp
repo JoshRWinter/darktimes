@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "assetmanager.hpp"
 
 static std::vector<const char*> floor_texture_names =

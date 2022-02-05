@@ -4,6 +4,7 @@
 #include <atomic>
 #include <mutex>
 #include <vector>
+#include <memory>
 
 #include "darktimes.hpp"
 #include "sim/levelmanager.hpp"

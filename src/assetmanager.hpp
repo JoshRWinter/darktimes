@@ -1,7 +1,8 @@
 #ifndef ASSET_MANAGER_HPP
 #define ASSET_MANAGER_HPP
 
-#include <win.h>
+#include <win/assetroll.hpp>
+#include <win/targa.hpp>
 
 #include "darktimes.hpp"
 
