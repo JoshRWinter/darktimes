@@ -13,8 +13,8 @@ set(sources
 	src/assetmanager.hpp
 	src/syncobject.hpp
 
-	src/render/renderer.cpp
-	src/render/renderer.hpp
+	src/render/gl/glrenderer.cpp
+	src/render/gl/glrenderer.hpp
 
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp

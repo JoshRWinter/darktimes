@@ -5,7 +5,7 @@
 #include <win/assetroll.hpp>
 
 #include "assetmanager.hpp"
-#include "render/renderer.hpp"
+#include "render/gl/glrenderer.hpp"
 #include "sim/simulation.hpp"
 
 int main()
@@ -59,9 +59,7 @@ int main()
 
 	win::AssetRoll roll("darktimes.bin");
 	AssetManager assetmanager(roll);
-	Renderer renderer(display.width(), display.height(), -16.0f, 16.0f, -2.0f, 18.0f, assetmanager);
-	// Renderer renderer(display.width(), display.height(), -32.0f, 32.0f, -18.0f, 18.0f, assetmanager);
-	// Renderer renderer(display.width(), display.height(), -16.0f, 16.0f, -9.0f, 9.0f, assetmanager);
+	GLRenderer renderer(win::IDimensions2D(display.width(), display.height()), win::FScreenArea(-8.0f, 8.0f, -4.5f, 4.5f), win::FScreenArea(-8.0f, 8.0f, -4.5f, 4.5f), assetmanager);
 
 	LargeSyncObject<STR_LevelDataSyncObject> str_level_data_sync;
 	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(str_level_data_sync));
@@ -71,7 +69,7 @@ int main()
 	{
 		display.process();
 
-		const float scoot = 0.4f;
+		const float scoot = 0.1f;
 		if (up) y += scoot;
 		if (down) y -= scoot;
 		if (left) x -= scoot;
@@ -84,7 +82,7 @@ int main()
 			renderer.set_level_data(leveldata->floors, leveldata->walls, leveldata->props, leveldata->seed);
 		}
 
-		renderer.computeframe();
+		renderer.send_frame();
 		display.swap();
 	}
 

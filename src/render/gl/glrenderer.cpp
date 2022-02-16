@@ -10,9 +10,9 @@
 #include <win/targa.hpp>
 #include <win/utility.hpp>
 
-#include "renderer.hpp"
+#include "glrenderer.hpp"
 
-static int get_uniform(unsigned program, const char *name)
+static GLint get_uniform(GLuint program, const char *name)
 {
 	auto result = glGetUniformLocation(program, name);
 	if (result == -1)
@@ -85,23 +85,22 @@ static std::vector<float> get_prop_verts(const std::vector<LevelProp> &props)
 	return verts;
 }
 
-Renderer::Renderer(int iwidth, int iheight, float left, float right, float bottom, float top, AssetManager &assetmanager)
-	: font_renderer(win::IDimensions2D(iwidth, iheight), win::FScreenArea(left, right, bottom, top))
+GLRenderer::GLRenderer(const win::IDimensions2D &screen_dims, const win::FScreenArea &hud_area, const win::FScreenArea &world_area, AssetManager &assetmanager)
+	: hud_area(hud_area)
+	, font_renderer(screen_dims, hud_area)
 	, font_debug(font_renderer, assetmanager["font/NotoSansMono-Regular.ttf"], 0.25f)
 	, font_ui(font_renderer, assetmanager["font/CHE-THIS.TTF"], 0.7f)
 	, last_fps_calc_time(std::chrono::high_resolution_clock::now())
 	, accumulated_fps(0)
-	, left(left)
-	, right(right)
-	, bottom(bottom)
-	, top(top)
 {
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	strcpy(fpsindicator, "0");
 
-	const glm::mat4 projection_matrix = glm::ortho(left, right, bottom, top);
+	const glm::mat4 projection_matrix = glm::ortho(world_area.left, world_area.right, world_area.bottom, world_area.top);
+	const glm::mat4 view_matrix = glm::translate(glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.0, 1.0f, 1.0f)), glm::vec3(0.2, 0.2, 0));
+	//const glm::mat4 view_matrix = glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.6, 0.6, 0.6));
 
 	// mode: wall
 	mode.wall.wallvert_count = 0;
@@ -110,6 +109,9 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 
 	mode.wall.uniform_projection = get_uniform(mode.wall.shader, "projection");
 	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
+	const std::string wall_vertex_shader = assetmanager["shader/wall.vert"].read_all_as_string();
+	mode.wall.uniform_view = get_uniform(mode.wall.shader, "view");
+	glUniformMatrix4fv(mode.wall.uniform_view, 1, false, glm::value_ptr(view_matrix));
 
 	glGenVertexArrays(1, &mode.wall.vao);
 	glGenBuffers(1, &mode.wall.vbo);
@@ -144,6 +146,8 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 
 	mode.floor.uniform_projection = get_uniform(mode.floor.shader, "projection");
 	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
+	mode.floor.uniform_view = get_uniform(mode.floor.shader, "view");
+	glUniformMatrix4fv(mode.floor.uniform_view, 1, false, glm::value_ptr(view_matrix));
 
 	glGenVertexArrays(1, &mode.floor.vao);
 	glGenBuffers(1, &mode.floor.vbo);
@@ -161,8 +165,11 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 
 	mode.prop.shader = win::load_gl_shaders(assetmanager["shader/prop.vert"], assetmanager["shader/prop.frag"]);
 	glUseProgram(mode.prop.shader);
+
 	mode.prop.uniform_projection = get_uniform(mode.prop.shader, "projection");
 	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
+	mode.prop.uniform_view = get_uniform(mode.prop.shader, "view");
+	glUniformMatrix4fv(mode.prop.uniform_view, 1, false, glm::value_ptr(view_matrix));
 
 	glGenVertexArrays(1, &mode.prop.vao);
 	glBindVertexArray(mode.prop.vao);
@@ -174,7 +181,7 @@ Renderer::Renderer(int iwidth, int iheight, float left, float right, float botto
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, NULL);
 }
 
-Renderer::~Renderer()
+GLRenderer::~GLRenderer()
 {
 	glDeleteBuffers(1, &mode.wall.vbo);
 	glDeleteVertexArrays(1, &mode.wall.vao);
@@ -190,7 +197,7 @@ Renderer::~Renderer()
 	glDeleteShader(mode.prop.shader);
 }
 
-void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props, int seed)
+void GLRenderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props, int seed)
 {
 	levelseed = std::to_string(seed);
 	const auto &floor_verts = get_floor_verts(floors);
@@ -210,7 +217,7 @@ void Renderer::set_level_data(const std::vector<LevelFloor> &floors, const std::
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mode.prop.propvert_count, prop_verts.data(), GL_STATIC_DRAW);
 }
 
-void Renderer::computeframe()
+void GLRenderer::send_frame()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -235,9 +242,9 @@ void Renderer::computeframe()
 	}
 	else ++accumulated_fps;
 
-	font_renderer.draw(font_debug, fpsindicator, left + 0.05f, top - font_debug.size(), win::Color(1.0f, 1.0f, 0.0f, 1.0f));
-	font_renderer.draw(font_ui, "Dark Times", 0.0f, top - font_ui.size(), win::Color(1.0f, 1.0f, 1.0f, 1.0f), true);
-	font_renderer.draw(font_debug, levelseed.c_str(), 0.0f, 0.0f, win::Color(1.0f, 1.0f, 0.0f, 1.0f));
+	font_renderer.draw(font_debug, fpsindicator, hud_area.left + 0.05f, hud_area.top - font_debug.size(), win::Color(1.0f, 1.0f, 0.0f, 1.0f));
+	font_renderer.draw(font_ui, "Dark Times", 0.0f, hud_area.top - font_ui.size(), win::Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+	font_renderer.draw(font_debug, levelseed.c_str(), 0.0f, hud_area.bottom + font_debug.size(), win::Color(1.0f, 1.0f, 0.0f, 1.0f), true);
 
 #ifndef NDEBUG
 	auto error = glGetError();
@@ -246,20 +253,17 @@ void Renderer::computeframe()
 #endif
 }
 
-void Renderer::set_center(float x, float y)
+void GLRenderer::set_center(float x, float y)
 {
-	const float factor = 1.0f;
-	const float left = (-16.0f * factor) + x;
-	const float right = (16.0f * factor) + x;
-	const float bottom = (-9.0f * factor) + y;
-	const float top = (9.0f * factor) + y;
-
-	const glm::mat4 projection_matrix = glm::ortho(left, right, bottom, top);
+	const float zoom = 0.2f;
+    const glm::mat4 view_matrix = glm::translate(glm::scale(glm::identity<glm::mat4>(), glm::vec3(zoom, zoom, zoom)), glm::vec3(-x, -y, 0.0f));
 
 	glUseProgram(mode.floor.shader);
-	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(mode.floor.uniform_view, 1, false, glm::value_ptr(view_matrix));
+
 	glUseProgram(mode.wall.shader);
-	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(mode.wall.uniform_view, 1, false, glm::value_ptr(view_matrix));
+
 	glUseProgram(mode.prop.shader);
-	glUniformMatrix4fv(mode.prop.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(mode.prop.uniform_view, 1, false, glm::value_ptr(view_matrix));
 }

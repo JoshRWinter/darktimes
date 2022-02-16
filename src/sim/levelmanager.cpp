@@ -501,8 +501,6 @@ void LevelManager::generate_props()
 		const float w = 0.5f;
 		const float h = 0.5f;
 
-		//props.emplace_back(true, (floor.x + (floor.w / 2.0f)) - (w / 2.0f), (floor.y + (floor.h / 2.0f)) - (h / 2.0f), w, h);
-
 		for (const auto &c : floor.connectors)
 		{
 			if (c.side == LevelSide::LEFT || c.side == LevelSide::TOP)
