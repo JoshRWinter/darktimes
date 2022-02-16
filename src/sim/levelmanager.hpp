@@ -17,10 +17,10 @@ struct LevelProp
 
 enum class LevelSide
 {
-	LEFT,
-	RIGHT,
-	BOTTOM,
-	TOP
+	left,
+	right,
+	bottom,
+	top
 };
 
 struct LevelWall

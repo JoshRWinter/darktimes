@@ -31,10 +31,10 @@ static std::array<LevelSide, 4> enumerate_connector_sides()
 {
 	std::array<LevelSide, 4> sides;
 
-	sides.at(0) = LevelSide::LEFT;
-	sides.at(1) = LevelSide::RIGHT;
-	sides.at(2) = LevelSide::BOTTOM;
-	sides.at(3) = LevelSide::TOP;
+	sides.at(0) = LevelSide::left;
+	sides.at(1) = LevelSide::right;
+	sides.at(2) = LevelSide::bottom;
+	sides.at(3) = LevelSide::top;
 
 	return sides;
 }
@@ -43,14 +43,14 @@ static LevelSide flip(LevelSide side)
 {
 	switch (side)
 	{
-	case LevelSide::LEFT:
-		return LevelSide::RIGHT;
-	case LevelSide::RIGHT:
-		return LevelSide::LEFT;
-	case LevelSide::BOTTOM:
-		return LevelSide::TOP;
-	case LevelSide::TOP:
-		return LevelSide::BOTTOM;
+	case LevelSide::left:
+		return LevelSide::right;
+	case LevelSide::right:
+		return LevelSide::left;
+	case LevelSide::bottom:
+		return LevelSide::top;
+	case LevelSide::top:
+		return LevelSide::bottom;
 	}
 
 	win::bug("no side");
@@ -84,7 +84,7 @@ bool LevelManager::generate_impl()
 		std::vector<LevelFloor> generated;
 		int attempts = 0;
 		int start_candidate_index;
-		LevelSide side = first ? LevelSide::TOP : random_side();
+		LevelSide side = first ? LevelSide::top : random_side();
 		do
 		{
 			start_candidate_index = find_start_candidate(floors, attempts++);
@@ -108,7 +108,7 @@ bool LevelManager::generate_impl()
 		attempts = 0;
 		do
 		{
-			side = first ? LevelSide::TOP : random_side();
+			side = first ? LevelSide::top : random_side();
 			start_candidate_index = find_start_candidate(floors, attempts++);
 
 			if (start_candidate_index == -1)
@@ -205,14 +205,14 @@ std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floo
 	const float tile_height = random_real(2.6f, 3.5f);
 
 	float start_x, start_y;
-	if (start_side == LevelSide::TOP)
+	if (start_side == LevelSide::top)
 	{
 		start_x = (start_floor.x + (start_floor.w / 2.0f)) - ((horizontal_tiles * tile_width) / 2.0f);
 		start_y = start_floor.y + start_floor.h;
 
 		if (horizontal_tiles % 2 == 0)
 			start_x -= (tile_width / 2.0f);
-	}else if (start_side == LevelSide::LEFT)
+	}else if (start_side == LevelSide::left)
 	{
 		start_x = start_floor.x - (horizontal_tiles * tile_width);
 		start_y = (start_floor.y + (start_floor.h / 2.0f)) - ((vertical_tiles * tile_height) / 2.0f);
@@ -220,7 +220,7 @@ std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floo
 		if (vertical_tiles % 2 == 0)
 			start_y -= (tile_height / 2.0f);
 	}
-	else if (start_side == LevelSide::RIGHT)
+	else if (start_side == LevelSide::right)
 	{
 		start_x = start_floor.x + start_floor.w;
 		start_y = (start_floor.y + (start_floor.h / 2.0f)) - ((vertical_tiles * tile_height) / 2.0f);
@@ -228,7 +228,7 @@ std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floo
 		if (vertical_tiles % 2 == 0)
 			start_y -= (tile_height / 2.0f);
 	}
-	else if (start_side == LevelSide::BOTTOM)
+	else if (start_side == LevelSide::bottom)
 	{
 		start_x = (start_floor.x + (start_floor.w / 2.0f)) - ((horizontal_tiles * tile_width) / 2.0f);
 		start_y = start_floor.y - (vertical_tiles * tile_height);
@@ -346,19 +346,19 @@ std::vector<LevelFloor> LevelManager::generate_linear(const LevelFloor &start_fl
 
 			switch (side)
 			{
-			case LevelSide::LEFT:
+			case LevelSide::left:
 				x = from_x - width;
 				y = random_real(lowy, highy);
 				break;
-			case LevelSide::RIGHT:
+			case LevelSide::right:
 				x = from_x + from_w;
 				y = random_real(lowy, highy);
 				break;
-			case LevelSide::BOTTOM:
+			case LevelSide::bottom:
 				x = random_real(lowx, highx);
 				y = from_y - height;
 				break;
-			case LevelSide::TOP:
+			case LevelSide::top:
 				x = random_real(lowx, highx);
 				y = from_y + from_h;
 				break;
@@ -427,9 +427,9 @@ void LevelManager::generate_walls()
 		{
 			auto connectors	= get_connectors(floor.connectors, side);
 
-			if (side == LevelSide::BOTTOM || side == LevelSide::TOP)
+			if (side == LevelSide::bottom || side == LevelSide::top)
 			{
-				const float y = side == LevelSide::BOTTOM ? floor.y - LevelWall::HALFWIDTH : ((floor.y + floor.h) - LevelWall::HALFWIDTH);
+				const float y = side == LevelSide::bottom ? floor.y - LevelWall::HALFWIDTH : ((floor.y + floor.h) - LevelWall::HALFWIDTH);
 				float startx = floor.x;
 
 				walls.emplace_back(startx, y, connectors.size() > 0 ? (connectors.at(0).start - startx) : floor.w, LevelWall::WIDTH);
@@ -446,7 +446,7 @@ void LevelManager::generate_walls()
 			}
 			else
 			{
-				const float x = side == LevelSide::LEFT ? floor.x - LevelWall::HALFWIDTH : ((floor.x + floor.w) - LevelWall::HALFWIDTH);
+				const float x = side == LevelSide::left ? floor.x - LevelWall::HALFWIDTH : ((floor.x + floor.w) - LevelWall::HALFWIDTH);
 				float starty = floor.y;
 
 				walls.emplace_back(x, starty, LevelWall::WIDTH, connectors.size() > 0 ? (connectors.at(0).start - starty) : floor.h);
@@ -475,20 +475,20 @@ void LevelManager::generate_props()
 		float x, y, w, h;
 		switch (c.side)
 		{
-		case LevelSide::LEFT:
-			x = (c.side == LevelSide::RIGHT ? f.x + f.w : f.x) - excluder_half_width;
+		case LevelSide::left:
+			x = (c.side == LevelSide::right ? f.x + f.w : f.x) - excluder_half_width;
 			y = c.start;
 			w = excluder_width;
 			h = c.stop - c.start;
 			break;
-		case LevelSide::TOP:
+		case LevelSide::top:
 			x = c.start;
-			y = (c.side == LevelSide::TOP ? f.y + f.h : f.y) - excluder_half_width;
+			y = (c.side == LevelSide::top ? f.y + f.h : f.y) - excluder_half_width;
 			w = c.stop - c.start;
 			h = excluder_width;
 			break;
-		case LevelSide::BOTTOM:
-		case LevelSide::RIGHT:
+		case LevelSide::bottom:
+		case LevelSide::right:
 			win::bug("invalid");
 		}
 
@@ -503,7 +503,7 @@ void LevelManager::generate_props()
 
 		for (const auto &c : floor.connectors)
 		{
-			if (c.side == LevelSide::LEFT || c.side == LevelSide::TOP)
+			if (c.side == LevelSide::left || c.side == LevelSide::top)
 				props.push_back(generate_excluder(floor, c));
 		}
 	}
@@ -526,13 +526,13 @@ LevelSide LevelManager::random_side()
 	switch (i)
 	{
 	case 0:
-		return LevelSide::LEFT;
+		return LevelSide::left;
 	case 1:
-		return LevelSide::RIGHT;
+		return LevelSide::right;
 	case 2:
-		return LevelSide::BOTTOM;
+		return LevelSide::bottom;
 	case 3:
-		return LevelSide::TOP;
+		return LevelSide::top;
 	}
 
 	win::bug("no side");
@@ -543,13 +543,13 @@ bool LevelManager::can_connect(const LevelFloor &floor1, const LevelFloor &floor
 	// determine which side floor 2 is on, relative to floor 1
 	LevelSide side;
 	if (float_equals(floor1.x + floor1.w, floor2.x)) // right?
-		side = LevelSide::RIGHT;
+		side = LevelSide::right;
 	else if (float_equals(floor1.x, floor2.x + floor2.w)) // left?
-		side = LevelSide::LEFT;
+		side = LevelSide::left;
 	else if (float_equals(floor1.y, floor2.y + floor2.h)) // bottom?
-		side = LevelSide::BOTTOM;
+		side = LevelSide::bottom;
 	else if (float_equals(floor1.y + floor1.h, floor2.y)) // top?
-		side = LevelSide::TOP;
+		side = LevelSide::top;
 	else
 		return false;
 
@@ -557,7 +557,7 @@ bool LevelManager::can_connect(const LevelFloor &floor1, const LevelFloor &floor
 	const float DOOR_LENGTH = 1.0f;
 
 	float start, stop;
-	if (side == LevelSide::BOTTOM || side == LevelSide::TOP)
+	if (side == LevelSide::bottom || side == LevelSide::top)
 	{
 		const float farleft = std::max(floor1.x, floor2.x);
 		const float farright = std::min(floor1.x + floor1.w, floor2.x + floor2.w);
@@ -567,7 +567,7 @@ bool LevelManager::can_connect(const LevelFloor &floor1, const LevelFloor &floor
 		start = ((farright + farleft) / 2.0f) - (DOOR_LENGTH / 2.0f);
 		stop = start + DOOR_LENGTH;
 	}
-	else if (side == LevelSide::LEFT || side == LevelSide::RIGHT)
+	else if (side == LevelSide::left || side == LevelSide::right)
 	{
 		const float lower = std::max(floor1.y, floor2.y);
 		const float upper = std::min(floor1.y + floor1.h, floor2.y + floor2.h);
@@ -582,17 +582,17 @@ bool LevelManager::can_connect(const LevelFloor &floor1, const LevelFloor &floor
 	LevelSide flipside;
 	switch (side)
 	{
-	case LevelSide::TOP:
-		flipside = LevelSide::BOTTOM;
+	case LevelSide::top:
+		flipside = LevelSide::bottom;
 		break;
-	case LevelSide::BOTTOM:
-		flipside = LevelSide::TOP;
+	case LevelSide::bottom:
+		flipside = LevelSide::top;
 		break;
-	case LevelSide::LEFT:
-		flipside = LevelSide::RIGHT;
+	case LevelSide::left:
+		flipside = LevelSide::right;
 		break;
-	case LevelSide::RIGHT:
-		flipside = LevelSide::LEFT;
+	case LevelSide::right:
+		flipside = LevelSide::left;
 		break;
 	}
 
