@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "darktimes.hpp"
-#include "sim/levelmanager.hpp"
+#include "sim/levelgen/levelmanager.hpp"
 
 template <typename T> class LargeSyncObject
 {

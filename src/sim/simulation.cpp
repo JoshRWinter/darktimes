@@ -2,7 +2,7 @@
 #include <chrono>
 
 #include "simulation.hpp"
-#include "levelmanager.hpp"
+#include "levelgen/levelmanager.hpp"
 
 static void set_level_data_sync(LargeSyncObject<STR_LevelDataSyncObject> &so, LevelManager &levelmanager)
 {

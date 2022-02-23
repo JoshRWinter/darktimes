@@ -9,7 +9,7 @@
 
 #include "../../darktimes.hpp"
 #include "../../assetmanager.hpp"
-#include "../../sim/levelmanager.hpp"
+#include "../../sim/levelgen/levelmanager.hpp"
 
 class GLRenderer
 {

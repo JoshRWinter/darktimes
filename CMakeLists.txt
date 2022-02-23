@@ -18,8 +18,8 @@ set(sources
 
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp
-	src/sim/levelmanager.cpp
-	src/sim/levelmanager.hpp
+	src/sim/levelgen/levelmanager.cpp
+	src/sim/levelgen/levelmanager.hpp
 
 	asset/recipe
 	asset/shader/wall.vert

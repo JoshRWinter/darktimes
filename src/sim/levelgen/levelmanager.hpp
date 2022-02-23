@@ -4,7 +4,7 @@
 #include <vector>
 #include <random>
 
-#include "../darktimes.hpp"
+#include "../../darktimes.hpp"
 
 struct LevelProp
 {

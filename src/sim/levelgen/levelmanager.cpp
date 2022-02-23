@@ -2,8 +2,7 @@
 #include <stack>
 #include <algorithm>
 
-#include "../darktimes.hpp"
-#include "../assetmanager.hpp"
+#include "../../assetmanager.hpp"
 #include "levelmanager.hpp"
 
 static bool float_equals(float a, float b, float tolerance = 0.005f)
