@@ -76,9 +76,16 @@ static std::vector<float> get_prop_verts(const std::vector<LevelProp> &props)
 	for (const auto &prop : props)
 	{
 		std::array<float, 12> qverts;
-		get_quad_verts(prop.x, prop.y, prop.w, prop.h, qverts);
+		get_quad_verts(prop.x, prop.y, prop.width, prop.height, qverts);
+
+		// excluder (debugging)
+		std::array<float, 12> qverts2;
+		get_quad_verts(prop.x - prop.excluder_padding_x, prop.y - prop.excluder_padding_y, prop.width + (prop.excluder_padding_x * 2.0f), prop.height + (prop.excluder_padding_y * 2.0f), qverts2);
 
 		for (auto f : qverts)
+			verts.push_back(f);
+
+		for (auto f : qverts2)
 			verts.push_back(f);
 	}
 
@@ -255,8 +262,8 @@ void GLRenderer::send_frame()
 
 void GLRenderer::set_center(float x, float y)
 {
-	const float zoom = 0.2f;
-    const glm::mat4 view_matrix = glm::translate(glm::scale(glm::identity<glm::mat4>(), glm::vec3(zoom, zoom, zoom)), glm::vec3(-x, -y, 0.0f));
+	const float zoom = 0.5f;
+	const glm::mat4 view_matrix = glm::translate(glm::scale(glm::identity<glm::mat4>(), glm::vec3(zoom, zoom, zoom)), glm::vec3(-x, -y, 0.0f));
 
 	glUseProgram(mode.floor.shader);
 	glUniformMatrix4fv(mode.floor.uniform_view, 1, false, glm::value_ptr(view_matrix));

@@ -2,7 +2,9 @@
 #include <stack>
 #include <algorithm>
 
+#include "../../render/texture.hpp"
 #include "../../assetmanager.hpp"
+#include "propdefs.hpp"
 #include "levelmanager.hpp"
 
 static bool float_equals(float a, float b, float tolerance = 0.005f)
@@ -56,7 +58,7 @@ static LevelSide flip(LevelSide side)
 }
 
 LevelManager::LevelManager(int seed)
-	: mersenne(seed)
+	: rand(seed)
 	, seed(seed)
 {
 	fprintf(stderr, "%d\n", seed);
@@ -75,7 +77,7 @@ void LevelManager::generate()
 
 bool LevelManager::generate_impl()
 {
-	floors.emplace_back(random_int(0, 1), -1.0f, -1.0f, 2.0f, 2.0f);
+	floors.emplace_back(0, -1.0f, -1.0f, 2.0f, 2.0f);
 
 	bool first = true;
 	while (floors.size() < 50)
@@ -156,9 +158,9 @@ int LevelManager::find_start_candidate(const std::vector<LevelFloor> &floors, co
 			three_conn.push_back(i);
 	}
 
-	std::shuffle(one_conn.begin(), one_conn.end(), mersenne);
-	std::shuffle(two_conn.begin(), two_conn.end(), mersenne);
-	std::shuffle(three_conn.begin(), three_conn.end(), mersenne);
+	std::shuffle(one_conn.begin(), one_conn.end(), rand.mersenne);
+	std::shuffle(two_conn.begin(), two_conn.end(), rand.mersenne);
+	std::shuffle(three_conn.begin(), three_conn.end(), rand.mersenne);
 
 	std::vector<int> candidates;
 
@@ -198,10 +200,10 @@ std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floo
 {
 	std::vector<LevelFloor> generated;
 
-	const int horizontal_tiles = random_int(3, 6);
-	const int vertical_tiles = random_int(3, 6);
-	const float tile_width = random_real(2.6f, 3.5f);
-	const float tile_height = random_real(2.6f, 3.5f);
+	const int horizontal_tiles = rand.uniform_int(3, 6);
+	const int vertical_tiles = rand.uniform_int(3, 6);
+	const float tile_width = rand.uniform_real(2.6f, 3.5f);
+	const float tile_height = rand.uniform_real(2.6f, 3.5f);
 
 	float start_x, start_y;
 	if (start_side == LevelSide::top)
@@ -243,10 +245,10 @@ std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floo
 	{
 		for (int j = 0; j < vertical_tiles; ++j)
 		{
-			const bool long_horizontal = random_int(0, 6) == 0;
-			const bool long_vertical = random_int(0, 6) == 0;
+			const bool long_horizontal = rand.uniform_int(0, 6) == 0;
+			const bool long_vertical = rand.uniform_int(0, 6) == 0;
 
-			LevelFloor floor(random_int(0, 1), start_x, start_y, long_horizontal ? tile_width * 2.0f : tile_width, long_vertical ? tile_height * 2.0f : tile_height);
+			LevelFloor floor(rand.uniform_int(0, 1), start_x, start_y, long_horizontal ? tile_width * 2.0f : tile_width, long_vertical ? tile_height * 2.0f : tile_height);
 
 			bool collision = false;
 			if (floor.collide(floors))
@@ -268,7 +270,7 @@ std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floo
 	auto neighbors = find_neighbors(generated, start_floor, start_side);
 	if (neighbors.empty())
 		return generated;
-	auto neighbor = neighbors.at(random_int(0, neighbors.size() - 1));
+	auto neighbor = neighbors.at(rand.uniform_int(0, neighbors.size() - 1));
 	//if (!connect(start_floor, *neighbor)) return generated;
 	LevelSide camefrom = flip(start_side);
 
@@ -289,7 +291,7 @@ std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floo
 			neighbors = find_neighbors(generated, *head, dir);
 			if (neighbors.empty())
 				continue;
-			neighbor = neighbors.at(random_int(0, neighbors.size() - 1));
+			neighbor = neighbors.at(rand.uniform_int(0, neighbors.size() - 1));
 
 			if (connect(*head, *neighbor))
 			{
@@ -315,7 +317,7 @@ std::vector<LevelFloor> LevelManager::generate_linear(const LevelFloor &start_fl
 {
 	std::vector<LevelFloor> generated;
 
-	const int count = random_int(0, 3) == 0 ? random_int(2, 4) : random_int(5, 12);
+	const int count = rand.uniform_int(0, 3) == 0 ? rand.uniform_int(2, 4) : rand.uniform_int(5, 12);
 
 	int from_index = -1;
 	for (int num = 0; num < count; ++num)
@@ -331,8 +333,8 @@ std::vector<LevelFloor> LevelManager::generate_linear(const LevelFloor &start_fl
 			const float from_w = head ? head->w : start_floor.w;
 			const float from_h = head ? head->h : start_floor.h;
 
-			const float width = random_int(0, 2) == 0 ? random_real(3.0f, 4.0f) : random_real(2.0f, 3.0f);
-			const float height = random_int(0, 2) == 0 ? random_real(3.0f, 4.0f) : random_real(2.0f, 3.0f);
+			const float width = rand.uniform_int(0, 2) == 0 ? rand.uniform_real(3.0f, 4.0f) : rand.uniform_real(2.0f, 3.0f);
+			const float height = rand.uniform_int(0, 2) == 0 ? rand.uniform_real(3.0f, 4.0f) : rand.uniform_real(2.0f, 3.0f);
 			float x, y;
 
 			const float MIN_WALL_LENGTH = 1.8f; // minimum wall length needed to support a door (with some padding)
@@ -347,23 +349,23 @@ std::vector<LevelFloor> LevelManager::generate_linear(const LevelFloor &start_fl
 			{
 			case LevelSide::left:
 				x = from_x - width;
-				y = random_real(lowy, highy);
+				y = rand.uniform_real(lowy, highy);
 				break;
 			case LevelSide::right:
 				x = from_x + from_w;
-				y = random_real(lowy, highy);
+				y = rand.uniform_real(lowy, highy);
 				break;
 			case LevelSide::bottom:
-				x = random_real(lowx, highx);
+				x = rand.uniform_real(lowx, highx);
 				y = from_y - height;
 				break;
 			case LevelSide::top:
-				x = random_real(lowx, highx);
+				x = rand.uniform_real(lowx, highx);
 				y = from_y + from_h;
 				break;
 			}
 
-			LevelFloor floor(random_int(0, 1), x, y, width, height);
+			LevelFloor floor(rand.uniform_int(0, 1), x, y, width, height);
 
 			if (floor.collide(floors))
 				continue;
@@ -466,61 +468,126 @@ void LevelManager::generate_walls()
 
 void LevelManager::generate_props()
 {
-	auto generate_excluder = [](const LevelFloor &f, const LevelFloorConnector &c)
+	for (const LevelFloor &floor : floors)
 	{
-		const float excluder_half_width = 1.0f;
-		const float excluder_width = excluder_half_width * 2.0f;
+		const std::vector<LevelProp> door_excluders = generate_door_excluders(floor);
 
-		float x, y, w, h;
-		switch (c.side)
-		{
-		case LevelSide::left:
-			x = (c.side == LevelSide::right ? f.x + f.w : f.x) - excluder_half_width;
-			y = c.start;
-			w = excluder_width;
-			h = c.stop - c.start;
-			break;
-		case LevelSide::top:
-			x = c.start;
-			y = (c.side == LevelSide::top ? f.y + f.h : f.y) - excluder_half_width;
-			w = c.stop - c.start;
-			h = excluder_width;
-			break;
-		case LevelSide::bottom:
-		case LevelSide::right:
-			win::bug("invalid");
-		}
+		// debugging
+		//for (const LevelProp &excluder : door_excluders)
+			//props.push_back(excluder);
 
-		return LevelProp(false, x, y, w, h);
-	};
+		const std::vector<LevelProp> floorprops = generate_props(floor, door_excluders);
 
-	for (const auto &floor : floors)
-	{
-
-		const float w = 0.5f;
-		const float h = 0.5f;
-
-		for (const auto &c : floor.connectors)
-		{
-			if (c.side == LevelSide::left || c.side == LevelSide::top)
-				props.push_back(generate_excluder(floor, c));
-		}
+		for (const LevelProp &prop : floorprops)
+			props.push_back(prop);
 	}
 }
 
-int LevelManager::random_int(int low, int high)
+std::vector<LevelProp> LevelManager::generate_props(const LevelFloor &floor, const std::vector<LevelProp> &excluders)
 {
-	return std::uniform_int_distribution<int>(low, high)(mersenne);
+	std::vector<LevelProp> props;
+
+	// generate some side tables
+	const int side_table_attempts = rand.uniform_int(0, 4);
+	for (int i = 0; i < side_table_attempts; ++i)
+	{
+		const int attempts = 3;
+
+		for (int j = 0; j < attempts; ++j)
+		{
+			LevelPropDefinition propdef = PropDefinitions::side_tables.at(rand.uniform_int(0, PropDefinitions::side_tables.size() - 1));
+			const LevelSide side = random_side();
+			const float table_margin = 0.075f;
+
+			float x, y;
+			LevelPropOrientation orientation;
+
+			switch (side)
+			{
+			case LevelSide::left:
+				orientation = LevelPropOrientation::right;
+				x = floor.x + table_margin;
+				y = rand.uniform_real(floor.y, (floor.y + floor.h) - propdef.get_height(orientation));
+				break;
+			case LevelSide::right:
+				orientation = LevelPropOrientation::left;
+				x = ((floor.x + floor.w) - propdef.get_width(orientation)) - table_margin;
+				y = rand.uniform_real(floor.y, (floor.y + floor.h) - propdef.get_height(orientation));
+				break;
+			case LevelSide::bottom:
+				orientation = LevelPropOrientation::up;
+				x = rand.uniform_real(floor.x, (floor.x + floor.w) - propdef.get_width(orientation));
+				y = floor.y + table_margin;
+				break;
+			case LevelSide::top:
+				orientation = LevelPropOrientation::down;
+				x = rand.uniform_real(floor.x, (floor.x + floor.w) - propdef.get_width(orientation));
+				y = ((floor.y + floor.h) - propdef.get_height(orientation)) - table_margin;
+				break;
+			}
+
+			LevelProp prop(orientation, propdef, x, y);
+
+			if (!prop.collide(props) && !prop.collide(excluders))
+			{
+				props.push_back(prop);
+				break;
+			}
+		}
+	}
+
+	return props;
 }
 
-float LevelManager::random_real(float low, float high)
+std::vector<LevelProp> LevelManager::generate_door_excluders(const LevelFloor &floor)
 {
-	return std::uniform_real_distribution<float>(low, high)(mersenne);
+	std::vector<LevelProp> excluders;
+
+	for (const LevelFloorConnector &connector : floor.connectors)
+	{
+		float x, y, w, h;
+
+		const float front_clearance = 0.3f; // distance in front of the door
+		const float side_clearance = 0.1f; // extra padding around the sides of the door
+		const float double_side_clearance = side_clearance * 2.0f;
+
+		switch (connector.side)
+		{
+		case LevelSide::left:
+			x = floor.x;
+			y = connector.start - side_clearance;
+			w = front_clearance;
+			h = (connector.stop - connector.start) + double_side_clearance;
+			break;
+		case LevelSide::right:
+			x = (floor.x + floor.w) - front_clearance;
+			y = connector.start - side_clearance;
+			w = front_clearance;
+			h = (connector.stop - connector.start) + double_side_clearance;
+			break;
+		case LevelSide::bottom:
+			x = connector.start - side_clearance;
+			y = floor.y;
+			w = (connector.stop - connector.start) + double_side_clearance;
+			h = front_clearance;
+			break;
+		case LevelSide::top:
+			x = connector.start - side_clearance;
+			y = (floor.y + floor.h) - front_clearance;
+			w = (connector.stop - connector.start) + double_side_clearance;
+			h = front_clearance;
+			break;
+		}
+
+		excluders.emplace_back(LevelPropOrientation::left, LevelPropDefinition(0, true, w, h, 0.1f, 0.1f), x, y);
+	}
+
+	return excluders;
 }
 
 LevelSide LevelManager::random_side()
 {
-	const int i = random_int(0, 3);
+	const int i = rand.uniform_int(0, 3);
 
 	switch (i)
 	{

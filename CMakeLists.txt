@@ -12,12 +12,18 @@ set(sources
 	src/assetmanager.cpp
 	src/assetmanager.hpp
 	src/syncobject.hpp
+	src/randomnumbergenerator.cpp
+	src/randomnumbergenerator.hpp
 
+	src/render/texture.hpp
 	src/render/gl/glrenderer.cpp
 	src/render/gl/glrenderer.hpp
 
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp
+	src/sim/levelgen/levelobjects.hpp
+	src/sim/levelgen/propdefs.hpp
+	src/sim/levelgen/propdefs.cpp
 	src/sim/levelgen/levelmanager.cpp
 	src/sim/levelgen/levelmanager.hpp
 
