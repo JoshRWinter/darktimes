@@ -488,8 +488,8 @@ std::vector<LevelProp> LevelManager::generate_props(const LevelFloor &floor, con
 	std::vector<LevelProp> props;
 
 	// generate some side tables
-	const int side_table_attempts = rand.uniform_int(0, 4);
-	for (int i = 0; i < side_table_attempts; ++i)
+	const int side_tables = rand.uniform_int(0, 4);
+	for (int i = 0; i < side_tables; ++i)
 	{
 		const int attempts = 3;
 
@@ -534,6 +534,23 @@ std::vector<LevelProp> LevelManager::generate_props(const LevelFloor &floor, con
 				break;
 			}
 		}
+	}
+
+	// generate some center tables
+	if (rand.one_in(3) ? 1 : 0)
+	{
+		LevelPropDefinition propdef = PropDefinitions::center_tables.at(rand.uniform_int(0, PropDefinitions::center_tables.size() - 1));
+
+		LevelPropOrientation orientations[4] { LevelPropOrientation::left, LevelPropOrientation::right, LevelPropOrientation::down, LevelPropOrientation::up };
+		const LevelPropOrientation orientation = orientations[rand.uniform_int(0, 3)];
+
+		const float x = (floor.x + (floor.w / 2.0f)) - (propdef.get_width(orientation) / 2.0f);
+		const float y = (floor.y + (floor.h / 2.0f)) - (propdef.get_height(orientation) / 2.0f);
+
+		LevelProp table(orientation, propdef, x, y);
+
+		if (!table.collide(props) && !table.collide(excluders))
+			props.push_back(table);
 	}
 
 	return props;

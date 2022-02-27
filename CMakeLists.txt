@@ -23,7 +23,6 @@ set(sources
 	src/sim/simulation.hpp
 	src/sim/levelgen/levelobjects.hpp
 	src/sim/levelgen/propdefs.hpp
-	src/sim/levelgen/propdefs.cpp
 	src/sim/levelgen/levelmanager.cpp
 	src/sim/levelgen/levelmanager.hpp
 

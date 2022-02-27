@@ -8,7 +8,15 @@
 class PropDefinitions
 {
 public:
-	static std::vector<LevelPropDefinition> side_tables;
+	inline static std::vector<LevelPropDefinition> side_tables =
+	{
+		LevelPropDefinition(0, true, 0.36f, 0.7f)
+	};
+
+	inline static std::vector<LevelPropDefinition> center_tables =
+	{
+		LevelPropDefinition(0, true, 0.5f, 0.5f, 0.1f, 0.1f)
+	};
 };
 
 #endif
