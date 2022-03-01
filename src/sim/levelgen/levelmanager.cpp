@@ -487,6 +487,26 @@ std::vector<LevelProp> LevelManager::generate_props(const LevelFloor &floor, con
 {
 	std::vector<LevelProp> props;
 
+	// generate some rugs
+	if (rand.one_in(2))
+	{
+		const LevelPropDefinition propdef = PropDefinitions::rugs.at(rand.uniform_int(0, PropDefinitions::rugs.size() - 1));
+
+		LevelPropOrientation orientations[4] { LevelPropOrientation::left, LevelPropOrientation::right, LevelPropOrientation::down, LevelPropOrientation::up };
+		const LevelPropOrientation orientation = orientations[rand.uniform_int(0, 3)];
+
+		const float x = (floor.x + (floor.w / 2.0f)) - (propdef.get_width(orientation) / 2.0f);
+		const float y = (floor.y + (floor.h / 2.0f)) - (propdef.get_height(orientation) / 2.0f);
+
+		LevelProp rug(orientation, propdef, x, y);
+
+		const float width_pct = propdef.get_width(orientation) / floor.w;
+		const float height_pct = propdef.get_height(orientation) / floor.h;
+
+		if (width_pct < 0.8f && height_pct < 0.8f)
+			props.push_back(rug);
+	}
+
 	// generate some side tables
 	const int side_tables = rand.uniform_int(0, 4);
 	for (int i = 0; i < side_tables; ++i)
@@ -495,7 +515,7 @@ std::vector<LevelProp> LevelManager::generate_props(const LevelFloor &floor, con
 
 		for (int j = 0; j < attempts; ++j)
 		{
-			LevelPropDefinition propdef = PropDefinitions::side_tables.at(rand.uniform_int(0, PropDefinitions::side_tables.size() - 1));
+			const LevelPropDefinition &propdef = PropDefinitions::side_tables.at(rand.uniform_int(0, PropDefinitions::side_tables.size() - 1));
 			const LevelSide side = random_side();
 			const float table_margin = 0.075f;
 
@@ -537,9 +557,9 @@ std::vector<LevelProp> LevelManager::generate_props(const LevelFloor &floor, con
 	}
 
 	// generate some center tables
-	if (rand.one_in(3) ? 1 : 0)
+	if (rand.one_in(3))
 	{
-		LevelPropDefinition propdef = PropDefinitions::center_tables.at(rand.uniform_int(0, PropDefinitions::center_tables.size() - 1));
+		const LevelPropDefinition &propdef = PropDefinitions::center_tables.at(rand.uniform_int(0, PropDefinitions::center_tables.size() - 1));
 
 		LevelPropOrientation orientations[4] { LevelPropOrientation::left, LevelPropOrientation::right, LevelPropOrientation::down, LevelPropOrientation::up };
 		const LevelPropOrientation orientation = orientations[rand.uniform_int(0, 3)];
