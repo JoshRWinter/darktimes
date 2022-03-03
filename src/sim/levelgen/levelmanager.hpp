@@ -23,11 +23,12 @@ public:
 private:
 	LevelSide random_side();
 
+	bool generate_impl();
 	std::vector<LevelFloor> generate_grid(const LevelFloor&, LevelSide);
 	std::vector<LevelFloor> generate_linear(const LevelFloor&, LevelSide);
+	std::vector<LevelFloor> generate_structure(const LevelFloor&, LevelSide);
 	void reset();
 
-	bool generate_impl();
 	int find_start_candidate(const std::vector<LevelFloor>&, int);
 	static std::vector<LevelFloor> prune(const std::vector<LevelFloor>&);
 	static bool can_connect(const LevelFloor&, const LevelFloor&, LevelFloorConnector&, LevelFloorConnector&);

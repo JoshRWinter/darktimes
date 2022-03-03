@@ -1,0 +1,25 @@
+#ifndef STRUCTURE_DEFS_HPP
+#define STRUCTURE_DEFS_HPP
+
+#include "structure.hpp"
+
+inline Structure test
+{
+    std::vector<StructureFloor>
+	{
+		StructureFloor(0, 0.0f, 0.0f, 4.0f, 2.0f),
+		StructureFloor(0, -1.0f, 2.0f, 6.0f, 2.0f)
+	},
+
+	std::vector<StructureFloorConnection>
+	{
+		StructureFloorConnection(0, 1)
+	}
+};
+
+inline std::vector<Structure> structure_defs
+{
+	test
+};
+
+#endif

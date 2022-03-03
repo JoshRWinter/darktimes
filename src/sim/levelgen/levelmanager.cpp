@@ -5,6 +5,7 @@
 #include "../../render/texture.hpp"
 #include "../../assetmanager.hpp"
 #include "propdefs.hpp"
+#include "structuredefs.hpp"
 #include "levelmanager.hpp"
 
 static bool float_equals(float a, float b, float tolerance = 0.005f)
@@ -79,6 +80,17 @@ bool LevelManager::generate_impl()
 {
 	floors.emplace_back(0, -1.0f, -1.0f, 2.0f, 2.0f);
 
+	/*
+	// ========= structure testing
+	floors.at(0).x = -3;
+	floors.at(0).y = 3;
+	for (const auto &floor : generate_structure(floors.at(0), LevelSide::right))
+		floors.push_back(floor);
+	connect(floors.at(0), floors.at(1));
+	return true;
+	// ========= structure testing
+	*/
+
 	bool first = true;
 	while (floors.size() < 50)
 	{
@@ -91,13 +103,10 @@ bool LevelManager::generate_impl()
 			start_candidate_index = find_start_candidate(floors, attempts++);
 
 			if (start_candidate_index == -1)
-				break;
+				return false;
 
 			generated = prune(generate_grid(floors.at(start_candidate_index), side));
 		} while (generated.size() < 5);
-
-		if (start_candidate_index == -1) // failed to generate
-			return false;
 
 		connect(floors.at(start_candidate_index), *find_neighbors(generated, floors.at(start_candidate_index), side).at(0));
 
@@ -106,25 +115,44 @@ bool LevelManager::generate_impl()
 
 		first = false;
 
-		attempts = 0;
-		do
+		if (rand.one_in(2) || true)
 		{
-			side = first ? LevelSide::top : random_side();
-			start_candidate_index = find_start_candidate(floors, attempts++);
+			attempts = 0;
+			do
+			{
+				side = random_side();
+				start_candidate_index = find_start_candidate(floors, attempts++);
 
-			if (start_candidate_index == -1)
-				break;
+				if (start_candidate_index == -1)
+					return false;
 
-			generated = generate_linear(floors.at(start_candidate_index), side);
-		} while (generated.size() < 2);
+				generated = generate_structure(floors.at(start_candidate_index), side);
+			} while (generated.size() < 1);
 
-		if (start_candidate_index == -1)
-			return false;
+			connect(floors.at(start_candidate_index), *find_neighbors(generated, floors.at(start_candidate_index), side).at(0));
 
-		connect(floors.at(start_candidate_index), *find_neighbors(generated, floors.at(start_candidate_index), side).at(0));
+			for (const auto &floor : generated)
+				floors.push_back(floor);
+		}
+		else
+		{
+			attempts = 0;
+			do
+			{
+				side = random_side();
+				start_candidate_index = find_start_candidate(floors, attempts++);
 
-		for (const auto &floor : generated)
-			floors.push_back(floor);
+				if (start_candidate_index == -1)
+					return false;
+
+				generated = generate_linear(floors.at(start_candidate_index), side);
+			} while (generated.size() < 2);
+
+			connect(floors.at(start_candidate_index), *find_neighbors(generated, floors.at(start_candidate_index), side).at(0));
+
+			for (const auto &floor : generated)
+				floors.push_back(floor);
+		}
 	}
 
 	return true;
@@ -393,6 +421,129 @@ std::vector<LevelFloor> LevelManager::generate_linear(const LevelFloor &start_fl
 			if (from_index == -1)
 				return generated;
 		}
+	}
+
+	return generated;
+}
+
+std::vector<LevelFloor> LevelManager::generate_structure(const LevelFloor &start_floor, const LevelSide start_side)
+{
+	StructureOrientation levelside_orientation_map[4];
+	levelside_orientation_map[(int)LevelSide::top] = StructureOrientation::up;
+	levelside_orientation_map[(int)LevelSide::left] = StructureOrientation::left;
+	levelside_orientation_map[(int)LevelSide::right] = StructureOrientation::right;
+	levelside_orientation_map[(int)LevelSide::bottom] = StructureOrientation::down;
+
+	std::vector<LevelFloor> generated;
+
+	const Structure &s = structure_defs.at(rand.uniform_int(0, structure_defs.size() - 1));
+
+	if (s.floors.size() < 1)
+		win::bug("short structure");
+
+	const StructureFloor &first_structure_floor = s.floors.at(0);
+
+	float origin_x, origin_y;
+	switch (start_side)
+	{
+	case LevelSide::top:
+		origin_x = (start_floor.x + (start_floor.w / 2.0f)) - (first_structure_floor.width / 2.0f);
+		origin_y = start_floor.y + start_floor.h;
+		break;
+	case LevelSide::left:
+		origin_x = start_floor.x;
+		origin_y = (start_floor.y + (start_floor.h / 2.0f)) - (first_structure_floor.width / 2.0f);
+		break;
+	case LevelSide::bottom:
+		origin_x = (start_floor.x + (start_floor.w / 2.0f)) + (first_structure_floor.width / 2.0f);
+		origin_y = start_floor.y;
+		break;
+	case LevelSide::right:
+		origin_x = start_floor.x + start_floor.w;
+		origin_y = (start_floor.y + (start_floor.h / 2.0f)) + (first_structure_floor.width / 2.0f);
+		break;
+	}
+
+	for (const StructureFloor &sfloor : s.floors)
+	{
+		float x, y, width, height;
+		switch (start_side)
+		{
+		case LevelSide::top:
+		{
+			const float rotated_x = sfloor.x;
+			const float rotated_y = sfloor.y;
+			const float translated_x = rotated_x + origin_x;
+			const float translated_y = rotated_y + origin_y;
+			const float corner_corrected_x = translated_x;
+			const float corner_corrected_y = translated_y;
+
+			x = corner_corrected_x;
+			y = corner_corrected_y;
+			width = sfloor.width;
+			height = sfloor.height;
+			break;
+		}
+	    case LevelSide::left:
+		{
+			const float rotated_x = -sfloor.y;
+			const float rotated_y = sfloor.x;
+			const float translated_x = rotated_x + origin_x;
+			const float translated_y = rotated_y + origin_y;
+			const float corner_corrected_x = translated_x - sfloor.height;
+			const float corner_corrected_y = translated_y;
+
+			x = corner_corrected_x;
+			y = corner_corrected_y;
+			width = sfloor.height;
+			height = sfloor.width;
+			break;
+		}
+	    case LevelSide::bottom:
+		{
+			const float rotated_x = -sfloor.x;
+			const float rotated_y = -sfloor.y;
+			const float translated_x = rotated_x + origin_x;
+			const float translated_y = rotated_y + origin_y;
+			const float corner_corrected_x = translated_x - sfloor.width;
+			const float corner_corrected_y = translated_y - sfloor.height;
+
+			x = corner_corrected_x;
+			y = corner_corrected_y;
+			width = sfloor.width;
+			height = sfloor.height;
+			break;
+		}
+	    case LevelSide::right:
+		{
+			const float rotated_x = sfloor.y;
+			const float rotated_y = -sfloor.x;
+			const float translated_x = rotated_x + origin_x;
+			const float translated_y = rotated_y + origin_y;
+			const float corner_corrected_x = translated_x;
+			const float corner_corrected_y = translated_y - sfloor.width;
+
+			x = corner_corrected_x;
+			y = corner_corrected_y;
+			width = sfloor.height;
+			height = sfloor.width;
+			break;
+		}
+	    }
+
+		const LevelFloor floor(sfloor.texture, x, y, width, height);
+
+		if (floor.collide(floors))
+			return {};
+		if (floor.collide(generated) && false)
+			win::bug("mangled structure");
+
+	    generated.push_back(floor);
+	}
+
+	for (const StructureFloorConnection &c : s.connections)
+	{
+		connect(generated.at(c.index_x), generated.at(c.index_y));
 	}
 
 	return generated;
