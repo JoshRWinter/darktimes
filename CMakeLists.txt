@@ -25,6 +25,7 @@ set(sources
 	src/sim/levelgen/propdefs.hpp
 	src/sim/levelgen/structuredefs.hpp
 	src/sim/levelgen/structure.hpp
+	src/sim/levelgen/structure.cpp
 	src/sim/levelgen/levelmanager.cpp
 	src/sim/levelgen/levelmanager.hpp
 

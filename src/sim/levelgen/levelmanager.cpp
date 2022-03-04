@@ -428,12 +428,6 @@ std::vector<LevelFloor> LevelManager::generate_linear(const LevelFloor &start_fl
 
 std::vector<LevelFloor> LevelManager::generate_structure(const LevelFloor &start_floor, const LevelSide start_side)
 {
-	StructureOrientation levelside_orientation_map[4];
-	levelside_orientation_map[(int)LevelSide::top] = StructureOrientation::up;
-	levelside_orientation_map[(int)LevelSide::left] = StructureOrientation::left;
-	levelside_orientation_map[(int)LevelSide::right] = StructureOrientation::right;
-	levelside_orientation_map[(int)LevelSide::bottom] = StructureOrientation::down;
-
 	std::vector<LevelFloor> generated;
 
 	const Structure &s = structure_defs.at(rand.uniform_int(0, structure_defs.size() - 1));
@@ -466,72 +460,7 @@ std::vector<LevelFloor> LevelManager::generate_structure(const LevelFloor &start
 
 	for (const StructureFloor &sfloor : s.floors)
 	{
-		float x, y, width, height;
-		switch (start_side)
-		{
-		case LevelSide::top:
-		{
-			const float rotated_x = sfloor.x;
-			const float rotated_y = sfloor.y;
-			const float translated_x = rotated_x + origin_x;
-			const float translated_y = rotated_y + origin_y;
-			const float corner_corrected_x = translated_x;
-			const float corner_corrected_y = translated_y;
-
-			x = corner_corrected_x;
-			y = corner_corrected_y;
-			width = sfloor.width;
-			height = sfloor.height;
-			break;
-		}
-	    case LevelSide::left:
-		{
-			const float rotated_x = -sfloor.y;
-			const float rotated_y = sfloor.x;
-			const float translated_x = rotated_x + origin_x;
-			const float translated_y = rotated_y + origin_y;
-			const float corner_corrected_x = translated_x - sfloor.height;
-			const float corner_corrected_y = translated_y;
-
-			x = corner_corrected_x;
-			y = corner_corrected_y;
-			width = sfloor.height;
-			height = sfloor.width;
-			break;
-		}
-	    case LevelSide::bottom:
-		{
-			const float rotated_x = -sfloor.x;
-			const float rotated_y = -sfloor.y;
-			const float translated_x = rotated_x + origin_x;
-			const float translated_y = rotated_y + origin_y;
-			const float corner_corrected_x = translated_x - sfloor.width;
-			const float corner_corrected_y = translated_y - sfloor.height;
-
-			x = corner_corrected_x;
-			y = corner_corrected_y;
-			width = sfloor.width;
-			height = sfloor.height;
-			break;
-		}
-	    case LevelSide::right:
-		{
-			const float rotated_x = sfloor.y;
-			const float rotated_y = -sfloor.x;
-			const float translated_x = rotated_x + origin_x;
-			const float translated_y = rotated_y + origin_y;
-			const float corner_corrected_x = translated_x;
-			const float corner_corrected_y = translated_y - sfloor.width;
-
-			x = corner_corrected_x;
-			y = corner_corrected_y;
-			width = sfloor.height;
-			height = sfloor.width;
-			break;
-		}
-	    }
-
-		const LevelFloor floor(sfloor.texture, x, y, width, height);
+		const LevelFloor floor = sfloor.get_floor(start_side, origin_x, origin_y);
 
 		if (floor.collide(floors))
 			return {};
