@@ -36,7 +36,8 @@ private:
 	static std::vector<LevelFloor*> find_neighbors(std::vector<LevelFloor>&, const LevelFloor&, LevelSide);
 	void generate_walls();
 	void generate_props();
-	std::vector<LevelProp> generate_props(const LevelFloor&, const std::vector<LevelProp> &excluders);
+	std::vector<LevelProp> generate_new_props(const LevelFloor&, const std::vector<LevelProp>&);
+	std::vector<LevelProp> generate_props_from_spawns(const LevelFloor&, const std::vector<LevelProp>&);
 	std::vector<LevelProp> generate_door_excluders(const LevelFloor&);
 	static bool test_floor(const std::vector<LevelFloor>&, const LevelFloor&);
 

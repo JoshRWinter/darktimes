@@ -84,7 +84,7 @@ bool LevelManager::generate_impl()
 	// ========= structure testing
 	floors.at(0).x = -3;
 	floors.at(0).y = 3;
-	for (const auto &floor : generate_structure(floors.at(0), LevelSide::right))
+	for (const auto &floor : generate_structure(floors.at(0), LevelSide::top))
 		floors.push_back(floor);
 	connect(floors.at(0), floors.at(1));
 	return true;
@@ -556,14 +556,30 @@ void LevelManager::generate_props()
 		//for (const LevelProp &excluder : door_excluders)
 			//props.push_back(excluder);
 
-		const std::vector<LevelProp> floorprops = generate_props(floor, door_excluders);
+		std::vector<LevelProp> spawned_props;
+		if (floor.prop_spawns.size() > 0)
+		{
+			spawned_props = generate_props_from_spawns(floor, door_excluders);
 
-		for (const LevelProp &prop : floorprops)
-			props.push_back(prop);
+			for (const LevelProp &prop : spawned_props)
+				props.push_back(prop);
+		}
+
+		if (!floor.skip_prop_generation)
+		{
+			std::vector<LevelProp> all_excluders;
+			for (const LevelProp &prop : door_excluders) all_excluders.push_back(prop);
+			for (const LevelProp &prop : spawned_props) all_excluders.push_back(prop);
+
+			const std::vector<LevelProp> floorprops = generate_new_props(floor, all_excluders);
+
+			for (const LevelProp &prop : floorprops)
+				props.push_back(prop);
+		}
 	}
 }
 
-std::vector<LevelProp> LevelManager::generate_props(const LevelFloor &floor, const std::vector<LevelProp> &excluders)
+std::vector<LevelProp> LevelManager::generate_new_props(const LevelFloor &floor, const std::vector<LevelProp> &excluders)
 {
 	std::vector<LevelProp> props;
 
@@ -651,6 +667,19 @@ std::vector<LevelProp> LevelManager::generate_props(const LevelFloor &floor, con
 
 		if (!table.collide(props) && !table.collide(excluders))
 			props.push_back(table);
+	}
+
+	return props;
+}
+
+std::vector<LevelProp> LevelManager::generate_props_from_spawns(const LevelFloor &floor, const std::vector<LevelProp> &excluders)
+{
+	std::vector<LevelProp> props;
+
+	for (const LevelProp &prop : floor.prop_spawns)
+	{
+		if (!prop.collide(props) && !prop.collide(excluders))
+			props.push_back(prop);
 	}
 
 	return props;
