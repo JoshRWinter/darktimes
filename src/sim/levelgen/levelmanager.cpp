@@ -82,9 +82,7 @@ bool LevelManager::generate_impl()
 
 	/*
 	// ========= structure testing
-	floors.at(0).x = -3;
-	floors.at(0).y = 3;
-	for (const auto &floor : generate_structure(floors.at(0), LevelSide::top))
+	for (const auto &floor : generate_structure(floors.at(0), LevelSide::top, 2))
 		floors.push_back(floor);
 	connect(floors.at(0), floors.at(1));
 	return true;
@@ -426,11 +424,11 @@ std::vector<LevelFloor> LevelManager::generate_linear(const LevelFloor &start_fl
 	return generated;
 }
 
-std::vector<LevelFloor> LevelManager::generate_structure(const LevelFloor &start_floor, const LevelSide start_side)
+std::vector<LevelFloor> LevelManager::generate_structure(const LevelFloor &start_floor, const LevelSide start_side, int force_index)
 {
 	std::vector<LevelFloor> generated;
 
-	const Structure &s = structure_defs.at(rand.uniform_int(0, structure_defs.size() - 1));
+	const Structure &s = structure_defs.at(force_index == -1 ? rand.uniform_int(0, structure_defs.size() - 1) : force_index);
 
 	if (s.floors.size() < 1)
 		win::bug("short structure");
@@ -467,7 +465,7 @@ std::vector<LevelFloor> LevelManager::generate_structure(const LevelFloor &start
 		if (floor.collide(generated) && false)
 			win::bug("mangled structure");
 
-	    generated.push_back(floor);
+		generated.push_back(floor);
 	}
 
 	for (const StructureFloorConnection &c : s.connections)

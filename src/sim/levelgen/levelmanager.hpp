@@ -26,7 +26,7 @@ private:
 	bool generate_impl();
 	std::vector<LevelFloor> generate_grid(const LevelFloor&, LevelSide);
 	std::vector<LevelFloor> generate_linear(const LevelFloor&, LevelSide);
-	std::vector<LevelFloor> generate_structure(const LevelFloor&, LevelSide);
+	std::vector<LevelFloor> generate_structure(const LevelFloor&, LevelSide, int = -1);
 	void reset();
 
 	int find_start_candidate(const std::vector<LevelFloor>&, int);

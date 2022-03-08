@@ -77,7 +77,6 @@ struct Structure
 {
 	std::vector<StructureFloor> floors;
 	std::vector<StructureFloorConnection> connections;
-	std::vector<StructureProp> props;
 };
 
 #endif
