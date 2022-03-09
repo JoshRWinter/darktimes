@@ -3,7 +3,6 @@
 #include <algorithm>
 
 #include "../../render/texture.hpp"
-#include "../../assetmanager.hpp"
 #include "propdefs.hpp"
 #include "structuredefs.hpp"
 #include "levelmanager.hpp"

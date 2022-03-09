@@ -6,9 +6,9 @@
 #include <win/font.hpp>
 #include <win/fontrenderer.hpp>
 #include <win/utility.hpp>
+#include <win/assetroll.hpp>
 
 #include "../../darktimes.hpp"
-#include "../../assetmanager.hpp"
 #include "../../sim/levelgen/levelobjects.hpp"
 
 class GLRenderer
@@ -16,7 +16,7 @@ class GLRenderer
 public:
 	NOCOPYMOVE(GLRenderer);
 
-	GLRenderer(const win::IDimensions2D&, const win::FScreenArea&, const win::FScreenArea&, AssetManager&);
+	GLRenderer(const win::IDimensions2D&, const win::FScreenArea&, const win::FScreenArea&, win::AssetRoll&);
 	~GLRenderer();
 
 	void set_level_data(const std::vector<LevelFloor>&, const std::vector<LevelWall>&, const std::vector<LevelProp>&, int);

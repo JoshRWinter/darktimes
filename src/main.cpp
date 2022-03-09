@@ -4,7 +4,6 @@
 #include <win/display.hpp>
 #include <win/assetroll.hpp>
 
-#include "assetmanager.hpp"
 #include "render/gl/glrenderer.hpp"
 #include "sim/simulation.hpp"
 
@@ -58,8 +57,7 @@ int main()
 	});
 
 	win::AssetRoll roll("darktimes.bin");
-	AssetManager assetmanager(roll);
-	GLRenderer renderer(win::IDimensions2D(display.width(), display.height()), win::FScreenArea(-8.0f, 8.0f, -4.5f, 4.5f), win::FScreenArea(-8.0f, 8.0f, -4.5f, 4.5f), assetmanager);
+	GLRenderer renderer(win::IDimensions2D(display.width(), display.height()), win::FScreenArea(-8.0f, 8.0f, -4.5f, 4.5f), win::FScreenArea(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 
 	LargeSyncObject<STR_LevelDataSyncObject> str_level_data_sync;
 	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(str_level_data_sync));

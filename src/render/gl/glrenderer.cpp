@@ -11,6 +11,7 @@
 #include <win/utility.hpp>
 
 #include "glrenderer.hpp"
+#include "../texture.hpp"
 
 static GLint get_uniform(GLuint program, const char *name)
 {
@@ -25,10 +26,12 @@ static std::vector<float> get_floor_verts(const std::vector<LevelFloor> &floors)
 {
 	std::vector<float> verts;
 
+	const float floor_texture_tile_size = 0.5f;
+
 	for (const auto &floor : floors)
 	{
-		const float x_magnitude = floor.w / AssetManager::floor_texture_tile_size;
-		const float y_magnitude = floor.h / AssetManager::floor_texture_tile_size;
+		const float x_magnitude = floor.w / floor_texture_tile_size;
+		const float y_magnitude = floor.h / floor_texture_tile_size;
 
 		verts.push_back(floor.x); verts.push_back(floor.y + floor.h); verts.push_back(0.0f); verts.push_back(y_magnitude); verts.push_back(floor.texture);
 		verts.push_back(floor.x); verts.push_back(floor.y); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(floor.texture);
@@ -92,11 +95,24 @@ static std::vector<float> get_prop_verts(const std::vector<LevelProp> &props)
 	return verts;
 }
 
-GLRenderer::GLRenderer(const win::IDimensions2D &screen_dims, const win::FScreenArea &hud_area, const win::FScreenArea &world_area, AssetManager &assetmanager)
+static std::vector<win::Targa> get_floor_textures(win::AssetRoll &roll)
+{
+	std::vector<win::Targa> textures;
+
+	for (int i = Texture::level_floor_start; i <= Texture::level_floor_end; ++i)
+	{
+		const std::string name = "texture/floor" + std::to_string(i - Texture::level_floor_start + 1) + ".tga";
+		textures.emplace_back(roll[name.c_str()]);
+	}
+
+	return textures;
+}
+
+GLRenderer::GLRenderer(const win::IDimensions2D &screen_dims, const win::FScreenArea &hud_area, const win::FScreenArea &world_area, win::AssetRoll &roll)
 	: hud_area(hud_area)
 	, font_renderer(screen_dims, hud_area)
-	, font_debug(font_renderer, assetmanager["font/NotoSansMono-Regular.ttf"], 0.25f)
-	, font_ui(font_renderer, assetmanager["font/CHE-THIS.TTF"], 0.7f)
+	, font_debug(font_renderer, roll["font/NotoSansMono-Regular.ttf"], 0.25f)
+	, font_ui(font_renderer, roll["font/CHE-THIS.TTF"], 0.7f)
 	, last_fps_calc_time(std::chrono::high_resolution_clock::now())
 	, accumulated_fps(0)
 {
@@ -107,16 +123,15 @@ GLRenderer::GLRenderer(const win::IDimensions2D &screen_dims, const win::FScreen
 
 	const glm::mat4 projection_matrix = glm::ortho(world_area.left, world_area.right, world_area.bottom, world_area.top);
 	const glm::mat4 view_matrix = glm::translate(glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.0, 1.0f, 1.0f)), glm::vec3(0.2, 0.2, 0));
-	//const glm::mat4 view_matrix = glm::scale(glm::identity<glm::mat4>(), glm::vec3(0.6, 0.6, 0.6));
 
 	// mode: wall
 	mode.wall.wallvert_count = 0;
-	mode.wall.shader = win::load_gl_shaders(assetmanager["shader/wall.vert"], assetmanager["shader/wall.frag"]);
+	mode.wall.shader = win::load_gl_shaders(roll["shader/wall.vert"], roll["shader/wall.frag"]);
 	glUseProgram(mode.wall.shader);
 
 	mode.wall.uniform_projection = get_uniform(mode.wall.shader, "projection");
 	glUniformMatrix4fv(mode.wall.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
-	const std::string wall_vertex_shader = assetmanager["shader/wall.vert"].read_all_as_string();
+	const std::string wall_vertex_shader = roll["shader/wall.vert"].read_all_as_string();
 	mode.wall.uniform_view = get_uniform(mode.wall.shader, "view");
 	glUniformMatrix4fv(mode.wall.uniform_view, 1, false, glm::value_ptr(view_matrix));
 
@@ -131,7 +146,7 @@ GLRenderer::GLRenderer(const win::IDimensions2D &screen_dims, const win::FScreen
 	// mode: floor
 	mode.floor.floorvert_count = 0;
 
-	std::vector<win::Targa> floortargas = assetmanager.get_floor_textures();
+	std::vector<win::Targa> floortargas = get_floor_textures(roll);
 	const unsigned long long floortexture_bytesize = floortargas.at(0).width() * floortargas.at(0).height() * 4;
 	auto floortexture_data = std::make_unique<unsigned char[]>(floortexture_bytesize * floortargas.size());
 	unsigned long long floortexture_index = 0;
@@ -148,7 +163,7 @@ GLRenderer::GLRenderer(const win::IDimensions2D &screen_dims, const win::FScreen
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, floortargas.at(0).width(), floortargas.at(0).height(), floortargas.size(), 0, GL_BGRA, GL_UNSIGNED_BYTE, floortexture_data.get());
 
-	mode.floor.shader = win::load_gl_shaders(assetmanager["shader/floor.vert"], assetmanager["shader/floor.frag"]);
+	mode.floor.shader = win::load_gl_shaders(roll["shader/floor.vert"], roll["shader/floor.frag"]);
 	glUseProgram(mode.floor.shader);
 
 	mode.floor.uniform_projection = get_uniform(mode.floor.shader, "projection");
@@ -170,7 +185,7 @@ GLRenderer::GLRenderer(const win::IDimensions2D &screen_dims, const win::FScreen
 	// mode: prop
 	mode.prop.propvert_count = 0;
 
-	mode.prop.shader = win::load_gl_shaders(assetmanager["shader/prop.vert"], assetmanager["shader/prop.frag"]);
+	mode.prop.shader = win::load_gl_shaders(roll["shader/prop.vert"], roll["shader/prop.frag"]);
 	glUseProgram(mode.prop.shader);
 
 	mode.prop.uniform_projection = get_uniform(mode.prop.shader, "projection");

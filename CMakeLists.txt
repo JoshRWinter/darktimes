@@ -9,8 +9,6 @@ set(sources
 
 	src/darktimes.hpp
 
-	src/assetmanager.cpp
-	src/assetmanager.hpp
 	src/syncobject.hpp
 	src/randomnumbergenerator.cpp
 	src/randomnumbergenerator.hpp
