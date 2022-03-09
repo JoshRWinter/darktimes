@@ -21,7 +21,6 @@ public:
 	const int seed;
 
 private:
-	LevelSide random_side();
 
 	bool generate_impl();
 	std::vector<LevelFloor> generate_grid(const LevelFloor&, LevelSide);
@@ -40,6 +39,7 @@ private:
 	std::vector<LevelProp> generate_props_from_spawns(const LevelFloor&, const std::vector<LevelProp>&);
 	std::vector<LevelProp> generate_door_excluders(const LevelFloor&);
 	static bool test_floor(const std::vector<LevelFloor>&, const LevelFloor&);
+	LevelSide random_side();
 
 	RandomNumberGenerator rand;
 };

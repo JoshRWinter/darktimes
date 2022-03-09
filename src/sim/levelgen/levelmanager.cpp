@@ -155,72 +155,6 @@ bool LevelManager::generate_impl()
 	return true;
 }
 
-int LevelManager::find_start_candidate(const std::vector<LevelFloor> &floors, const int attempt_num)
-{
-	if (attempt_num < 0)
-		win::bug("invalid param");
-
-	if (floors.empty())
-		win::bug("no possible start candidate");
-
-	if (floors.size() == 1)
-		return 0;
-
-	const int low = std::max(1, ((int)floors.size()) - 8);
-	const int high = floors.size() - 1;
-
-	std::vector<int> one_conn;
-	std::vector<int> two_conn;
-	std::vector<int> three_conn;
-
-	for (int i = low; i <= high; ++i)
-	{
-		if (floors.at(i).connectors.size() == 1)
-			one_conn.push_back(i);
-		else if (floors.at(i).connectors.size() == 2)
-			two_conn.push_back(i);
-		else if (floors.at(i).connectors.size() == 3)
-			three_conn.push_back(i);
-	}
-
-	std::shuffle(one_conn.begin(), one_conn.end(), rand.mersenne);
-	std::shuffle(two_conn.begin(), two_conn.end(), rand.mersenne);
-	std::shuffle(three_conn.begin(), three_conn.end(), rand.mersenne);
-
-	std::vector<int> candidates;
-
-	for (int c : one_conn)
-		candidates.push_back(c);
-	for (int c : two_conn)
-		candidates.push_back(c);
-	for (int c : three_conn)
-		candidates.push_back(c);
-
-	if (attempt_num >= candidates.size())
-		return -1;
-
-	return candidates.at(attempt_num);
-}
-
-void LevelManager::reset()
-{
-	floors.clear();
-	walls.clear();
-}
-
-std::vector<LevelFloor> LevelManager::prune(const std::vector<LevelFloor> &floors)
-{
-	std::vector<LevelFloor> pruned;
-
-	for (const auto &floor : floors)
-	{
-		if (!floor.connectors.empty())
-			pruned.push_back(floor);
-	}
-
-	return pruned;
-}
-
 std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floor, LevelSide start_side)
 {
 	std::vector<LevelFloor> generated;
@@ -473,6 +407,159 @@ std::vector<LevelFloor> LevelManager::generate_structure(const LevelFloor &start
 	}
 
 	return generated;
+}
+
+void LevelManager::reset()
+{
+	floors.clear();
+	walls.clear();
+}
+
+int LevelManager::find_start_candidate(const std::vector<LevelFloor> &floors, const int attempt_num)
+{
+	if (attempt_num < 0)
+		win::bug("invalid param");
+
+	if (floors.empty())
+		win::bug("no possible start candidate");
+
+	if (floors.size() == 1)
+		return 0;
+
+	const int low = std::max(1, ((int)floors.size()) - 8);
+	const int high = floors.size() - 1;
+
+	std::vector<int> one_conn;
+	std::vector<int> two_conn;
+	std::vector<int> three_conn;
+
+	for (int i = low; i <= high; ++i)
+	{
+		if (floors.at(i).connectors.size() == 1)
+			one_conn.push_back(i);
+		else if (floors.at(i).connectors.size() == 2)
+			two_conn.push_back(i);
+		else if (floors.at(i).connectors.size() == 3)
+			three_conn.push_back(i);
+	}
+
+	std::shuffle(one_conn.begin(), one_conn.end(), rand.mersenne);
+	std::shuffle(two_conn.begin(), two_conn.end(), rand.mersenne);
+	std::shuffle(three_conn.begin(), three_conn.end(), rand.mersenne);
+
+	std::vector<int> candidates;
+
+	for (int c : one_conn)
+		candidates.push_back(c);
+	for (int c : two_conn)
+		candidates.push_back(c);
+	for (int c : three_conn)
+		candidates.push_back(c);
+
+	if (attempt_num >= candidates.size())
+		return -1;
+
+	return candidates.at(attempt_num);
+}
+
+std::vector<LevelFloor> LevelManager::prune(const std::vector<LevelFloor> &floors)
+{
+	std::vector<LevelFloor> pruned;
+
+	for (const auto &floor : floors)
+	{
+		if (!floor.connectors.empty())
+			pruned.push_back(floor);
+	}
+
+	return pruned;
+}
+
+bool LevelManager::can_connect(const LevelFloor &floor1, const LevelFloor &floor2, LevelFloorConnector &c1, LevelFloorConnector &c2)
+{
+	// determine which side floor 2 is on, relative to floor 1
+	LevelSide side;
+	if (float_equals(floor1.x + floor1.w, floor2.x)) // right?
+		side = LevelSide::right;
+	else if (float_equals(floor1.x, floor2.x + floor2.w)) // left?
+		side = LevelSide::left;
+	else if (float_equals(floor1.y, floor2.y + floor2.h)) // bottom?
+		side = LevelSide::bottom;
+	else if (float_equals(floor1.y + floor1.h, floor2.y)) // top?
+		side = LevelSide::top;
+	else
+		return false;
+
+	const float MIN_WALL_LENGTH = 1.8f; // minimum wall length needed to support a door (with some padding)
+	const float DOOR_LENGTH = 1.0f;
+
+	float start, stop;
+	if (side == LevelSide::bottom || side == LevelSide::top)
+	{
+		const float farleft = std::max(floor1.x, floor2.x);
+		const float farright = std::min(floor1.x + floor1.w, floor2.x + floor2.w);
+		if (farright - farleft < MIN_WALL_LENGTH)
+			return false;
+
+		start = ((farright + farleft) / 2.0f) - (DOOR_LENGTH / 2.0f);
+		stop = start + DOOR_LENGTH;
+	}
+	else if (side == LevelSide::left || side == LevelSide::right)
+	{
+		const float lower = std::max(floor1.y, floor2.y);
+		const float upper = std::min(floor1.y + floor1.h, floor2.y + floor2.h);
+
+		if (upper - lower < MIN_WALL_LENGTH)
+			return false;
+
+		start = ((upper + lower) / 2.0f) - (DOOR_LENGTH / 2.0f);
+		stop = start + DOOR_LENGTH;
+	}
+
+	LevelSide flipside;
+	switch (side)
+	{
+	case LevelSide::top:
+		flipside = LevelSide::bottom;
+		break;
+	case LevelSide::bottom:
+		flipside = LevelSide::top;
+		break;
+	case LevelSide::left:
+		flipside = LevelSide::right;
+		break;
+	case LevelSide::right:
+		flipside = LevelSide::left;
+		break;
+	}
+
+	LevelFloorConnector floor1_connector(side, start, stop);
+	LevelFloorConnector floor2_connector(flipside, start, stop);
+
+	if (floor1_connector.collide(floor1.connectors, 0.5f))
+		return false;
+	if (floor2_connector.collide(floor2.connectors, 0.5f))
+		return false;
+
+	c1 = floor1_connector;
+	c2 = floor2_connector;
+
+	return true;
+}
+
+bool LevelManager::connect(LevelFloor &floor1, LevelFloor &floor2)
+{
+	LevelFloorConnector floor1_connector;
+	LevelFloorConnector floor2_connector;
+
+	if (can_connect(floor1, floor2, floor1_connector, floor2_connector))
+	{
+		floor1.connectors.push_back(floor1_connector);
+		floor2.connectors.push_back(floor2_connector);
+		return true;
+	}
+
+	return false;
 }
 
 std::vector<LevelFloor*> LevelManager::find_neighbors(std::vector<LevelFloor> &floors, const LevelFloor& floor, LevelSide side)
@@ -728,6 +815,17 @@ std::vector<LevelProp> LevelManager::generate_door_excluders(const LevelFloor &f
 	return excluders;
 }
 
+bool LevelManager::test_floor(const std::vector<LevelFloor> &floors, const LevelFloor &floor)
+{
+	for (const auto &f : floors)
+	{
+		if (f.collide(floor))
+			return false;
+	}
+
+	return true;
+}
+
 LevelSide LevelManager::random_side()
 {
 	const int i = rand.uniform_int(0, 3);
@@ -745,102 +843,4 @@ LevelSide LevelManager::random_side()
 	}
 
 	win::bug("no side");
-}
-
-bool LevelManager::can_connect(const LevelFloor &floor1, const LevelFloor &floor2, LevelFloorConnector &c1, LevelFloorConnector &c2)
-{
-	// determine which side floor 2 is on, relative to floor 1
-	LevelSide side;
-	if (float_equals(floor1.x + floor1.w, floor2.x)) // right?
-		side = LevelSide::right;
-	else if (float_equals(floor1.x, floor2.x + floor2.w)) // left?
-		side = LevelSide::left;
-	else if (float_equals(floor1.y, floor2.y + floor2.h)) // bottom?
-		side = LevelSide::bottom;
-	else if (float_equals(floor1.y + floor1.h, floor2.y)) // top?
-		side = LevelSide::top;
-	else
-		return false;
-
-	const float MIN_WALL_LENGTH = 1.8f; // minimum wall length needed to support a door (with some padding)
-	const float DOOR_LENGTH = 1.0f;
-
-	float start, stop;
-	if (side == LevelSide::bottom || side == LevelSide::top)
-	{
-		const float farleft = std::max(floor1.x, floor2.x);
-		const float farright = std::min(floor1.x + floor1.w, floor2.x + floor2.w);
-		if (farright - farleft < MIN_WALL_LENGTH)
-			return false;
-
-		start = ((farright + farleft) / 2.0f) - (DOOR_LENGTH / 2.0f);
-		stop = start + DOOR_LENGTH;
-	}
-	else if (side == LevelSide::left || side == LevelSide::right)
-	{
-		const float lower = std::max(floor1.y, floor2.y);
-		const float upper = std::min(floor1.y + floor1.h, floor2.y + floor2.h);
-
-		if (upper - lower < MIN_WALL_LENGTH)
-			return false;
-
-		start = ((upper + lower) / 2.0f) - (DOOR_LENGTH / 2.0f);
-		stop = start + DOOR_LENGTH;
-	}
-
-	LevelSide flipside;
-	switch (side)
-	{
-	case LevelSide::top:
-		flipside = LevelSide::bottom;
-		break;
-	case LevelSide::bottom:
-		flipside = LevelSide::top;
-		break;
-	case LevelSide::left:
-		flipside = LevelSide::right;
-		break;
-	case LevelSide::right:
-		flipside = LevelSide::left;
-		break;
-	}
-
-	LevelFloorConnector floor1_connector(side, start, stop);
-	LevelFloorConnector floor2_connector(flipside, start, stop);
-
-	if (floor1_connector.collide(floor1.connectors, 0.5f))
-		return false;
-	if (floor2_connector.collide(floor2.connectors, 0.5f))
-		return false;
-
-	c1 = floor1_connector;
-	c2 = floor2_connector;
-
-	return true;
-}
-
-bool LevelManager::connect(LevelFloor &floor1, LevelFloor &floor2)
-{
-	LevelFloorConnector floor1_connector;
-	LevelFloorConnector floor2_connector;
-
-	if (can_connect(floor1, floor2, floor1_connector, floor2_connector))
-	{
-		floor1.connectors.push_back(floor1_connector);
-		floor2.connectors.push_back(floor2_connector);
-		return true;
-	}
-
-	return false;
-}
-
-bool LevelManager::test_floor(const std::vector<LevelFloor> &floors, const LevelFloor &floor)
-{
-	for (const auto &f : floors)
-	{
-		if (f.collide(floor))
-			return false;
-	}
-
-	return true;
 }
