@@ -1,6 +1,7 @@
 #include <cmath>
 #include <stack>
 #include <algorithm>
+#include <utility>
 
 #include "../../render/texture.hpp"
 #include "propdefs.hpp"
@@ -80,77 +81,77 @@ bool LevelManager::generate_impl()
 	floors.emplace_back(0, -1.0f, -1.0f, 2.0f, 2.0f);
 
 	/*
-	// ========= structure testing
-	for (const auto &floor : generate_structure(floors.at(0), LevelSide::top, 2))
-		floors.push_back(floor);
+	// ================ structure testing
+	for (const auto &f : generate_structure(floors.at(0), LevelSide::top, 0))
+		floors.push_back(f);
 	connect(floors.at(0), floors.at(1));
 	return true;
-	// ========= structure testing
 	*/
 
+	auto grid_generator = [this](const LevelFloor& start_floor, LevelSide side)
+	{
+		return prune(generate_grid(start_floor, side));
+	};
+
+	auto linear_generator = [this](const LevelFloor &start_floor, LevelSide side)
+	{
+		return generate_linear(start_floor, side);
+	};
+
+	auto structure_generator = [this](const LevelFloor &start_floor, LevelSide side)
+	{
+		return generate_structure(start_floor, side);
+	};
+
+	const std::vector<std::pair<GeneratorFunction, int>> generators =
+	{
+		std::make_pair(grid_generator, 10),
+		std::make_pair(structure_generator, 1),
+		std::make_pair(linear_generator, 5)
+	};
+
 	bool first = true;
+	int last_index = -1;
 	while (floors.size() < 50)
 	{
-		std::vector<LevelFloor> generated;
-		int attempts = 0;
-		int start_candidate_index;
-		LevelSide side = first ? LevelSide::top : random_side();
+		// pick a generator
+		int generator_index;
 		do
 		{
-			start_candidate_index = find_start_candidate(floors, attempts++);
+			generator_index = rand.uniform_int(0, generators.size() - 1);
+		} while (generator_index == last_index);
+		last_index = generator_index;
 
-			if (start_candidate_index == -1)
-				return false;
-
-			generated = prune(generate_grid(floors.at(start_candidate_index), side));
-		} while (generated.size() < 5);
-
-		connect(floors.at(start_candidate_index), *find_neighbors(generated, floors.at(start_candidate_index), side).at(0));
-
-		for (const auto &floor : generated)
-			floors.push_back(floor);
+		if (!generate_segment(floors, generators.at(generator_index).second, first ? LevelSide::top : random_side(), generators.at(generator_index).first))
+			return false;
 
 		first = false;
-
-		if (rand.one_in(2) || true)
-		{
-			attempts = 0;
-			do
-			{
-				side = random_side();
-				start_candidate_index = find_start_candidate(floors, attempts++);
-
-				if (start_candidate_index == -1)
-					return false;
-
-				generated = generate_structure(floors.at(start_candidate_index), side);
-			} while (generated.size() < 1);
-
-			connect(floors.at(start_candidate_index), *find_neighbors(generated, floors.at(start_candidate_index), side).at(0));
-
-			for (const auto &floor : generated)
-				floors.push_back(floor);
-		}
-		else
-		{
-			attempts = 0;
-			do
-			{
-				side = random_side();
-				start_candidate_index = find_start_candidate(floors, attempts++);
-
-				if (start_candidate_index == -1)
-					return false;
-
-				generated = generate_linear(floors.at(start_candidate_index), side);
-			} while (generated.size() < 2);
-
-			connect(floors.at(start_candidate_index), *find_neighbors(generated, floors.at(start_candidate_index), side).at(0));
-
-			for (const auto &floor : generated)
-				floors.push_back(floor);
-		}
 	}
+
+	return true;
+}
+
+bool LevelManager::generate_segment(std::vector<LevelFloor> &existing_floors, const int minimum_added, const LevelSide side, const GeneratorFunction &generator)
+{
+	int attempts = 0;
+	std::vector<LevelFloor> generated;
+	int start_candidate_index;
+
+	do
+	{
+		start_candidate_index = find_start_candidate(floors, attempts++);
+
+		if (start_candidate_index == -1)
+			return false;
+
+		generated = generator(existing_floors.at(start_candidate_index), side);
+	} while (generated.size() < minimum_added);
+
+	if (!connect(floors.at(start_candidate_index), *find_neighbors(generated, existing_floors.at(start_candidate_index), side).at(0)))
+		win::bug("Failed to connect segments with seed " + std::to_string(seed));
+
+	for (const auto &f : generated)
+		existing_floors.push_back(f);
 
 	return true;
 }
@@ -172,7 +173,8 @@ std::vector<LevelFloor> LevelManager::generate_grid(const LevelFloor &start_floo
 
 		if (horizontal_tiles % 2 == 0)
 			start_x -= (tile_width / 2.0f);
-	}else if (start_side == LevelSide::left)
+	}
+	else if (start_side == LevelSide::left)
 	{
 		start_x = start_floor.x - (horizontal_tiles * tile_width);
 		start_y = (start_floor.y + (start_floor.h / 2.0f)) - ((vertical_tiles * tile_height) / 2.0f);

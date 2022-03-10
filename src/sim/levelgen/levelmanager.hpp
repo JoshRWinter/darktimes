@@ -2,6 +2,7 @@
 #define LEVEL_MANAGER_HPP
 
 #include <random>
+#include <functional>
 
 #include "../../darktimes.hpp"
 #include "../../randomnumbergenerator.hpp"
@@ -9,6 +10,8 @@
 
 class LevelManager
 {
+	typedef std::function<std::vector<LevelFloor>(const LevelFloor&, LevelSide)> GeneratorFunction;
+
 public:
 	NOCOPYMOVE(LevelManager);
 
@@ -23,6 +26,7 @@ public:
 private:
 
 	bool generate_impl();
+	bool generate_segment(std::vector<LevelFloor>&, int, const LevelSide, const GeneratorFunction&);
 	std::vector<LevelFloor> generate_grid(const LevelFloor&, LevelSide);
 	std::vector<LevelFloor> generate_linear(const LevelFloor&, LevelSide);
 	std::vector<LevelFloor> generate_structure(const LevelFloor&, LevelSide, int = -1);
