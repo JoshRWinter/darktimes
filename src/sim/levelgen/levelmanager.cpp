@@ -685,8 +685,11 @@ std::vector<LevelProp> LevelManager::generate_new_props(const LevelFloor &floor,
 		const float width_pct = propdef.get_width(orientation) / floor.w;
 		const float height_pct = propdef.get_height(orientation) / floor.h;
 
-		if (width_pct < 0.8f && height_pct < 0.8f)
-			props.push_back(rug);
+		if (!rug.collide(props))
+		{
+			if (width_pct < 0.8f && height_pct < 0.8f)
+				props.push_back(rug);
+		}
 	}
 
 	// generate some side tables
@@ -811,7 +814,7 @@ std::vector<LevelProp> LevelManager::generate_door_excluders(const LevelFloor &f
 			break;
 		}
 
-		excluders.emplace_back(LevelPropOrientation::left, LevelPropDefinition(0, true, w, h, 0.1f, 0.1f), x, y);
+		excluders.emplace_back(LevelPropOrientation::left, LevelPropDefinition(0, LevelPropDefinition::collision_class_excluder, LevelPropDefinition::collision_class_furniture, w, h, 0.1f, 0.1f), x, y);
 	}
 
 	return excluders;

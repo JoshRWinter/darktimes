@@ -23,8 +23,15 @@ struct LevelPropDefinition
 {
 	static constexpr float default_excluder_padding = 0.2f;
 
-	LevelPropDefinition(int texture, bool solid, float width, float height, float excluder_padding_x = default_excluder_padding, float excluder_padding_y = default_excluder_padding)
-		: texture(texture), solid(solid), excluder_padding_x(excluder_padding_x), excluder_padding_y(excluder_padding_y), width(width), height(height)
+	// bitflags
+	static constexpr int collision_class_none = 0;
+	static constexpr int collision_class_excluder = 1;
+	static constexpr int collision_class_furniture = 2;
+	static constexpr int collision_class_rug = 4;
+	static constexpr int collision_class_debris = 8;
+
+	LevelPropDefinition(int texture, int collision_class, int collides_with_class, float width, float height, float excluder_padding_x = default_excluder_padding, float excluder_padding_y = default_excluder_padding)
+		: texture(texture), collision_class(collision_class), collides_with_class(collides_with_class), excluder_padding_x(excluder_padding_x), excluder_padding_y(excluder_padding_y), width(width), height(height)
 	{}
 
 	float get_width(LevelPropOrientation o) const { return o == LevelPropOrientation::left || o == LevelPropOrientation::right ? width : height; }
@@ -33,7 +40,8 @@ struct LevelPropDefinition
 	float get_excluder_padding_y(LevelPropOrientation o) const { return o == LevelPropOrientation::left || o == LevelPropOrientation::right ? excluder_padding_y : excluder_padding_x; }
 
 	int texture;
-	bool solid;
+	int collision_class;
+	int collides_with_class;
 
 private:
 	float excluder_padding_x;
@@ -45,7 +53,7 @@ private:
 struct LevelProp
 {
 	LevelProp(LevelPropOrientation orientation, const LevelPropDefinition &def, float x, float y)
-		: orientation(orientation), solid(def.solid), x(x), y(y), width(def.get_width(orientation)), height(def.get_height(orientation)), excluder_padding_x(def.get_excluder_padding_x(orientation)), excluder_padding_y(def.get_excluder_padding_y(orientation))
+		: orientation(orientation), collision_class(def.collision_class), collides_with_class(def.collides_with_class), x(x), y(y), width(def.get_width(orientation)), height(def.get_height(orientation)), excluder_padding_x(def.get_excluder_padding_x(orientation)), excluder_padding_y(def.get_excluder_padding_y(orientation))
 	{
 	}
 
@@ -62,15 +70,31 @@ struct LevelProp
 
 	bool collide(const LevelProp &other) const
 	{
-		return solid && other.solid &&
+		return matches_collision_class(other.collision_class) &&
 				x + width + excluder_padding_x > other.x - other.excluder_padding_x &&
 				x - excluder_padding_x < other.x + other.width + other.excluder_padding_x &&
 				y + height + excluder_padding_y > other.y - other.excluder_padding_y &&
 				y - excluder_padding_y < other.y + other.height + other.excluder_padding_y;
 	}
 
+	bool matches_collision_class(int other_collision_class) const
+	{
+		// loop over all the bits
+		for (int position = 0; position < sizeof(collides_with_class) * 8; ++position)
+		{
+			bool left_bit = ((collides_with_class >> position) & 1) == 1;
+			bool right_bit = ((other_collision_class >> position) & 1) == 1;
+
+			if (left_bit && right_bit)
+				return true;
+		}
+
+		return false;
+	}
+
 	LevelPropOrientation orientation;
-	bool solid;
+	int collision_class;
+	int collides_with_class;
 	float x, y, width, height;
 	float excluder_padding_x, excluder_padding_y;
 };
