@@ -57,7 +57,7 @@ int main()
 	});
 
 	win::AssetRoll roll("darktimes.bin");
-	GLRenderer renderer(win::IDimensions2D(display.width(), display.height()), win::FScreenArea(-8.0f, 8.0f, -4.5f, 4.5f), win::FScreenArea(-8.0f, 8.0f, -4.5f, 4.5f), roll);
+	GLRenderer renderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 
 	LargeSyncObject<STR_LevelDataSyncObject> str_level_data_sync;
 	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(str_level_data_sync));

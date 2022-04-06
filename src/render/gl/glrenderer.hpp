@@ -16,7 +16,7 @@ class GLRenderer
 public:
 	NOCOPYMOVE(GLRenderer);
 
-	GLRenderer(const win::IDimensions2D&, const win::FScreenArea&, const win::FScreenArea&, win::AssetRoll&);
+	GLRenderer(const win::Dimensions<int>&, const win::Area<float>&, const win::Area<float>&, win::AssetRoll&);
 	~GLRenderer();
 
 	void set_level_data(const std::vector<LevelFloor>&, const std::vector<LevelWall>&, const std::vector<LevelProp>&, int);
@@ -66,7 +66,7 @@ private:
 	std::string levelseed;
 
 	// render state
-	win::FScreenArea hud_area;
+	win::Area<float> hud_area;
 	win::FontRenderer font_renderer;
 	win::Font font_debug, font_ui;
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_fps_calc_time;

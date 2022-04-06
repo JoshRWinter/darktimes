@@ -108,7 +108,7 @@ static std::vector<win::Targa> get_floor_textures(win::AssetRoll &roll)
 	return textures;
 }
 
-GLRenderer::GLRenderer(const win::IDimensions2D &screen_dims, const win::FScreenArea &hud_area, const win::FScreenArea &world_area, win::AssetRoll &roll)
+GLRenderer::GLRenderer(const win::Dimensions<int> &screen_dims, const win::Area<float> &hud_area, const win::Area<float> &world_area, win::AssetRoll &roll)
 	: hud_area(hud_area)
 	, font_renderer(screen_dims, hud_area)
 	, font_debug(font_renderer, roll["font/NotoSansMono-Regular.ttf"], 0.25f)
