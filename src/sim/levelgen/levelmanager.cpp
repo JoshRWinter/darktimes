@@ -2,6 +2,7 @@
 #include <stack>
 #include <algorithm>
 #include <utility>
+#include <array>
 
 #include "../../render/texture.hpp"
 #include "propdefs.hpp"

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(Darktimes)
 add_subdirectory(win)
+set(CMAKE_CXX_STANDARD 17)
 
 set(executable Darktimes)
 
