@@ -1,6 +1,3 @@
-#include <chrono>
-#include <string.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -108,18 +105,11 @@ static std::vector<win::Targa> get_floor_textures(win::AssetRoll &roll)
 	return textures;
 }
 
-GLRenderer::GLRenderer(const win::Dimensions<int> &screen_dims, const win::Area<float> &hud_area, const win::Area<float> &world_area, win::AssetRoll &roll)
-	: hud_area(hud_area)
-	, font_renderer(screen_dims, hud_area)
-	, font_debug(font_renderer, roll["font/NotoSansMono-Regular.ttf"], 0.25f)
-	, font_ui(font_renderer, roll["font/CHE-THIS.TTF"], 0.7f)
-	, last_fps_calc_time(std::chrono::high_resolution_clock::now())
-	, accumulated_fps(0)
+GLRenderer::GLRenderer(const win::Area<float> &world_area, win::AssetRoll &roll)
 {
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	strcpy(fpsindicator, "0");
 
 	const glm::mat4 projection_matrix = glm::ortho(world_area.left, world_area.right, world_area.bottom, world_area.top);
 	const glm::mat4 view_matrix = glm::translate(glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.0, 1.0f, 1.0f)), glm::vec3(0.2, 0.2, 0));
@@ -219,9 +209,8 @@ GLRenderer::~GLRenderer()
 	glDeleteShader(mode.prop.shader);
 }
 
-void GLRenderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props, int seed)
+void GLRenderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props)
 {
-	levelseed = std::to_string(seed);
 	const auto &floor_verts = get_floor_verts(floors);
 	mode.floor.floorvert_count = floor_verts.size();
 	glBindBuffer(GL_ARRAY_BUFFER, mode.floor.vbo);
@@ -255,18 +244,6 @@ void GLRenderer::send_frame()
 	glUseProgram(mode.prop.shader);
 	glBindVertexArray(mode.prop.vao);
 	glDrawArrays(GL_TRIANGLES, 0, mode.prop.propvert_count / 2);
-
-	if (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - last_fps_calc_time).count() > 1000)
-	{
-		snprintf(fpsindicator, sizeof(fpsindicator), "%d", accumulated_fps);
-		accumulated_fps = 0;
-		last_fps_calc_time = std::chrono::high_resolution_clock::now();
-	}
-	else ++accumulated_fps;
-
-	font_renderer.draw(font_debug, fpsindicator, hud_area.left + 0.05f, hud_area.top - font_debug.size(), win::Color(1.0f, 1.0f, 0.0f, 1.0f));
-	font_renderer.draw(font_ui, "Dark Times", 0.0f, hud_area.top - font_ui.size(), win::Color(1.0f, 1.0f, 1.0f, 1.0f), true);
-	font_renderer.draw(font_debug, levelseed.c_str(), 0.0f, hud_area.bottom + font_debug.size(), win::Color(1.0f, 1.0f, 0.0f, 1.0f), true);
 
 #ifndef NDEBUG
 	auto error = glGetError();

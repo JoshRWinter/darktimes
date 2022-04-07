@@ -2,9 +2,8 @@
 #define GL_RENDERER_HPP
 
 #include <vector>
+#include <GL/gl.h>
 
-#include <win/font.hpp>
-#include <win/fontrenderer.hpp>
 #include <win/utility.hpp>
 #include <win/assetroll.hpp>
 
@@ -16,10 +15,10 @@ class GLRenderer
 public:
 	NOCOPYMOVE(GLRenderer);
 
-	GLRenderer(const win::Dimensions<int>&, const win::Area<float>&, const win::Area<float>&, win::AssetRoll&);
+	GLRenderer(const win::Area<float>&, win::AssetRoll&);
 	~GLRenderer();
 
-	void set_level_data(const std::vector<LevelFloor>&, const std::vector<LevelWall>&, const std::vector<LevelProp>&, int);
+	void set_level_data(const std::vector<LevelFloor>&, const std::vector<LevelWall>&, const std::vector<LevelProp>&);
 	void set_center(float, float);
 	void send_frame();
 
@@ -61,16 +60,5 @@ private:
 			int propvert_count;
 		} prop;
 	} mode;
-
-	// world state
-	std::string levelseed;
-
-	// render state
-	win::Area<float> hud_area;
-	win::FontRenderer font_renderer;
-	win::Font font_debug, font_ui;
-	std::chrono::time_point<std::chrono::high_resolution_clock> last_fps_calc_time;
-	int accumulated_fps;
-	char fpsindicator[10];
 };
 #endif

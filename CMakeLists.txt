@@ -17,6 +17,8 @@ set(sources
 	src/render/texture.hpp
 	src/render/gl/glrenderer.cpp
 	src/render/gl/glrenderer.hpp
+	src/render/gl/gluirenderer.cpp
+	src/render/gl/gluirenderer.hpp
 
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp

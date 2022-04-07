@@ -5,6 +5,7 @@
 #include <win/assetroll.hpp>
 
 #include "render/gl/glrenderer.hpp"
+#include "render/gl/gluirenderer.hpp"
 #include "sim/simulation.hpp"
 
 int main()
@@ -57,7 +58,8 @@ int main()
 	});
 
 	win::AssetRoll roll("darktimes.bin");
-	GLRenderer renderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
+	GLRenderer renderer(win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
+	GLUIRenderer uirenderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 
 	LargeSyncObject<STR_LevelDataSyncObject> str_level_data_sync;
 	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(str_level_data_sync));
@@ -77,10 +79,12 @@ int main()
 		{
 			std::unique_ptr<STR_LevelDataSyncObject> leveldata;
 			str_level_data_sync.get(leveldata);
-			renderer.set_level_data(leveldata->floors, leveldata->walls, leveldata->props, leveldata->seed);
+			renderer.set_level_data(leveldata->floors, leveldata->walls, leveldata->props);
+			uirenderer.set_seed(leveldata->seed);
 		}
 
 		renderer.send_frame();
+		uirenderer.draw_gamehud();
 		display.swap();
 	}
 
