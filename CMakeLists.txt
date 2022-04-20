@@ -23,6 +23,8 @@ set(sources
 	src/render/gl/gluirenderer.hpp
 	src/render/gl/floorpass.cpp
 	src/render/gl/floorpass.hpp
+	src/render/gl/proppass.cpp
+	src/render/gl/proppass.hpp
 
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp

@@ -1,24 +1,23 @@
-#ifndef GL_FLOORPASS_HPP
-#define GL_FLOORPASS_HPP
+#ifndef GL_PROPPASS_HPP
+#define GL_PROPPASS_HPP
 
 #include <GL/gl.h>
 
-#include <win/assetroll.hpp>
 #include <glm/glm.hpp>
+#include <win/assetroll.hpp>
 
 #include "../../darktimes.hpp"
 #include "../../sim/levelgen/levelobjects.hpp"
 
-class FloorPass
+class PropPass
 {
-	NOCOPYMOVE(FloorPass);
-
+	NOCOPYMOVE(PropPass);
 public:
-	FloorPass(win::AssetRoll&);
-	~FloorPass();
+	PropPass(win::AssetRoll&);
+	~PropPass();
 
 	void draw();
-    void set_floors(const std::vector<LevelFloor>&);
+	void set_props(const std::vector<LevelProp>&);
 	void set_projection(const glm::mat4&);
 	void set_view(const glm::mat4&);
 
@@ -29,9 +28,7 @@ private:
     GLint uniform_projection;
     GLint uniform_view;
 
-    GLuint floortextures;
-
-    int floorvert_count;
+    int propvert_count;
 };
 
 #endif
