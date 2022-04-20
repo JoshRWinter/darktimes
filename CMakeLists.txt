@@ -15,10 +15,14 @@ set(sources
 	src/randomnumbergenerator.hpp
 
 	src/render/texture.hpp
+	src/render/gl/gl.cpp
+	src/render/gl/gl.hpp
 	src/render/gl/glrenderer.cpp
 	src/render/gl/glrenderer.hpp
 	src/render/gl/gluirenderer.cpp
 	src/render/gl/gluirenderer.hpp
+	src/render/gl/floorpass.cpp
+	src/render/gl/floorpass.hpp
 
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp

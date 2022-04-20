@@ -9,6 +9,7 @@
 
 #include "../../darktimes.hpp"
 #include "../../sim/levelgen/levelobjects.hpp"
+#include "floorpass.hpp"
 
 class GLRenderer
 {
@@ -44,21 +45,10 @@ private:
 			GLint uniform_projection;
 			GLint uniform_view;
 
-			GLuint floortextures;
-
-			int floorvert_count;
-		} floor;
-
-		struct
-		{
-			GLuint shader;
-			GLuint vao, vbo;
-
-			GLint uniform_projection;
-			GLint uniform_view;
-
 			int propvert_count;
 		} prop;
 	} mode;
+
+	FloorPass floor_pass;
 };
 #endif

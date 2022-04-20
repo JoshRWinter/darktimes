@@ -19,29 +19,6 @@ static GLint get_uniform(GLuint program, const char *name)
 	return result;
 }
 
-static std::vector<float> get_floor_verts(const std::vector<LevelFloor> &floors)
-{
-	std::vector<float> verts;
-
-	const float floor_texture_tile_size = 0.5f;
-
-	for (const auto &floor : floors)
-	{
-		const float x_magnitude = floor.w / floor_texture_tile_size;
-		const float y_magnitude = floor.h / floor_texture_tile_size;
-
-		verts.push_back(floor.x); verts.push_back(floor.y + floor.h); verts.push_back(0.0f); verts.push_back(y_magnitude); verts.push_back(floor.texture);
-		verts.push_back(floor.x); verts.push_back(floor.y); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(floor.texture);
-		verts.push_back(floor.x + floor.w); verts.push_back(floor.y); verts.push_back(x_magnitude); verts.push_back(0.0f); verts.push_back(floor.texture);
-
-		verts.push_back(floor.x); verts.push_back(floor.y + floor.h); verts.push_back(0.0f); verts.push_back(y_magnitude); verts.push_back(floor.texture);
-		verts.push_back(floor.x + floor.w); verts.push_back(floor.y); verts.push_back(x_magnitude); verts.push_back(0.0f); verts.push_back(floor.texture);
-		verts.push_back(floor.x + floor.w); verts.push_back(floor.y + floor.h); verts.push_back(x_magnitude); verts.push_back(y_magnitude); verts.push_back(floor.texture);
-	}
-
-	return verts;
-}
-
 static void get_quad_verts(float x, float y, float w, float h, std::array<float, 12> &verts)
 {
 	verts[0] = x; verts[1] = y + h;
@@ -92,27 +69,18 @@ static std::vector<float> get_prop_verts(const std::vector<LevelProp> &props)
 	return verts;
 }
 
-static std::vector<win::Targa> get_floor_textures(win::AssetRoll &roll)
-{
-	std::vector<win::Targa> textures;
-
-	for (int i = Texture::level_floor_start; i <= Texture::level_floor_end; ++i)
-	{
-		const std::string name = "texture/floor" + std::to_string(i - Texture::level_floor_start + 1) + ".tga";
-		textures.emplace_back(roll[name.c_str()]);
-	}
-
-	return textures;
-}
-
 GLRenderer::GLRenderer(const win::Area<float> &world_area, win::AssetRoll &roll)
+	: floor_pass(roll)
 {
+	const glm::mat4 projection_matrix = glm::ortho(world_area.left, world_area.right, world_area.bottom, world_area.top);
+	const glm::mat4 view_matrix = glm::translate(glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.0, 1.0f, 1.0f)), glm::vec3(0.2, 0.2, 0));
+
+	floor_pass.set_projection(projection_matrix);
+	floor_pass.set_view(view_matrix);
+
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	const glm::mat4 projection_matrix = glm::ortho(world_area.left, world_area.right, world_area.bottom, world_area.top);
-	const glm::mat4 view_matrix = glm::translate(glm::scale(glm::identity<glm::mat4>(), glm::vec3(1.0, 1.0f, 1.0f)), glm::vec3(0.2, 0.2, 0));
 
 	// mode: wall
 	mode.wall.wallvert_count = 0;
@@ -133,45 +101,6 @@ GLRenderer::GLRenderer(const win::Area<float> &world_area, win::AssetRoll &roll)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, NULL);
 
-	// mode: floor
-	mode.floor.floorvert_count = 0;
-
-	std::vector<win::Targa> floortargas = get_floor_textures(roll);
-	const unsigned long long floortexture_bytesize = floortargas.at(0).width() * floortargas.at(0).height() * 4;
-	auto floortexture_data = std::make_unique<unsigned char[]>(floortexture_bytesize * floortargas.size());
-	unsigned long long floortexture_index = 0;
-	for (auto &targa : floortargas)
-	{
-		memcpy(floortexture_data.get() + floortexture_index, targa.data(), floortexture_bytesize);
-		floortexture_index += floortexture_bytesize;
-	}
-	glGenTextures(1, &mode.floor.floortextures);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, mode.floor.floortextures);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, floortargas.at(0).width(), floortargas.at(0).height(), floortargas.size(), 0, GL_BGRA, GL_UNSIGNED_BYTE, floortexture_data.get());
-
-	mode.floor.shader = win::load_gl_shaders(roll["shader/floor.vert"], roll["shader/floor.frag"]);
-	glUseProgram(mode.floor.shader);
-
-	mode.floor.uniform_projection = get_uniform(mode.floor.shader, "projection");
-	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
-	mode.floor.uniform_view = get_uniform(mode.floor.shader, "view");
-	glUniformMatrix4fv(mode.floor.uniform_view, 1, false, glm::value_ptr(view_matrix));
-
-	glGenVertexArrays(1, &mode.floor.vao);
-	glGenBuffers(1, &mode.floor.vbo);
-
-	glBindVertexArray(mode.floor.vao);
-	glBindBuffer(GL_ARRAY_BUFFER, mode.floor.vbo);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, false, 20, NULL);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, false, 20, (void*)8);
-
 	// mode: prop
 	mode.prop.propvert_count = 0;
 
@@ -179,7 +108,7 @@ GLRenderer::GLRenderer(const win::Area<float> &world_area, win::AssetRoll &roll)
 	glUseProgram(mode.prop.shader);
 
 	mode.prop.uniform_projection = get_uniform(mode.prop.shader, "projection");
-	glUniformMatrix4fv(mode.floor.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(mode.prop.uniform_projection, 1, false, glm::value_ptr(projection_matrix));
 	mode.prop.uniform_view = get_uniform(mode.prop.shader, "view");
 	glUniformMatrix4fv(mode.prop.uniform_view, 1, false, glm::value_ptr(view_matrix));
 
@@ -199,11 +128,6 @@ GLRenderer::~GLRenderer()
 	glDeleteVertexArrays(1, &mode.wall.vao);
 	glDeleteShader(mode.wall.shader);
 
-	glDeleteTextures(1, &mode.floor.floortextures);
-	glDeleteBuffers(1, &mode.floor.vbo);
-	glDeleteVertexArrays(1, &mode.floor.vao);
-	glDeleteShader(mode.floor.shader);
-
 	glDeleteBuffers(1, &mode.prop.vbo);
 	glDeleteVertexArrays(1, &mode.prop.vao);
 	glDeleteShader(mode.prop.shader);
@@ -211,10 +135,7 @@ GLRenderer::~GLRenderer()
 
 void GLRenderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props)
 {
-	const auto &floor_verts = get_floor_verts(floors);
-	mode.floor.floorvert_count = floor_verts.size();
-	glBindBuffer(GL_ARRAY_BUFFER, mode.floor.vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mode.floor.floorvert_count, floor_verts.data(), GL_STATIC_DRAW);
+	floor_pass.set_floors(floors);
 
 	const auto &wall_verts = get_wall_verts(walls);
 	mode.wall.wallvert_count = wall_verts.size();
@@ -223,7 +144,6 @@ void GLRenderer::set_level_data(const std::vector<LevelFloor> &floors, const std
 
 	const auto &prop_verts = get_prop_verts(props);
 	mode.prop.propvert_count = prop_verts.size();
-	//win::bug("got size of " + std::to_string(prop_verts.size()));
 	glBindBuffer(GL_ARRAY_BUFFER, mode.prop.vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mode.prop.propvert_count, prop_verts.data(), GL_STATIC_DRAW);
 }
@@ -232,10 +152,7 @@ void GLRenderer::send_frame()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glBindTexture(GL_TEXTURE_2D_ARRAY, mode.floor.floortextures);
-	glUseProgram(mode.floor.shader);
-	glBindVertexArray(mode.floor.vao);
-	glDrawArrays(GL_TRIANGLES, 0, mode.floor.floorvert_count / 4);
+	floor_pass.draw();
 
 	glUseProgram(mode.wall.shader);
 	glBindVertexArray(mode.wall.vao);
@@ -257,8 +174,7 @@ void GLRenderer::set_center(float x, float y)
 	const float zoom = 0.5f;
 	const glm::mat4 view_matrix = glm::translate(glm::scale(glm::identity<glm::mat4>(), glm::vec3(zoom, zoom, zoom)), glm::vec3(-x, -y, 0.0f));
 
-	glUseProgram(mode.floor.shader);
-	glUniformMatrix4fv(mode.floor.uniform_view, 1, false, glm::value_ptr(view_matrix));
+	floor_pass.set_view(view_matrix);
 
 	glUseProgram(mode.wall.shader);
 	glUniformMatrix4fv(mode.wall.uniform_view, 1, false, glm::value_ptr(view_matrix));
