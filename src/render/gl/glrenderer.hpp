@@ -11,6 +11,7 @@
 #include "../../sim/levelgen/levelobjects.hpp"
 #include "floorpass.hpp"
 #include "proppass.hpp"
+#include "debugquadpass.hpp"
 
 class GLRenderer
 {
@@ -18,7 +19,6 @@ public:
 	NOCOPYMOVE(GLRenderer);
 
 	GLRenderer(const win::Area<float>&, win::AssetRoll&);
-	~GLRenderer();
 
 	void set_level_data(const std::vector<LevelFloor>&, const std::vector<LevelWall>&, const std::vector<LevelProp>&);
 	void set_center(float, float);
@@ -41,5 +41,6 @@ private:
 
 	FloorPass floor_pass;
 	PropPass prop_pass;
+	DebugQuadPass debugquad_pass;
 };
 #endif

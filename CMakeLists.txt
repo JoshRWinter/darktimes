@@ -25,6 +25,8 @@ set(sources
 	src/render/gl/floorpass.hpp
 	src/render/gl/proppass.cpp
 	src/render/gl/proppass.hpp
+	src/render/gl/debugquadpass.cpp
+	src/render/gl/debugquadpass.hpp
 
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp
