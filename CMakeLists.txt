@@ -63,3 +63,15 @@ elseif(WIN32)
 		string(REGEX REPLACE "/W[0-4]" "/W1" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 	endif()
 endif()
+
+if (USE_ASAN)
+	message("Enabling ASAN")
+
+	target_compile_options(${executable} PRIVATE -fsanitize=address)
+	target_link_options(${executable} PRIVATE -fsanitize=address)
+
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		target_compile_options(${executable} PRIVATE -fsanitize=undefined)
+		target_link_options(${executable} PRIVATE -fsanitize=undefined)
+	endif()
+endif()
