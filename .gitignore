@@ -1,2 +1,2 @@
-CMakeLists.txt.user
-asset/*/recipe-generated.*
+asset/texture/*.tga
+asset/texture/*.png
