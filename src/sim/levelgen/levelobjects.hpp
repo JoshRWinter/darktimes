@@ -110,7 +110,6 @@ struct LevelWall
 	float x, y, w, h;
 };
 
-struct LevelFloor;
 struct LevelFloorConnector
 {
 	LevelFloorConnector() = default;

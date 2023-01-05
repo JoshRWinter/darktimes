@@ -22,6 +22,8 @@ public:
 	{
 		LevelPropDefinition(0, LevelPropDefinition::collision_class_rug, LevelPropDefinition::collision_class_rug, 1.0f, 2.0f, 0.0f, 0.0f)
 	};
+
+	inline static LevelPropDefinition floor_transition_strip = LevelPropDefinition(0, LevelPropDefinition::collision_class_debris, 0.0f, 0.025f, 1.0f, 0.0f, 0.0f);
 };
 
 #endif

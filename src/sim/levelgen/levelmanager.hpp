@@ -15,7 +15,7 @@ class LevelManager
 public:
 	NOCOPYMOVE(LevelManager);
 
-	LevelManager(int);
+	explicit LevelManager(int);
 	void generate();
 
 	std::vector<LevelFloor> floors;
@@ -42,6 +42,7 @@ private:
 	std::vector<LevelProp> generate_new_props(const LevelFloor&, const std::vector<LevelProp>&);
 	std::vector<LevelProp> generate_props_from_spawns(const LevelFloor&, const std::vector<LevelProp>&);
 	std::vector<LevelProp> generate_door_excluders(const LevelFloor&);
+	static std::vector<LevelProp> generate_transition_strips(const LevelFloor&);
 	static bool test_floor(const std::vector<LevelFloor>&, const LevelFloor&);
 	LevelSide random_side();
 

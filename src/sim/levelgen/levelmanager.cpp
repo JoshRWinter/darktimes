@@ -416,6 +416,7 @@ void LevelManager::reset()
 {
 	floors.clear();
 	walls.clear();
+	props.clear();
 }
 
 int LevelManager::find_start_candidate(const std::vector<LevelFloor> &floors, const int attempt_num)
@@ -663,6 +664,11 @@ void LevelManager::generate_props()
 			for (const LevelProp &prop : floorprops)
 				props.push_back(prop);
 		}
+
+		// generate them lil transition strips between the floor textures
+		const std::vector<LevelProp> strips = generate_transition_strips(floor);
+		for (const LevelProp &strip : strips)
+			props.push_back(strip);
 	}
 }
 
@@ -819,6 +825,43 @@ std::vector<LevelProp> LevelManager::generate_door_excluders(const LevelFloor &f
 	}
 
 	return excluders;
+}
+
+std::vector<LevelProp> LevelManager::generate_transition_strips(const LevelFloor &floor)
+{
+	std::vector<LevelProp> props;
+
+	const LevelPropDefinition &def = PropDefinitions::floor_transition_strip;
+
+	for (const LevelFloorConnector &con : floor.connectors)
+	{
+		LevelPropOrientation o;
+
+		float x = 0.0f, y = 0.0f;
+		switch (con.side)
+		{
+			case LevelSide::left:
+				o = LevelPropOrientation::left;
+				x = floor.x - (def.get_width(o) / 2.0f);
+				y = con.start;
+				break;
+			case LevelSide::right:
+				continue;
+			case LevelSide::bottom:
+				o = LevelPropOrientation::down;
+				x = con.start;
+				y = floor.y - (def.get_height(o) / 2.0f);
+				break;
+			case LevelSide::top:
+				continue;
+		}
+
+		LevelProp strip(o, PropDefinitions::floor_transition_strip, x, y);
+
+		props.push_back(strip);
+	}
+
+	return props;
 }
 
 bool LevelManager::test_floor(const std::vector<LevelFloor> &floors, const LevelFloor &floor)
