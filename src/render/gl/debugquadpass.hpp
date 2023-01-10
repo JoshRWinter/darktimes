@@ -1,5 +1,4 @@
-#ifndef GL_DEBUGQUADPASS_HPP
-#define GL_DEBUGQUADPASS_HPP
+#pragma once
 
 #include <GL/gl.h>
 
@@ -44,5 +43,3 @@ private:
 
     int quadvert_count;
 };
-
-#endif

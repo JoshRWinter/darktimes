@@ -1,5 +1,4 @@
-#ifndef TEXTURE_HPP
-#define TEXTURE_HPP
+#pragma once
 
 struct Texture
 {
@@ -16,5 +15,3 @@ struct Texture
 
 	static constexpr int level_prop_sidetable = 200;
 };
-
-#endif

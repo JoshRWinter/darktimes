@@ -1,5 +1,4 @@
-#ifndef SYNC_OBJECT_HPP
-#define SYNC_OBJECT_HPP
+#pragma once
 
 #include <atomic>
 
@@ -85,5 +84,3 @@ public:
 private:
 	SyncObject<T> objects[slots];
 };
-
-#endif

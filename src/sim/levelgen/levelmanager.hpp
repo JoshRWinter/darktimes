@@ -1,5 +1,4 @@
-#ifndef LEVEL_MANAGER_HPP
-#define LEVEL_MANAGER_HPP
+#pragma once
 
 #include <random>
 #include <functional>
@@ -48,5 +47,3 @@ private:
 
 	RandomNumberGenerator rand;
 };
-
-#endif

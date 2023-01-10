@@ -1,5 +1,4 @@
-#ifndef GL_FLOORPASS_HPP
-#define GL_FLOORPASS_HPP
+#pragma once
 
 #include <GL/gl.h>
 
@@ -33,5 +32,3 @@ private:
 
     int floorvert_count;
 };
-
-#endif

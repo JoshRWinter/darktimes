@@ -1,5 +1,4 @@
-#ifndef PROP_DEFS_HPP
-#define PROP_DEFS_HPP
+#pragma once
 
 #include <vector>
 
@@ -25,5 +24,3 @@ public:
 
 	inline static LevelPropDefinition floor_transition_strip = LevelPropDefinition(0, LevelPropDefinition::collision_class_debris, 0.0f, 0.025f, 1.0f, 0.0f, 0.0f);
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GL_UI_RENDERER_HPP
-#define GL_UI_RENDERER_HPP
+#pragma once
 
 #include <chrono>
 
@@ -31,5 +30,3 @@ private:
 	int accumulated_fps;
 	char fps_str[20];
 };
-
-#endif

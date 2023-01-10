@@ -1,5 +1,4 @@
-#ifndef LEVEL_OBJECTS_HPP
-#define LEVEL_OBJECTS_HPP
+#pragma once
 
 #include <vector>
 
@@ -165,5 +164,3 @@ struct LevelFloor
 	std::vector<LevelFloorConnector> connectors;
 	std::vector<LevelProp> prop_spawns;
 };
-
-#endif

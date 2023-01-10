@@ -1,5 +1,4 @@
-#ifndef RANDOM_NUMBER_GENERATOR_HPP
-#define RANDOM_NUMBER_GENERATOR_HPP
+#pragma once
 
 #include <random>
 
@@ -18,5 +17,3 @@ public:
 
 	std::mt19937 mersenne;
 };
-
-#endif

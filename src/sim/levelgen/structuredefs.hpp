@@ -1,5 +1,4 @@
-#ifndef STRUCTURE_DEFS_HPP
-#define STRUCTURE_DEFS_HPP
+#pragma once
 
 #include "structure.hpp"
 #include "propdefs.hpp"
@@ -61,5 +60,3 @@ inline std::vector<Structure> structure_defs
 	small2,
 	small3
 };
-
-#endif

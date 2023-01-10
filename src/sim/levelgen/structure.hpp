@@ -1,5 +1,4 @@
-#ifndef STRUCTURE_HPP
-#define STRUCTURE_HPP
+#pragma once
 
 #include <vector>
 
@@ -78,5 +77,3 @@ struct Structure
 	std::vector<StructureFloor> floors;
 	std::vector<StructureFloorConnection> connections;
 };
-
-#endif

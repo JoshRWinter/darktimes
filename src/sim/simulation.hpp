@@ -1,5 +1,4 @@
-#ifndef WORLD_SIMULATION_HPP
-#define WORLD_SIMULATION_HPP
+#pragma once
 
 #include <atomic>
 #include <mutex>
@@ -9,5 +8,3 @@
 #include "../leveldatasyncobject.hpp"
 
 void simulation(std::atomic<bool>&, SyncObjectManager<LevelDataSyncObject>&);
-
-#endif

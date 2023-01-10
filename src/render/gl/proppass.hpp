@@ -1,5 +1,4 @@
-#ifndef GL_PROPPASS_HPP
-#define GL_PROPPASS_HPP
+#pragma once
 
 #include <GL/gl.h>
 
@@ -30,5 +29,3 @@ private:
 
     int propvert_count;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GL_HPP
-#define GL_HPP
+#pragma once
 
 #include <array>
 
@@ -9,5 +8,3 @@
 
 int get_uniform(GLuint, const char*);
 void get_quad_verts(float, float, float, float, std::array<float, 12>&);
-
-#endif
