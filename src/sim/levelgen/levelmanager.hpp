@@ -13,7 +13,7 @@ class LevelManager
 	typedef std::function<std::vector<LevelFloor>(const LevelFloor&, LevelSide)> GeneratorFunction;
 
 public:
-	NOCOPYMOVE(LevelManager);
+	NO_COPY_MOVE(LevelManager);
 
 	explicit LevelManager(int);
 	void generate();

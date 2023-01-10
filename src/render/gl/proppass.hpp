@@ -11,7 +11,7 @@
 
 class PropPass
 {
-	NOCOPYMOVE(PropPass);
+	NO_COPY_MOVE(PropPass);
 public:
 	PropPass(win::AssetRoll&);
 	~PropPass();

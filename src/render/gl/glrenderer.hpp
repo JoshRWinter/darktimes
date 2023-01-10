@@ -16,7 +16,7 @@
 class GLRenderer
 {
 public:
-	NOCOPYMOVE(GLRenderer);
+	NO_COPY_MOVE(GLRenderer);
 
 	GLRenderer(const win::Area<float>&, win::AssetRoll&);
 

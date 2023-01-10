@@ -7,7 +7,7 @@
 
 class RandomNumberGenerator
 {
-	NOCOPYMOVE(RandomNumberGenerator);
+	NO_COPY_MOVE(RandomNumberGenerator);
 
 public:
 	RandomNumberGenerator(int);

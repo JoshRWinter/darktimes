@@ -5,8 +5,9 @@
 #include <mutex>
 #include <memory>
 
-#include "../syncobject.hpp"
+#include "../syncobjectmanager.hpp"
+#include "../leveldatasyncobject.hpp"
 
-void simulation(std::atomic<bool>&, LargeSyncObject<STR_LevelDataSyncObject>&);
+void simulation(std::atomic<bool>&, SyncObjectManager<LevelDataSyncObject>&);
 
 #endif

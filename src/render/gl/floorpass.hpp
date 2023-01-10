@@ -11,7 +11,7 @@
 
 class FloorPass
 {
-	NOCOPYMOVE(FloorPass);
+	NO_COPY_MOVE(FloorPass);
 
 public:
 	FloorPass(win::AssetRoll&);

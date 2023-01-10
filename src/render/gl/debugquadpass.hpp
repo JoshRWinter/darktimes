@@ -24,7 +24,7 @@ struct DebugQuad
 
 class DebugQuadPass
 {
-	NOCOPYMOVE(DebugQuadPass);
+	NO_COPY_MOVE(DebugQuadPass);
 
 public:
 	DebugQuadPass(win::AssetRoll&);

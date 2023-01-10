@@ -12,7 +12,7 @@
 
 class GLUIRenderer
 {
-	NOCOPYMOVE(GLUIRenderer);
+	NO_COPY_MOVE(GLUIRenderer);
 
 public:
 	GLUIRenderer(const win::Dimensions<int>&, const win::Area<float>&, win::AssetRoll&);
