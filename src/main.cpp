@@ -61,8 +61,8 @@ int main()
 	GLRenderer renderer(win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 	GLUIRenderer uirenderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 
-	LargeSyncObject<STR_LevelDataSyncObject> str_level_data_sync;
-	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(str_level_data_sync));
+	SyncObjectManager<LevelDataSyncObject> level_data_sync_object_manager;
+	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(level_data_sync_object_manager));
 
 	float x = 0.0f, y = 0.0f;
 	while(!quit)
@@ -75,12 +75,14 @@ int main()
 		if (left) x -= scoot;
 		if (right) x += scoot;
 		renderer.set_center(x, y);
-		if (str_level_data_sync.dirty())
+
+		LevelDataSyncObject *const ldso = level_data_sync_object_manager.reader_acquire();
+		if (ldso != NULL)
 		{
-			std::unique_ptr<STR_LevelDataSyncObject> leveldata;
-			str_level_data_sync.get(leveldata);
-			renderer.set_level_data(leveldata->floors, leveldata->walls, leveldata->props);
-			uirenderer.set_seed(leveldata->seed);
+			renderer.set_level_data(ldso->floors, ldso->walls, ldso->props);
+			uirenderer.set_seed(ldso->seed);
+
+			level_data_sync_object_manager.reader_release(ldso);
 		}
 
 		renderer.send_frame();

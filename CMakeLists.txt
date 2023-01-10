@@ -10,7 +10,8 @@ set(sources
 
 	src/darktimes.hpp
 
-	src/syncobject.hpp
+	src/syncobjectmanager.hpp
+	src/leveldatasyncobject.hpp
 	src/randomnumbergenerator.cpp
 	src/randomnumbergenerator.hpp
 

@@ -4,30 +4,32 @@
 #include "simulation.hpp"
 #include "levelgen/levelmanager.hpp"
 
-static void set_level_data_sync(LargeSyncObject<STR_LevelDataSyncObject> &so, LevelManager &levelmanager)
+static void set_level_data_sync(SyncObjectManager<LevelDataSyncObject> &level_data_sync_object_manager, LevelManager &levelmanager)
 {
-	auto data = so.prepare();
+	LevelDataSyncObject *ldso;
+	do
+	{
+		ldso = level_data_sync_object_manager.writer_acquire();
+	} while (ldso == NULL);
 
-	data->walls = levelmanager.walls;
-	data->floors = levelmanager.floors;
-	data->props = levelmanager.props;
-	data->seed = levelmanager.seed;
+	ldso->walls = levelmanager.walls;
+	ldso->floors = levelmanager.floors;
+	ldso->props = levelmanager.props;
+	ldso->seed = levelmanager.seed;
 
-	so.set(data);
+	level_data_sync_object_manager.writer_release(ldso);
 }
 
-void simulation(std::atomic<bool>& stop, LargeSyncObject<STR_LevelDataSyncObject> &str_level_data_sync)
+void simulation(std::atomic<bool>& stop, SyncObjectManager<LevelDataSyncObject> &level_data_sync_object_manager)
 {
 	LevelManager level_manager(time(NULL));
-	set_level_data_sync(str_level_data_sync, level_manager);
+	set_level_data_sync(level_data_sync_object_manager, level_manager);
 
 	while(!stop)
 	{
 		std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(10));
 
-		/*
 		level_manager.generate();
-		set_level_data_sync(str_level_data_sync, level_manager);
-		*/
+		set_level_data_sync(level_data_sync_object_manager, level_manager);
 	}
 }
