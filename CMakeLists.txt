@@ -11,7 +11,9 @@ set(sources
 	src/darktimes.hpp
 
 	src/syncobjectmanager.hpp
-	src/leveldatasyncobject.hpp
+	src/leveldata.hpp
+	src/input.hpp
+	src/renderstate.hpp
 	src/randomnumbergenerator.cpp
 	src/randomnumbergenerator.hpp
 

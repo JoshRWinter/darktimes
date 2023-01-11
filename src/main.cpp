@@ -10,6 +10,7 @@
 
 int main()
 {
+	// display setup
 	win::DisplayOptions display_options;
 #ifndef NDEBUG
 	display_options.caption = "debug_window";
@@ -28,22 +29,33 @@ int main()
 	win::Display display(display_options);
 	display.vsync(true);
 
+	// input handling
 	bool quit = false;
 	std::atomic<bool> simulation_quit = false;
-	bool up = false, down = false, left = false, right = false;
-	display.register_button_handler([&quit, &up, &down, &left, &right](win::Button button, bool press)
+
+	Input input;
+
+	SyncObjectManager<Input> input_sync_object_manager;
+	display.register_button_handler([&quit, &input, &input_sync_object_manager](win::Button button, bool press)
 	{
 		if (button == win::Button::esc)
 			quit = true;
-
 		else if (button == win::Button::up)
-			up = press;
+			input.up = press;
 		else if (button == win::Button::down)
-			down = press;
+			input.down = press;
 		else if (button == win::Button::left)
-			left = press;
+			input.left = press;
 		else if (button == win::Button::right)
-			right = press;
+			input.right = press;
+		else if (button == win::Button::enter)
+			input.regenerate = press;
+
+		// tell the sim
+		Input *iso;
+		do { iso = input_sync_object_manager.writer_acquire(); } while (iso == NULL);
+		*iso = input;
+		input_sync_object_manager.writer_release(iso);
 	});
 
 	display.register_window_handler([&quit](win::WindowEvent event)
@@ -57,26 +69,30 @@ int main()
 		}
 	});
 
+	// renderer setup
 	win::AssetRoll roll("darktimes.bin");
 	GLRenderer renderer(win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 	GLUIRenderer uirenderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 
-	SyncObjectManager<LevelDataSyncObject> level_data_sync_object_manager;
-	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(level_data_sync_object_manager));
+	// set up the simulation thread
+	SyncObjectManager<LevelData> level_data_sync_object_manager;
+	SyncObjectManager<RenderState> render_state_sync_object_manager;
+	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(level_data_sync_object_manager), std::ref(input_sync_object_manager), std::ref(render_state_sync_object_manager));
 
-	float x = 0.0f, y = 0.0f;
+	renderer.set_center(0.0f, 0.0f);
+	// loop de loop
 	while(!quit)
 	{
 		display.process();
 
-		const float scoot = 0.1f;
-		if (up) y += scoot;
-		if (down) y -= scoot;
-		if (left) x -= scoot;
-		if (right) x += scoot;
-		renderer.set_center(x, y);
+		RenderState *rs;
+		if ((rs = render_state_sync_object_manager.reader_acquire()) != NULL)
+		{
+			renderer.set_center(rs->centerx, rs->centery);
+			render_state_sync_object_manager.reader_release(rs);
+		}
 
-		LevelDataSyncObject *const ldso = level_data_sync_object_manager.reader_acquire();
+		LevelData *const ldso = level_data_sync_object_manager.reader_acquire();
 		if (ldso != NULL)
 		{
 			renderer.set_level_data(ldso->floors, ldso->walls, ldso->props);

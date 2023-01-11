@@ -5,6 +5,8 @@
 #include <memory>
 
 #include "../syncobjectmanager.hpp"
-#include "../leveldatasyncobject.hpp"
+#include "../leveldata.hpp"
+#include "../input.hpp"
+#include "../renderstate.hpp"
 
-void simulation(std::atomic<bool>&, SyncObjectManager<LevelDataSyncObject>&);
+void simulation(std::atomic<bool>&, SyncObjectManager<LevelData>&, SyncObjectManager<Input>&, SyncObjectManager<RenderState>&);

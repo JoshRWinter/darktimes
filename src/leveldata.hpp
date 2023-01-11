@@ -3,7 +3,7 @@
 #include <vector>
 #include "sim/levelgen/levelobjects.hpp"
 
-struct LevelDataSyncObject
+struct LevelData
 {
 	std::vector<LevelFloor> floors;
 	std::vector<LevelWall> walls;
