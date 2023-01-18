@@ -15,12 +15,12 @@ public:
 	NO_COPY_MOVE(LevelManager);
 
 	explicit LevelManager(int);
-	void generate();
+	void generate(int);
 
 	std::vector<LevelFloor> floors;
 	std::vector<LevelWall> walls;
 	std::vector<LevelProp> props;
-	const int seed;
+	int seed;
 
 private:
 

@@ -1,8 +1,9 @@
-#include <cmath>
 #include <stack>
-#include <algorithm>
-#include <utility>
-#include <array>
+#include <fstream>
+#include <filesystem>
+#include <cstdlib>
+
+#include <time.h>
 
 #include "../../render/texture.hpp"
 #include "propdefs.hpp"
@@ -64,17 +65,35 @@ LevelManager::LevelManager(int seed)
 	, seed(seed)
 {
 	fprintf(stderr, "%d\n", seed);
-	generate();
+	generate(seed);
 }
 
-void LevelManager::generate()
+void LevelManager::generate(int seed)
 {
+	this->seed = seed;
+
 	reset();
 
 	while (!generate_impl()) reset();
 
 	generate_walls();
 	generate_props();
+
+#if defined WINPLAT_WINDOWS
+	const char *local_app_data = std::getenv("LOCALAPPDATA");
+	std::filesystem::path basepath = userprofile ? std::filesystem::path(userprofile) / ".darktimes-seeds.txt" : "";
+#elif defined WINPLAT_LINUX
+	const char *home = std::getenv("HOME");
+	const std::filesystem::path basepath = home ? std::filesystem::path(home) / ".darktimes-seeds.txt" : "";
+#endif
+	char timestring[100];
+	time_t seed_as_time = seed;
+	struct tm *t = localtime(&seed_as_time);
+	strftime(timestring, sizeof(timestring), "%Y-%m-%d %I:%M:%S %p", t);
+
+	std::ofstream out(basepath, std::ofstream::app);
+	if (out)
+		out << timestring << "\t" << seed << std::endl;
 }
 
 bool LevelManager::generate_impl()
