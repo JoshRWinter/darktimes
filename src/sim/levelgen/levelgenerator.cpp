@@ -529,16 +529,13 @@ static std::vector<LevelFloor*> find_neighbors(std::vector<LevelFloor> &floors, 
 }
 
 // of some existing floors, find one to serve as a starting point for a future segment
-static int find_start_candidate(RandomNumberGenerator &rand, const std::vector<LevelFloor> &floors, const int attempt_num)
+static std::vector<int> find_start_candidates(RandomNumberGenerator &rand, const std::vector<LevelFloor> &floors)
 {
-	if (attempt_num < 0)
-		win::bug("invalid param");
-
 	if (floors.empty())
 		win::bug("no possible start candidate");
 
 	if (floors.size() == 1)
-		return 0;
+		return { 0 };
 
 	const int low = std::max(1, ((int)floors.size()) - 8);
 	const int high = floors.size() - 1;
@@ -570,10 +567,7 @@ static int find_start_candidate(RandomNumberGenerator &rand, const std::vector<L
 	for (int c : three_conn)
 		candidates.push_back(c);
 
-	if (attempt_num >= candidates.size())
-		return -1;
-
-	return candidates.at(attempt_num);
+	return candidates;
 }
 
 /*
@@ -856,15 +850,22 @@ static bool generate_segment(RandomNumberGenerator &rand, std::vector<LevelFloor
 	std::vector<LevelFloor> generated;
 	int start_candidate_index;
 
-	do
+	const std::vector<int> start_candidates = find_start_candidates(rand, existing_floors);
+	bool success = false;
+	for (int i = 0; i < start_candidates.size(); ++i)
 	{
-		start_candidate_index = find_start_candidate(rand, existing_floors, attempts++);
-
-		if (start_candidate_index == -1)
-			return false;
-
+		start_candidate_index = start_candidates.at(i);
 		generated = generator(existing_floors.at(start_candidate_index), side);
-	} while (generated.size() < minimum_added);
+
+		if (generated.size() >= minimum_added)
+		{
+			success = true;
+			break;
+		}
+	}
+
+	if (!success)
+		return false;
 
 	if (!connect(existing_floors.at(start_candidate_index), *find_neighbors(generated, existing_floors.at(start_candidate_index), side).at(0)))
 		win::bug("Failed to connect segments");
