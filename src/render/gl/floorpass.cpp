@@ -21,7 +21,7 @@ static std::vector<win::Targa> get_floor_textures(win::AssetRoll &roll)
 	return textures;
 }
 
-static std::vector<float> get_floor_verts(const std::vector<LevelFloor> &floors)
+static std::vector<float> get_floor_verts(const std::vector<Renderable> &floors)
 {
 	std::vector<float> verts;
 
@@ -99,7 +99,7 @@ void FloorPass::draw()
 	glDrawArrays(GL_TRIANGLES, 0, floorvert_count / 4);
 }
 
-void FloorPass::set_floors(const std::vector<LevelFloor> &floors)
+void FloorPass::set_floors(const std::vector<Renderable> &floors)
 {
 	const auto &floor_verts = get_floor_verts(floors);
 	floorvert_count = floor_verts.size();

@@ -1,12 +1,19 @@
 #pragma once
 
 #include <vector>
-#include "sim/levelgen/levelobjects.hpp"
+
+#include "render/renderable.hpp"
 
 struct LevelData
 {
-	std::vector<LevelFloor> floors;
-	std::vector<LevelWall> walls;
-	std::vector<LevelProp> props;
+	std::vector<Renderable> atlas_renderables;
+	std::vector<Renderable> tile_renderables;
 	int seed;
+
+	void reset()
+	{
+		atlas_renderables.clear();
+		tile_renderables.clear();
+		seed = -1;
+	}
 };

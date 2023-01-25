@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "../../darktimes.hpp"
-#include "../../sim/levelgen/levelobjects.hpp"
+#include "../renderable.hpp"
 
 class FloorPass
 {
@@ -17,7 +17,7 @@ public:
 	~FloorPass();
 
 	void draw();
-    void set_floors(const std::vector<LevelFloor>&);
+    void set_floors(const std::vector<Renderable>&);
 	void set_projection(const glm::mat4&);
 	void set_view(const glm::mat4&);
 

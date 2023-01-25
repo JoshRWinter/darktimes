@@ -2,28 +2,50 @@
 #include <chrono>
 
 #include "simulation.hpp"
-#include "levelgen/levelmanager.hpp"
+#include "world.hpp"
+#include "levelgen/levelgenerator.hpp"
 
-static void set_level_data_sync(SyncObjectManager<LevelData> &level_data_sync_object_manager, LevelManager &levelmanager)
+static void map_renderables(const win::Pool<RenderableComponent> &renderable_component_input, std::vector<Renderable> &renderable)
 {
-	LevelData *ldso;
-	do
+	for (const auto &input : renderable_component_input)
 	{
-		ldso = level_data_sync_object_manager.writer_acquire();
-	} while (ldso == NULL);
+		auto physical = input.entity.get<PhysicalComponent>();
 
-	ldso->walls = levelmanager.walls;
-	ldso->floors = levelmanager.floors;
-	ldso->props = levelmanager.props;
-	ldso->seed = levelmanager.seed;
+#ifndef NDEBUG
+		if (physical == NULL)
+			win::bug("null physical");
+#endif
 
-	level_data_sync_object_manager.writer_release(ldso);
+		renderable.emplace_back(input.texture, physical->x, physical->y, physical->w, physical->h, physical->rot);
+	}
 }
 
-void simulation(std::atomic<bool> &stop, SyncObjectManager<LevelData> &level_data_sync_object_manager, SyncObjectManager<Input> &input_sync_object_manager, SyncObjectManager<RenderState> &render_state_sync_object_manager)
+static void generate_and_set_level_data(SyncObjectManager<LevelData> &level_data_som, World &world)
 {
-	LevelManager level_manager(time(NULL));
-	set_level_data_sync(level_data_sync_object_manager, level_manager);
+	LevelData *data;
+	do
+	{
+		data = level_data_som.writer_acquire();
+	} while (data == NULL);
+
+	data->reset();
+
+	win::Pool<RenderableComponent> tile_renderables;
+	const int seed = time(NULL);
+	level_generate(seed, world.entities, world.physicals, world.atlas_renderables, tile_renderables);
+
+	map_renderables(world.atlas_renderables, data->atlas_renderables);
+	map_renderables(tile_renderables, data->tile_renderables);
+	data->seed = seed;
+
+	level_data_som.writer_release(data);
+}
+
+void simulation(std::atomic<bool> &stop, SyncObjectManager<LevelData> &level_data_som, SyncObjectManager<Input> &input_som, SyncObjectManager<RenderState> &render_state_som)
+{
+	World world;
+
+	generate_and_set_level_data(level_data_som, world);
 
 	float xpos = 0.0f;
 	float ypos = 0.0f;
@@ -31,10 +53,10 @@ void simulation(std::atomic<bool> &stop, SyncObjectManager<LevelData> &level_dat
 	while(!stop)
 	{
 		Input *i;
-		if ((i = input_sync_object_manager.reader_acquire()) != NULL)
+		if ((i = input_som.reader_acquire()) != NULL)
 		{
 			input = *i;
-			input_sync_object_manager.reader_release(i);
+			input_som.reader_release(i);
 		}
 
 		const float scoot = 0.08f;
@@ -48,12 +70,12 @@ void simulation(std::atomic<bool> &stop, SyncObjectManager<LevelData> &level_dat
 			ypos -= scoot;
 
 		RenderState *rs;
-		do { rs = render_state_sync_object_manager.writer_acquire(); } while (rs == NULL);
+		do { rs = render_state_som.writer_acquire(); } while (rs == NULL);
 
 		rs->centerx = xpos;
 		rs->centery = ypos;
 
-		render_state_sync_object_manager.writer_release(rs);
+		render_state_som.writer_release(rs);
 
 		std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(16));
 

@@ -3,7 +3,6 @@
 #include <atomic>
 
 #include "darktimes.hpp"
-#include "sim/levelgen/levelmanager.hpp"
 
 enum class SyncObjectState
 {

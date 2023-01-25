@@ -17,6 +17,7 @@ set(sources
 	src/randomnumbergenerator.cpp
 	src/randomnumbergenerator.hpp
 
+	src/render/renderable.hpp
 	src/render/texture.hpp
 	src/render/gl/gl.cpp
 	src/render/gl/gl.hpp
@@ -28,18 +29,20 @@ set(sources
 	src/render/gl/floorpass.hpp
 	src/render/gl/proppass.cpp
 	src/render/gl/proppass.hpp
-	src/render/gl/debugquadpass.cpp
-	src/render/gl/debugquadpass.hpp
 
+	src/sim/world.hpp
 	src/sim/simulation.cpp
 	src/sim/simulation.hpp
+	src/sim/entity.hpp
+	src/sim/component.hpp
+
 	src/sim/levelgen/levelobjects.hpp
 	src/sim/levelgen/propdefs.hpp
 	src/sim/levelgen/structuredefs.hpp
 	src/sim/levelgen/structure.hpp
 	src/sim/levelgen/structure.cpp
-	src/sim/levelgen/levelmanager.cpp
-	src/sim/levelgen/levelmanager.hpp
+	src/sim/levelgen/levelgenerator.cpp
+	src/sim/levelgen/levelgenerator.hpp
 
 	asset/recipe
 	asset/shader/wall.vert

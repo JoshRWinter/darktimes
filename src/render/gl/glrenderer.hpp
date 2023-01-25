@@ -7,10 +7,10 @@
 #include <win/assetroll.hpp>
 
 #include "../../darktimes.hpp"
-#include "../../sim/levelgen/levelobjects.hpp"
+#include "../renderable.hpp"
+
 #include "floorpass.hpp"
 #include "proppass.hpp"
-#include "debugquadpass.hpp"
 
 class GLRenderer
 {
@@ -19,29 +19,13 @@ public:
 
 	GLRenderer(const win::Area<float> &, win::AssetRoll &);
 
-	void
-	set_level_data(const std::vector<LevelFloor> &, const std::vector<LevelWall> &, const std::vector<LevelProp> &);
+	void set_level_data(const std::vector<Renderable>&, const std::vector<Renderable>&);
 
 	void set_center(float, float);
 
-	void send_frame();
+	void draw();
 
 private:
-	struct
-	{
-		struct
-		{
-			GLuint shader;
-			GLuint vao, vbo;
-
-			GLint uniform_projection, uniform_rot;
-			GLint uniform_view;
-
-			int wallvert_count;
-		} wall;
-	} mode;
-
 	FloorPass floor_pass;
 	PropPass prop_pass;
-	DebugQuadPass debugquad_pass;
 };

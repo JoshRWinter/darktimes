@@ -6,7 +6,7 @@
 #include <win/assetroll.hpp>
 
 #include "../../darktimes.hpp"
-#include "../../sim/levelgen/levelobjects.hpp"
+#include "../renderable.hpp"
 
 class PropPass
 {
@@ -16,7 +16,7 @@ public:
 	~PropPass();
 
 	void draw();
-	void set_props(const std::vector<LevelProp>&);
+	void set_props(const std::vector<Renderable>&);
 	void set_projection(const glm::mat4&);
 	void set_view(const glm::mat4&);
 

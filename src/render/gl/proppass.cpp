@@ -4,24 +4,28 @@
 #include "gl.hpp"
 #include "proppass.hpp"
 
-static std::vector<float> get_prop_verts(const std::vector<LevelProp> &props)
+static std::vector<float> get_prop_verts(const std::vector<Renderable> &props)
 {
 	std::vector<float> verts;
 
 	for (const auto &prop : props)
 	{
 		std::array<float, 12> qverts;
-		get_quad_verts(prop.x, prop.y, prop.width, prop.height, qverts);
+		get_quad_verts(prop.x, prop.y, prop.w, prop.h, qverts);
 
+		/*
 		// excluder (debugging)
 		std::array<float, 12> qverts2;
 		get_quad_verts(prop.x - prop.excluder_padding_x, prop.y - prop.excluder_padding_y, prop.width + (prop.excluder_padding_x * 2.0f), prop.height + (prop.excluder_padding_y * 2.0f), qverts2);
+		 */
 
 		for (auto f : qverts)
 			verts.push_back(f);
 
+		/*
 		for (auto f : qverts2)
 			verts.push_back(f);
+		 */
 	}
 
 	return verts;
@@ -61,7 +65,7 @@ void PropPass::draw()
 	glDrawArrays(GL_TRIANGLES, 0, propvert_count / 2);
 }
 
-void PropPass::set_props(const std::vector<LevelProp> &props)
+void PropPass::set_props(const std::vector<Renderable> &props)
 {
 	const auto &prop_verts = get_prop_verts(props);
 	propvert_count = prop_verts.size();

@@ -8,36 +8,28 @@
 GLRenderer::GLRenderer(const win::Area<float> &world_area, win::AssetRoll &roll)
 	: floor_pass(roll)
 	, prop_pass(roll)
-	, debugquad_pass(roll)
 {
 	const glm::mat4 projection_matrix = glm::ortho(world_area.left, world_area.right, world_area.bottom, world_area.top);
 
 	floor_pass.set_projection(projection_matrix);
 	prop_pass.set_projection(projection_matrix);
-	debugquad_pass.set_projection(projection_matrix);
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void GLRenderer::set_level_data(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props)
+void GLRenderer::set_level_data(const std::vector<Renderable> &tile_renderables, const std::vector<Renderable> &atlas_renderables)
 {
-	floor_pass.set_floors(floors);
-	prop_pass.set_props(props);
-
-	std::vector<DebugQuad> debugquads;
-	for (const auto &wall : walls)
-		debugquads.emplace_back(wall.x, wall.y, wall.w, wall.h);
-	debugquad_pass.set_quads(debugquads);
+	floor_pass.set_floors(tile_renderables);
+	prop_pass.set_props(atlas_renderables);
 }
 
-void GLRenderer::send_frame()
+void GLRenderer::draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	floor_pass.draw();
-	debugquad_pass.draw();
 	prop_pass.draw();
 
 #ifndef NDEBUG
@@ -54,5 +46,4 @@ void GLRenderer::set_center(float x, float y)
 
 	floor_pass.set_view(view_matrix);
 	prop_pass.set_view(view_matrix);
-	debugquad_pass.set_view(view_matrix);
 }

@@ -95,13 +95,13 @@ int main()
 		LevelData *const ldso = level_data_sync_object_manager.reader_acquire();
 		if (ldso != NULL)
 		{
-			renderer.set_level_data(ldso->floors, ldso->walls, ldso->props);
+			renderer.set_level_data(ldso->tile_renderables, ldso->atlas_renderables);
 			uirenderer.set_seed(ldso->seed);
 
 			level_data_sync_object_manager.reader_release(ldso);
 		}
 
-		renderer.send_frame();
+		renderer.draw();
 		uirenderer.draw_gamehud();
 		display.swap();
 	}
