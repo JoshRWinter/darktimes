@@ -27,6 +27,12 @@
 ///////////////////////////////////////////
 
 ///////////////////////////////////////////
+/// COOL NUMBERS
+///////////////////////////////////////////
+static constexpr float MIN_WALL_LENGTH = 1.8f;
+static constexpr float DOOR_LENGTH = 1.8f;
+
+///////////////////////////////////////////
 /// random helper functions
 ///////////////////////////////////////////
 
@@ -432,9 +438,6 @@ static bool can_connect(const LevelFloor &floor1, const LevelFloor &floor2, Leve
 	else
 		return false;
 
-	const float MIN_WALL_LENGTH = 1.8f; // minimum wall length needed to support a door (with some padding)
-	const float DOOR_LENGTH = 1.0f;
-
 	float start, stop;
 	if (side == LevelSide::bottom || side == LevelSide::top)
 	{
@@ -622,7 +625,7 @@ static std::vector<LevelFloor> generate_structure(RandomNumberGenerator &rand, c
 
 		if (floor.collide(existing_floors))
 			return {};
-		if (floor.collide(generated) && false)
+		if (floor.collide(generated))
 			win::bug("mangled structure");
 
 		generated.push_back(floor);
@@ -637,6 +640,7 @@ static std::vector<LevelFloor> generate_structure(RandomNumberGenerator &rand, c
 }
 
 // make a winding line of rooms
+// the clang analyzer seems to report some unreachable code in here but that is a false positive, so watch out for that
 static std::vector<LevelFloor> generate_linear(RandomNumberGenerator &rand, const std::vector<LevelFloor> &existing_floors, const LevelFloor &start_floor, const LevelSide start_side)
 {
 	std::vector<LevelFloor> generated;
@@ -660,8 +664,6 @@ static std::vector<LevelFloor> generate_linear(RandomNumberGenerator &rand, cons
 			const float width = rand.uniform_int(0, 2) == 0 ? rand.uniform_real(3.0f, 4.0f) : rand.uniform_real(2.0f, 3.0f);
 			const float height = rand.uniform_int(0, 2) == 0 ? rand.uniform_real(3.0f, 4.0f) : rand.uniform_real(2.0f, 3.0f);
 			float x, y;
-
-			const float MIN_WALL_LENGTH = 1.8f; // minimum wall length needed to support a door (with some padding)
 
 			const float lowx = (from_x + MIN_WALL_LENGTH) - width;
 			const float highx = ((from_x + from_w) - MIN_WALL_LENGTH);
@@ -710,12 +712,9 @@ static std::vector<LevelFloor> generate_linear(RandomNumberGenerator &rand, cons
 		if (!success)
 		{
 			if (from_index == -1)
-				return generated;
+				return generated; // give up, maybe we've done enough
 
 			--from_index;
-
-			if (from_index == -1)
-				return generated;
 		}
 	}
 
