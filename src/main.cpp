@@ -34,9 +34,9 @@ int main()
 	std::atomic<bool> simulation_quit = false;
 
 	Input input;
+	SyncObjectManager<Input> input_som;
 
-	SyncObjectManager<Input> input_sync_object_manager;
-	display.register_button_handler([&quit, &input, &input_sync_object_manager](win::Button button, bool press)
+	display.register_button_handler([&quit, &input, &input_som](win::Button button, bool press)
 	{
 		if (button == win::Button::esc)
 			quit = true;
@@ -53,9 +53,9 @@ int main()
 
 		// tell the sim
 		Input *iso;
-		do { iso = input_sync_object_manager.writer_acquire(); } while (iso == NULL);
+		do { iso = input_som.writer_acquire(); } while (iso == NULL);
 		*iso = input;
-		input_sync_object_manager.writer_release(iso);
+		input_som.writer_release(iso);
 	});
 
 	display.register_window_handler([&quit](win::WindowEvent event)
@@ -75,9 +75,9 @@ int main()
 	GLUIRenderer uirenderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 
 	// set up the simulation thread
-	SyncObjectManager<LevelData> level_data_sync_object_manager;
-	SyncObjectManager<RenderState> render_state_sync_object_manager;
-	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(level_data_sync_object_manager), std::ref(input_sync_object_manager), std::ref(render_state_sync_object_manager));
+	SyncObjectManager<LevelRenderState> level_render_state_som;
+	SyncObjectManager<RenderState> render_state_som;
+	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(level_render_state_som), std::ref(render_state_som), std::ref(input_som));
 
 	renderer.set_center(0.0f, 0.0f);
 	// loop de loop
@@ -86,19 +86,19 @@ int main()
 		display.process();
 
 		RenderState *rs;
-		if ((rs = render_state_sync_object_manager.reader_acquire()) != NULL)
+		if ((rs = render_state_som.reader_acquire()) != NULL)
 		{
 			renderer.set_center(rs->centerx, rs->centery);
-			render_state_sync_object_manager.reader_release(rs);
+			render_state_som.reader_release(rs);
 		}
 
-		LevelData *const ldso = level_data_sync_object_manager.reader_acquire();
-		if (ldso != NULL)
+		LevelRenderState *const lrsso = level_render_state_som.reader_acquire();
+		if (lrsso != NULL)
 		{
-			renderer.set_level_data(ldso->tile_renderables, ldso->atlas_renderables);
-			uirenderer.set_seed(ldso->seed);
+			renderer.set_level_data(lrsso->tile_renderables, lrsso->atlas_renderables);
+			uirenderer.set_seed(lrsso->seed);
 
-			level_data_sync_object_manager.reader_release(ldso);
+			level_render_state_som.reader_release(lrsso);
 		}
 
 		renderer.draw();

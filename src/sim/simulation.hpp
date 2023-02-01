@@ -5,8 +5,13 @@
 #include <memory>
 
 #include "../syncobjectmanager.hpp"
-#include "../leveldata.hpp"
-#include "../input.hpp"
+#include "../levelrenderstate.hpp"
 #include "../renderstate.hpp"
+#include "../input.hpp"
 
-void simulation(std::atomic<bool>&, SyncObjectManager<LevelData>&, SyncObjectManager<Input>&, SyncObjectManager<RenderState>&);
+void simulation(
+	std::atomic<bool>&,
+	SyncObjectManager<LevelRenderState>&,
+	SyncObjectManager<RenderState>&,
+	SyncObjectManager<Input>&
+);

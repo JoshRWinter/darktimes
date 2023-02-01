@@ -20,12 +20,12 @@ static void map_renderables(const win::Pool<RenderableComponent> &renderable_com
 	}
 }
 
-static void generate_and_set_level_data(SyncObjectManager<LevelData> &level_data_som, World &world)
+static void generate_and_set_level_data(SyncObjectManager<LevelRenderState> &level_renderables_som, World &world)
 {
-	LevelData *data;
+	LevelRenderState *data;
 	do
 	{
-		data = level_data_som.writer_acquire();
+		data = level_renderables_som.writer_acquire();
 	} while (data == NULL);
 
 	data->reset();
@@ -38,14 +38,19 @@ static void generate_and_set_level_data(SyncObjectManager<LevelData> &level_data
 	map_renderables(tile_renderables, data->tile_renderables);
 	data->seed = seed;
 
-	level_data_som.writer_release(data);
+	level_renderables_som.writer_release(data);
 }
 
-void simulation(std::atomic<bool> &stop, SyncObjectManager<LevelData> &level_data_som, SyncObjectManager<Input> &input_som, SyncObjectManager<RenderState> &render_state_som)
+void simulation(
+	std::atomic<bool> &stop,
+	SyncObjectManager<LevelRenderState> &level_render_state_som,
+	SyncObjectManager<RenderState> &render_state_som,
+	SyncObjectManager<Input> &input_som
+)
 {
 	World world;
 
-	generate_and_set_level_data(level_data_som, world);
+	generate_and_set_level_data(level_render_state_som, world);
 
 	float xpos = 0.0f;
 	float ypos = 0.0f;
