@@ -944,7 +944,7 @@ static void log_seed(int seed)
 {
 #if defined WINPLAT_WINDOWS
 	const char *local_app_data = std::getenv("LOCALAPPDATA");
-	std::filesystem::path basepath = userprofile ? std::filesystem::path(userprofile) / ".darktimes-seeds.txt" : "";
+	std::filesystem::path basepath = local_app_data ? std::filesystem::path(local_app_data) / ".darktimes-seeds.txt" : "";
 #elif defined WINPLAT_LINUX
 	const char *home = std::getenv("HOME");
 	const std::filesystem::path basepath = home ? std::filesystem::path(home) / ".darktimes-seeds.txt" : "";
