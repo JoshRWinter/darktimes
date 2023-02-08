@@ -1,12 +1,12 @@
 #include <chrono>
 #include <thread>
 
-#include <win/display.hpp>
-#include <win/assetroll.hpp>
+#include <win/Display.hpp>
+#include <win/AssetRoll.hpp>
 
-#include "render/gl/glrenderer.hpp"
-#include "render/gl/gluirenderer.hpp"
-#include "sim/simulation.hpp"
+#include "render/gl/GLRenderer.hpp"
+#include "render/gl/GLUIRenderer.hpp"
+#include "sim/Simulation.hpp"
 
 int main()
 {
@@ -70,7 +70,7 @@ int main()
 	});
 
 	// renderer setup
-	win::AssetRoll roll("darktimes.bin");
+	win::AssetRoll roll("Darktimes.roll");
 	GLRenderer renderer(win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 	GLUIRenderer uirenderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 

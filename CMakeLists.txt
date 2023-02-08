@@ -8,42 +8,42 @@ set(executable Darktimes)
 set(sources
 	src/main.cpp
 
-	src/darktimes.hpp
+	src/Darktimes.hpp
 
-	src/syncobjectmanager.hpp
-	src/levelrenderstate.hpp
-	src/renderstate.hpp
-	src/input.hpp
-	src/renderstate.hpp
-	src/randomnumbergenerator.cpp
-	src/randomnumbergenerator.hpp
+	src/SyncObjectManager.hpp
+	src/LevelRenderState.hpp
+	src/RenderState.hpp
+	src/Input.hpp
+	src/RenderState.hpp
+	src/RandomNumberGenerator.cpp
+	src/RandomNumberGenerator.hpp
 
-	src/render/renderable.hpp
-	src/render/texture.hpp
-	src/render/gl/gl.cpp
-	src/render/gl/gl.hpp
-	src/render/gl/glrenderer.cpp
-	src/render/gl/glrenderer.hpp
-	src/render/gl/gluirenderer.cpp
-	src/render/gl/gluirenderer.hpp
-	src/render/gl/floorpass.cpp
-	src/render/gl/floorpass.hpp
-	src/render/gl/proppass.cpp
-	src/render/gl/proppass.hpp
+	src/render/Renderable.hpp
+	src/render/Texture.hpp
+	src/render/gl/GL.cpp
+	src/render/gl/GL.hpp
+	src/render/gl/GLRenderer.cpp
+	src/render/gl/GLRenderer.hpp
+	src/render/gl/GLUIRenderer.cpp
+	src/render/gl/GLUIRenderer.hpp
+	src/render/gl/FloorPass.cpp
+	src/render/gl/FloorPass.hpp
+	src/render/gl/PropPass.cpp
+	src/render/gl/PropPass.hpp
 
-	src/sim/world.hpp
-	src/sim/simulation.cpp
-	src/sim/simulation.hpp
-	src/sim/entity.hpp
-	src/sim/component.hpp
+	src/sim/World.hpp
+	src/sim/Simulation.cpp
+	src/sim/Simulation.hpp
+	src/sim/Entity.hpp
+	src/sim/Component.hpp
 
-	src/sim/levelgen/levelobjects.hpp
-	src/sim/levelgen/propdefs.hpp
-	src/sim/levelgen/structuredefs.hpp
-	src/sim/levelgen/structure.hpp
-	src/sim/levelgen/structure.cpp
-	src/sim/levelgen/levelgenerator.cpp
-	src/sim/levelgen/levelgenerator.hpp
+	src/sim/levelgen/LevelObjects.hpp
+	src/sim/levelgen/PropDefs.hpp
+	src/sim/levelgen/StructureDefs.hpp
+	src/sim/levelgen/Structure.hpp
+	src/sim/levelgen/Structure.cpp
+	src/sim/levelgen/LevelGenerator.cpp
+	src/sim/levelgen/LevelGenerator.hpp
 
 	asset/recipe
 	asset/shader/wall.vert
