@@ -30,7 +30,7 @@
 /// COOL NUMBERS
 ///////////////////////////////////////////
 static constexpr float MIN_WALL_LENGTH = 1.8f;
-static constexpr float DOOR_LENGTH = 1.8f;
+static constexpr float DOOR_LENGTH = 1.0f;
 
 ///////////////////////////////////////////
 /// random helper functions
