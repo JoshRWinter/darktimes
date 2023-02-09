@@ -3,7 +3,9 @@
 #include <win/Pool.hpp>
 
 #include "../Entity.hpp"
-#include "../Component.hpp"
+#include "../component/Component.hpp"
+#include "../component/PhysicalComponent.hpp"
+#include "../component/RenderableComponent.hpp"
 
 void level_generate(
 	int seed,

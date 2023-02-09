@@ -2,7 +2,7 @@
 
 #include <win/Win.hpp>
 
-#include "Component.hpp"
+#include "component/Component.hpp"
 
 class Entity
 {
@@ -13,15 +13,22 @@ public:
 
 	Entity() = default;
 
+	~Entity()
+	{
+		for (auto &component : components)
+			if (component.occupied)
+				win::bug("Live component on entity");
+	}
+
 	Component &add(Component &c) { return *add(&c); }
 	Component *add(Component *c)
 	{
-		for (int i = 0; i < max_components; ++i)
+		for (auto &component : components)
 		{
-			if (!components[i].occupied)
+			if (!component.occupied)
 			{
-				components[i].occupied = true;
-				components[i].component = c;
+				component.occupied = true;
+				component.component = c;
 
 				return c;
 			}
@@ -32,12 +39,12 @@ public:
 
 	void remove(ComponentType type)
 	{
-		for (int i = 0; i < max_components; ++i)
+		for (auto &component : components)
 		{
-			if (components[i].occupied && components[i].component->type == type)
+			if (component.occupied && component.component->type == type)
 			{
-				components[i].occupied = false;
-				components[i].component = NULL;
+				component.occupied = false;
+				component.component = NULL;
 			}
 		}
 	}
@@ -45,13 +52,19 @@ public:
 	template <typename T> T *get() { return get<T>(T::ctype); }
 	template <typename T> T *get(ComponentType type)
 	{
-		for (int i = 0; i < max_components; ++i)
+		for (auto &component : components)
 		{
-			if (components[i].occupied && components[i].component->type == type)
-				return (T*)components[i].component;
+			if (component.occupied && component.component->type == type)
+				return (T*)component.component;
 		}
 
 		return NULL;
+	}
+
+	void clear()
+	{
+		for (auto &component : components)
+			component.occupied = false;
 	}
 
 private:

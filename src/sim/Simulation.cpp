@@ -30,12 +30,11 @@ static void generate_and_set_level_data(SyncObjectManager<LevelRenderState> &lev
 
 	data->reset();
 
-	win::Pool<RenderableComponent> tile_renderables;
 	const int seed = time(NULL);
-	level_generate(seed, world.entities, world.physicals, world.atlas_renderables, tile_renderables);
+	level_generate(seed, world.entities, world.physicals, world.atlas_renderables, world.tile_renderables);
 
 	map_renderables(world.atlas_renderables, data->atlas_renderables);
-	map_renderables(tile_renderables, data->tile_renderables);
+	map_renderables(world.tile_renderables, data->tile_renderables);
 	data->seed = seed;
 
 	level_renderables_som.writer_release(data);

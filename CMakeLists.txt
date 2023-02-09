@@ -34,8 +34,11 @@ set(sources
 	src/sim/World.hpp
 	src/sim/Simulation.cpp
 	src/sim/Simulation.hpp
+
 	src/sim/Entity.hpp
-	src/sim/Component.hpp
+	src/sim/component/Component.hpp
+	src/sim/component/PhysicalComponent.hpp
+	src/sim/component/RenderableComponent.hpp
 
 	src/sim/levelgen/LevelObjects.hpp
 	src/sim/levelgen/PropDefs.hpp
