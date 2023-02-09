@@ -8,13 +8,34 @@
 #include "render/gl/GLUIRenderer.hpp"
 #include "sim/Simulation.hpp"
 
+static void button_event(const win::Button button, const bool press, Input &input)
+{
+	switch (button)
+	{
+		case win::Button::left:
+			input.left = press;
+			break;
+		case win::Button::right:
+			input.right = press;
+			break;
+		case win::Button::down:
+			input.down = press;
+			break;
+		case win::Button::up:
+			input.up = press;
+			break;
+
+		default: break;
+	}
+}
+
 int main()
 {
 	// display setup
 	win::DisplayOptions display_options;
 #ifndef NDEBUG
 	display_options.caption = "debug_window";
-	display_options.fullscreen = 0;
+	display_options.fullscreen = false;
 	display_options.width = 1600;
 	display_options.height = 900;
 #else
@@ -40,32 +61,18 @@ int main()
 	{
 		if (button == win::Button::esc)
 			quit = true;
-		else if (button == win::Button::up)
-			input.up = press;
-		else if (button == win::Button::down)
-			input.down = press;
-		else if (button == win::Button::left)
-			input.left = press;
-		else if (button == win::Button::right)
-			input.right = press;
-		else if (button == win::Button::enter)
-			input.regenerate = press;
 
-		// tell the sim
-		Input *iso;
-		do { iso = input_som.writer_acquire(); } while (iso == NULL);
-		*iso = input;
-		input_som.writer_release(iso);
+		button_event(button, press, input);
 	});
 
 	display.register_window_handler([&quit](win::WindowEvent event)
 	{
 		switch (event)
 		{
-		case win::WindowEvent::close:
-			quit = true;
-			break;
-		default: break;
+			case win::WindowEvent::close:
+				quit = true;
+				break;
+			default: break;
 		}
 	});
 
@@ -85,6 +92,15 @@ int main()
 	{
 		display.process();
 
+		// publish the latest inputs
+		Input *i;
+		if ((i = input_som.writer_acquire()) != NULL)
+		{
+			*i = input;
+			input_som.writer_release(i);
+		}
+
+		// gather the latest info about render state
 		RenderState *rs;
 		if ((rs = render_state_som.reader_acquire()) != NULL)
 		{
@@ -92,6 +108,7 @@ int main()
 			render_state_som.reader_release(rs);
 		}
 
+		// see if the sim has published a new level layout
 		LevelRenderState *const lrsso = level_render_state_som.reader_acquire();
 		if (lrsso != NULL)
 		{
@@ -102,7 +119,8 @@ int main()
 		}
 
 		renderer.draw();
-		uirenderer.draw_gamehud();
+		uirenderer.draw();
+
 		display.swap();
 	}
 

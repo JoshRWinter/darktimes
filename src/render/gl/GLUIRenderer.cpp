@@ -1,7 +1,5 @@
 #include <ratio>
 
-#include <string.h>
-
 #include "GLUIRenderer.hpp"
 
 GLUIRenderer::GLUIRenderer(const win::Dimensions<int> &dims, const win::Area<float> &area, win::AssetRoll &roll)
@@ -21,7 +19,7 @@ void GLUIRenderer::set_seed(int seed)
 	snprintf(levelseed, sizeof(levelseed), "%d", seed);
 }
 
-void GLUIRenderer::draw_gamehud()
+void GLUIRenderer::draw()
 {
 	++accumulated_fps;
 	auto now = std::chrono::high_resolution_clock::now();

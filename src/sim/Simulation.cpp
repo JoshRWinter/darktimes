@@ -54,6 +54,7 @@ void simulation(
 	float xpos = 0.0f;
 	float ypos = 0.0f;
 	Input input;
+
 	while(!stop)
 	{
 		Input *i;
@@ -81,11 +82,6 @@ void simulation(
 
 		render_state_som.writer_release(rs);
 
-		std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(16));
-
-		/*
-		level_manager.generate();
-		set_level_data_sync(level_data_sync_object_manager, level_manager);
-		 */
+		std::this_thread::sleep_for(std::chrono::duration<float, std::milli>(16.666));
 	}
 }

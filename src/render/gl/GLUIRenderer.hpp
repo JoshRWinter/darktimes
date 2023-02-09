@@ -17,7 +17,7 @@ public:
 	GLUIRenderer(const win::Dimensions<int>&, const win::Area<float>&, win::AssetRoll&);
 
 	void set_seed(int);
-	void draw_gamehud();
+	void draw();
 
 private:
 	win::Area<float> area;
