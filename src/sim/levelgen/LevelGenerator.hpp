@@ -2,7 +2,7 @@
 
 #include <win/Pool.hpp>
 
-#include "../Entity.hpp"
+#include "../entity/Entity.hpp"
 #include "../component/Component.hpp"
 #include "../component/PhysicalComponent.hpp"
 #include "../component/RenderableComponent.hpp"

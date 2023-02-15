@@ -10,6 +10,9 @@ set(sources
 
 	src/Darktimes.hpp
 
+	# top level nonsense
+	src/Renderable.hpp
+	src/Texture.hpp
 	src/SyncObjectManager.hpp
 	src/LevelRenderState.hpp
 	src/RenderState.hpp
@@ -18,36 +21,48 @@ set(sources
 	src/RandomNumberGenerator.cpp
 	src/RandomNumberGenerator.hpp
 
-	src/render/Renderable.hpp
-	src/render/Texture.hpp
-	src/render/gl/GL.cpp
+	# render
 	src/render/gl/GL.hpp
-	src/render/gl/GLRenderer.cpp
+	src/render/gl/GL.cpp
 	src/render/gl/GLRenderer.hpp
-	src/render/gl/GLUIRenderer.cpp
+	src/render/gl/GLRenderer.cpp
 	src/render/gl/GLUIRenderer.hpp
-	src/render/gl/FloorPass.cpp
+	src/render/gl/GLUIRenderer.cpp
 	src/render/gl/FloorPass.hpp
-	src/render/gl/PropPass.cpp
+	src/render/gl/FloorPass.cpp
 	src/render/gl/PropPass.hpp
+	src/render/gl/PropPass.cpp
 
+	# sim
 	src/sim/World.hpp
 	src/sim/Simulation.cpp
 	src/sim/Simulation.hpp
 
-	src/sim/Entity.hpp
+	# entities
+	src/sim/entity/Entity.hpp
+	src/sim/entity/PlayerEntity.hpp
+	src/sim/entity/PlayerEntity.cpp
+
+	# components
 	src/sim/component/Component.hpp
 	src/sim/component/PhysicalComponent.hpp
 	src/sim/component/RenderableComponent.hpp
+	src/sim/component/PlayerComponent.hpp
 
+	# systems
+	src/sim/system/PlayerSystem.hpp
+	src/sim/system/PlayerSystem.cpp
+
+	# level gen nonsense
 	src/sim/levelgen/LevelObjects.hpp
 	src/sim/levelgen/PropDefs.hpp
 	src/sim/levelgen/StructureDefs.hpp
 	src/sim/levelgen/Structure.hpp
 	src/sim/levelgen/Structure.cpp
-	src/sim/levelgen/LevelGenerator.cpp
 	src/sim/levelgen/LevelGenerator.hpp
+	src/sim/levelgen/LevelGenerator.cpp
 
+	# more nonsense
 	asset/recipe
 	asset/shader/wall.vert
 	asset/shader/wall.frag

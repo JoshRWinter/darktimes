@@ -5,7 +5,8 @@
 enum class ComponentType
 {
 	physical,
-	renderable
+	renderable,
+	player
 };
 
 class Entity;

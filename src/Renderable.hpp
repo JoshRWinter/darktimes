@@ -1,8 +1,10 @@
 #pragma once
 
+#include "Texture.hpp"
+
 struct Renderable
 {
-	Renderable(int texture, float x, float y, float w, float h, float rot)
+	Renderable(Texture texture, float x, float y, float w, float h, float rot)
 		: texture(texture)
 		, x(x)
 		, y(y)
@@ -11,7 +13,7 @@ struct Renderable
 		, rot(rot)
 	{}
 
-	int texture;
+	Texture texture;
 	float x;
 	float y;
 	float w;

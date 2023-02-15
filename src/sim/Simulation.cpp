@@ -2,8 +2,11 @@
 #include <chrono>
 
 #include "Simulation.hpp"
+
 #include "World.hpp"
 #include "levelgen/LevelGenerator.hpp"
+
+#include "system/PlayerSystem.hpp"
 
 static void map_renderables(const win::Pool<RenderableComponent> &renderable_component_input, std::vector<Renderable> &renderable)
 {
@@ -51,12 +54,11 @@ void simulation(
 
 	generate_and_set_level_data(level_render_state_som, world);
 
-	float xpos = 0.0f;
-	float ypos = 0.0f;
 	Input input;
 
 	while(!stop)
 	{
+		// gather input
 		Input *i;
 		if ((i = input_som.reader_acquire()) != NULL)
 		{
@@ -64,21 +66,26 @@ void simulation(
 			input_som.reader_release(i);
 		}
 
-		const float scoot = 0.08f;
-		if (input.left)
-			xpos -= scoot;
-		if (input.right)
-			xpos += scoot;
-		if (input.up)
-			ypos += scoot;
-		if (input.down)
-			ypos -= scoot;
+		player_system(
+			world.entities,
+			world.physicals,
+			world.atlas_renderables,
+			world.players,
+			input,
+			world.centerx,
+			world.centery
+		);
 
+		// send render state
 		RenderState *rs;
-		do { rs = render_state_som.writer_acquire(); } while (rs == NULL);
+		do
+		{
+			rs = render_state_som.writer_acquire();
+		} while (rs == NULL);
 
-		rs->centerx = xpos;
-		rs->centery = ypos;
+		map_renderables(world.atlas_renderables, rs->renderables);
+		rs->centerx = world.centerx;
+		rs->centery = world.centery;
 
 		render_state_som.writer_release(rs);
 

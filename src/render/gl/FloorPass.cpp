@@ -4,7 +4,7 @@
 #include <win/GL.hpp>
 #include <win/Targa.hpp>
 
-#include "../Texture.hpp"
+#include "../../Texture.hpp"
 #include "GL.hpp"
 #include "FloorPass.hpp"
 
@@ -12,9 +12,9 @@ static std::vector<win::Targa> get_floor_textures(win::AssetRoll &roll)
 {
 	std::vector<win::Targa> textures;
 
-	for (int i = Texture::level_floor_start; i <= Texture::level_floor_end; ++i)
+	for (int i = (int)Texture::level_floor_start; i <= (int)Texture::level_floor_end; ++i)
 	{
-		const std::string name = "texture/floor" + std::to_string(i - Texture::level_floor_start + 1) + ".tga";
+		const std::string name = "texture/floor" + std::to_string((i - (int)Texture::level_floor_start) + 1) + ".tga";
 		textures.emplace_back(roll[name.c_str()]);
 	}
 
@@ -32,13 +32,13 @@ static std::vector<float> get_floor_verts(const std::vector<Renderable> &floors)
 		const float x_magnitude = floor.w / floor_texture_tile_size;
 		const float y_magnitude = floor.h / floor_texture_tile_size;
 
-		verts.push_back(floor.x); verts.push_back(floor.y + floor.h); verts.push_back(0.0f); verts.push_back(y_magnitude); verts.push_back(floor.texture);
-		verts.push_back(floor.x); verts.push_back(floor.y); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back(floor.texture);
-		verts.push_back(floor.x + floor.w); verts.push_back(floor.y); verts.push_back(x_magnitude); verts.push_back(0.0f); verts.push_back(floor.texture);
+		verts.push_back(floor.x); verts.push_back(floor.y + floor.h); verts.push_back(0.0f); verts.push_back(y_magnitude); verts.push_back((float)floor.texture);
+		verts.push_back(floor.x); verts.push_back(floor.y); verts.push_back(0.0f); verts.push_back(0.0f); verts.push_back((float)floor.texture);
+		verts.push_back(floor.x + floor.w); verts.push_back(floor.y); verts.push_back(x_magnitude); verts.push_back(0.0f); verts.push_back((float)floor.texture);
 
-		verts.push_back(floor.x); verts.push_back(floor.y + floor.h); verts.push_back(0.0f); verts.push_back(y_magnitude); verts.push_back(floor.texture);
-		verts.push_back(floor.x + floor.w); verts.push_back(floor.y); verts.push_back(x_magnitude); verts.push_back(0.0f); verts.push_back(floor.texture);
-		verts.push_back(floor.x + floor.w); verts.push_back(floor.y + floor.h); verts.push_back(x_magnitude); verts.push_back(y_magnitude); verts.push_back(floor.texture);
+		verts.push_back(floor.x); verts.push_back(floor.y + floor.h); verts.push_back(0.0f); verts.push_back(y_magnitude); verts.push_back((float)floor.texture);
+		verts.push_back(floor.x + floor.w); verts.push_back(floor.y); verts.push_back(x_magnitude); verts.push_back(0.0f); verts.push_back((float)floor.texture);
+		verts.push_back(floor.x + floor.w); verts.push_back(floor.y + floor.h); verts.push_back(x_magnitude); verts.push_back(y_magnitude); verts.push_back((float)floor.texture);
 	}
 
 	return verts;

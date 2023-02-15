@@ -7,7 +7,7 @@
 #include <win/AssetRoll.hpp>
 
 #include "../../Darktimes.hpp"
-#include "../Renderable.hpp"
+#include "../../Renderable.hpp"
 
 #include "FloorPass.hpp"
 #include "PropPass.hpp"

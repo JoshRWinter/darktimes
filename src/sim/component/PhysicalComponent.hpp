@@ -4,7 +4,7 @@
 
 struct PhysicalComponent : Component
 {
-	constexpr static ComponentType ctype = ComponentType::physical;
+	static constexpr ComponentType ctype = ComponentType::physical;
 
 	PhysicalComponent(Entity &entity, float x, float y, float w, float h, float rot)
 		: Component(ctype, entity)

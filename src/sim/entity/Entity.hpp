@@ -2,7 +2,7 @@
 
 #include <win/Win.hpp>
 
-#include "component/Component.hpp"
+#include "../component/Component.hpp"
 
 class Entity
 {
@@ -11,13 +11,15 @@ class Entity
 public:
 	constexpr static int max_components = 4;
 
-	Entity() = default;
+	// name MUST BE STATIC!!!
+	explicit Entity(const char *name)
+		: name(name) {}
 
 	~Entity()
 	{
 		for (auto &component : components)
 			if (component.occupied)
-				win::bug("Live component on entity");
+				win::bug("Live component on entity " + std::string(name));
 	}
 
 	Component &add(Component &c) { return *add(&c); }
@@ -34,7 +36,7 @@ public:
 			}
 		}
 
-		win::bug("Component slots full");
+		win::bug("Component slots full on entity " + std::string(name));
 	}
 
 	void remove(ComponentType type)
@@ -49,14 +51,20 @@ public:
 		}
 	}
 
-	template <typename T> T *get() { return get<T>(T::ctype); }
-	template <typename T> T *get(ComponentType type)
+	template <typename T> T &rget()
 	{
 		for (auto &component : components)
-		{
-			if (component.occupied && component.component->type == type)
+			if (component.occupied && component.component->type == T::ctype)
+				return *(T*)component.component;
+
+		win::bug("No component with type " + std::to_string((int)T::ctype) + " on entity " + name);
+	}
+
+	template <typename T> T *get()
+	{
+		for (auto &component : components)
+			if (component.occupied && component.component->type == T::ctype)
 				return (T*)component.component;
-		}
 
 		return NULL;
 	}
@@ -68,5 +76,6 @@ public:
 	}
 
 private:
+	const char *name;
 	struct { Component *component = NULL; bool occupied = false; } components[max_components];
 };

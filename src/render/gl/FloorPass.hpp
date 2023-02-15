@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "../../Darktimes.hpp"
-#include "../Renderable.hpp"
+#include "../../Renderable.hpp"
 
 class FloorPass
 {

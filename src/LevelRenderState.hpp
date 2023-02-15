@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "Darktimes.hpp"
-#include "render/Renderable.hpp"
+#include "Renderable.hpp"
 
 struct LevelRenderState
 {

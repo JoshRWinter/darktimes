@@ -1,15 +1,16 @@
 #pragma once
 
 #include "Component.hpp"
+#include "../../Texture.hpp"
 
 struct RenderableComponent : Component
 {
-	constexpr static ComponentType ctype = ComponentType::renderable;
+	static constexpr ComponentType ctype = ComponentType::renderable;
 
-	RenderableComponent(Entity &entity, int texture)
+	RenderableComponent(Entity &entity, Texture texture)
 		: Component(ctype, entity)
 		, texture(texture)
 	{}
 
-	int texture;
+	Texture texture;
 };
