@@ -11,6 +11,7 @@
 
 #include "FloorPass.hpp"
 #include "PropPass.hpp"
+#include "DynamicPass.hpp"
 
 class GLRenderer
 {
@@ -20,6 +21,7 @@ public:
 	GLRenderer(const win::Area<float> &, win::AssetRoll &);
 
 	void set_level_data(const std::vector<Renderable>&, const std::vector<Renderable>&);
+	void set_dynamics(const std::vector<Renderable>&);
 
 	void set_center(float, float);
 
@@ -28,4 +30,5 @@ public:
 private:
 	FloorPass floor_pass;
 	PropPass prop_pass;
+	DynamicPass dynamic_pass;
 };

@@ -1,7 +1,7 @@
 #include <string.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <win/GL.hpp>
+#include <win/gl/GL.hpp>
 #include <win/Targa.hpp>
 
 #include "../../Texture.hpp"

@@ -1,5 +1,5 @@
 #include <glm/gtc/type_ptr.hpp>
-#include <win/GL.hpp>
+#include <win/gl/GL.hpp>
 
 #include "GL.hpp"
 #include "PropPass.hpp"

@@ -1,18 +1,20 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <win/GL.hpp>
+#include <win/gl/GL.hpp>
 
 #include "GLRenderer.hpp"
 
 GLRenderer::GLRenderer(const win::Area<float> &world_area, win::AssetRoll &roll)
 	: floor_pass(roll)
 	, prop_pass(roll)
+	, dynamic_pass(roll)
 {
 	const glm::mat4 projection_matrix = glm::ortho(world_area.left, world_area.right, world_area.bottom, world_area.top);
 
 	floor_pass.set_projection(projection_matrix);
 	prop_pass.set_projection(projection_matrix);
+	dynamic_pass.set_projection(projection_matrix);
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable(GL_BLEND);
@@ -25,12 +27,18 @@ void GLRenderer::set_level_data(const std::vector<Renderable> &tile_renderables,
 	prop_pass.set_props(atlas_renderables);
 }
 
+void GLRenderer::set_dynamics(const std::vector<Renderable> &dynamics)
+{
+	dynamic_pass.set_renderables(dynamics);
+}
+
 void GLRenderer::draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	floor_pass.draw();
 	prop_pass.draw();
+	dynamic_pass.draw();
 
 #ifndef NDEBUG
 	auto error = glGetError();
@@ -46,4 +54,5 @@ void GLRenderer::set_center(float x, float y)
 
 	floor_pass.set_view(view_matrix);
 	prop_pass.set_view(view_matrix);
+	dynamic_pass.set_view(view_matrix);
 }

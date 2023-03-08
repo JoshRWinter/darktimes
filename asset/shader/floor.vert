@@ -10,6 +10,6 @@ out vec3 ftexcoord;
 
 void main()
 {
-	gl_Position = view * projection * vec4(pos.xy, 0.0, 1.0);
+	gl_Position = projection * view * vec4(pos.xy, 0.0, 1.0);
 	ftexcoord = texcoord;
 }

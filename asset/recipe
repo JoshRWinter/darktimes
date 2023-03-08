@@ -7,8 +7,15 @@ shader/floor.vert z
 shader/floor.frag z
 shader/prop.vert z
 shader/prop.frag z
+shader/dynamic.vert z
+shader/dynamic.frag z
 
 svg2tga {
 	texture/floor1.svg 50 50
 	texture/floor2.svg 50 50
+	texture/player.svg 50 50 exclude
+}
+
+atlas {
+    texture/gameplay.atlas.txt texture/gameplay.atlas
 }

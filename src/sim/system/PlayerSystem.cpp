@@ -23,7 +23,7 @@ void player_system(
 	auto &player = *players.begin();
 	auto &phys = player.entity.rget<PhysicalComponent>();
 
-	const float scoot = 0.1f;
+	const float scoot = 0.4f;
 	if (input.up)
 		phys.y += scoot;
 	if (input.down)

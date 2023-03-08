@@ -32,6 +32,8 @@ set(sources
 	src/render/gl/FloorPass.cpp
 	src/render/gl/PropPass.hpp
 	src/render/gl/PropPass.cpp
+	src/render/gl/DynamicPass.cpp
+	src/render/gl/DynamicPass.hpp
 
 	# sim
 	src/sim/World.hpp
