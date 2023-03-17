@@ -1,21 +1,24 @@
-#include <win/gl/GL.hpp>
+#include <win/Win.hpp>
 
 #ifdef WIN_USE_OPENGL
 
-#include <string.h>
+#define WIN_GL_EXTENSION_STORAGE
+#include <win/gl/GL.hpp>
 
 namespace win
 {
 
 #if defined WINPLAT_LINUX
+
 static void *getproc(const char *name)
 {
-	void *address = (void*)glXGetProcAddress((const unsigned char*)name);
-	if(address == NULL)
+	void *address = (void *) glXGetProcAddress((const unsigned char *) name);
+	if (address == NULL)
 		win::bug(std::string("Could not get extension \"") + name + "\"");
 
 	return address;
 }
+
 #elif defined WINPLAT_WINDOWS
 static void *getproc(const char *name)
 {
@@ -29,6 +32,42 @@ static void *getproc(const char *name)
 	return address;
 }
 #endif
+
+void gl_check_error()
+{
+	const char *errname;
+	const auto err = glGetError();
+
+	switch (err)
+	{
+		case GL_NO_ERROR:
+			errname = "GL_NO_ERROR";
+			break;
+		case GL_INVALID_ENUM:
+			errname = "GL_INVALID_ENUM";
+			break;
+		case GL_INVALID_VALUE:
+			errname = "GL_INVALID_VALUE";
+			break;
+		case GL_INVALID_OPERATION:
+			errname = "GL_INVALID_OPERATION";
+			break;
+		case GL_STACK_OVERFLOW:
+			errname = "GL_STACK_OVERFLOW";
+			break;
+		case GL_STACK_UNDERFLOW:
+			errname = "GL_STACK_UNDERFLOW";
+			break;
+		case GL_OUT_OF_MEMORY:
+			errname = "GL_OUT_OF_MEMORY";
+			break;
+		default:
+			errname = "Unknown gl error";
+			break;
+	}
+	if (err != GL_NO_ERROR)
+		win::bug("GL error " + std::string(errname) + " (" + std::to_string(err) + ")");
+}
 
 static void *getproc(const char*);
 void load_gl_extensions()
@@ -47,25 +86,36 @@ void load_gl_extensions()
 	glCreateProgram = (decltype(glCreateProgram))getproc("glCreateProgram");
 	glUseProgram = (decltype(glUseProgram))getproc("glUseProgram");
 	glDeleteProgram = (decltype(glDeleteProgram))getproc("glDeleteProgram");
+
 	glGenVertexArrays = (decltype(glGenVertexArrays))getproc("glGenVertexArrays");
-	glGenBuffers = (decltype(glGenBuffers))getproc("glGenBuffers");
 	glBindVertexArray = (decltype(glBindVertexArray))getproc("glBindVertexArray");
+	glDeleteVertexArrays = (decltype(glDeleteVertexArrays))getproc("glDeleteVertexArrays");
+
+	glGenBuffers = (decltype(glGenBuffers))getproc("glGenBuffers");
 	glBindBuffer = (decltype(glBindBuffer))getproc("glBindBuffer");
+	glDeleteBuffers = (decltype(glDeleteBuffers))getproc("glDeleteBuffers");
+
 	glBufferData = (decltype(glBufferData))getproc("glBufferData");
+	glBufferStorage = (decltype(glBufferStorage))getproc("glBufferStorage");
+	glMapBufferRange = (decltype(glMapBufferRange))getproc("glMapBufferRange");
+
+	glVertexAttribDivisor = (decltype(glVertexAttribDivisor))getproc("glVertexAttribDivisor");
 	glVertexAttribPointer = (decltype(glVertexAttribPointer))getproc("glVertexAttribPointer");
 	glEnableVertexAttribArray = (decltype(glEnableVertexAttribArray))getproc("glEnableVertexAttribArray");
-	glDeleteVertexArrays = (decltype(glDeleteVertexArrays))getproc("glDeleteVertexArrays");
-	glDeleteBuffers = (decltype(glDeleteBuffers))getproc("glDeleteBuffers");
+
+	glGetUniformBlockIndex = (decltype(glGetUniformBlockIndex))getproc("glGetUniformBlockIndex");
+	glUniformBlockBinding = (decltype(glUniformBlockBinding))getproc("glUniformBlockBinding");
 	glGetUniformLocation = (decltype(glGetUniformLocation))getproc("glGetUniformLocation");
 	glUniformMatrix4fv = (decltype(glUniformMatrix4fv))getproc("glUniformMatrix4fv");
-	glVertexAttribDivisor = (decltype(glVertexAttribDivisor))getproc("glVertexAttribDivisor");
 	glUniform1f = (decltype(glUniform1f))getproc("glUniform1f");
 	glUniform2f = (decltype(glUniform2f))getproc("glUniform2f");
 	glUniform4f = (decltype(glUniform4f))getproc("glUniform4f");
 	glUniform1i = (decltype(glUniform1i))getproc("glUniform1i");
 	glUniform2i = (decltype(glUniform2i))getproc("glUniform2i");
+
 	glDrawElementsInstanced = (decltype(glDrawElementsInstanced))getproc("glDrawElementsInstanced");
-	glBufferSubData = (decltype(glBufferSubData))getproc("glBufferSubData");
+	glDrawElementsBaseVertex = (decltype(glDrawElementsBaseVertex))getproc("glDrawElementsBaseVertex");
+	glMultiDrawElementsIndirect = (decltype(glMultiDrawElementsIndirect))getproc("glMultiDrawElementsIndirect");
 
 #if defined WINPLAT_LINUX
 	glXSwapIntervalEXT = (decltype(glXSwapIntervalEXT))getproc("glXSwapIntervalEXT");

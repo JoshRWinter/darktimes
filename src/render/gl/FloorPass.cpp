@@ -12,7 +12,7 @@ static std::vector<win::Targa> get_floor_textures(win::AssetRoll &roll)
 {
 	std::vector<win::Targa> textures;
 
-	for (int i = (int)Texture::level_floor_start; i <= (int)Texture::level_floor_end; ++i)
+	for (int i = (int)Texture::level_floor_start; i < (int)Texture::level_floor_end; ++i)
 	{
 		const std::string name = "texture/floor" + std::to_string((i - (int)Texture::level_floor_start) + 1) + ".tga";
 		textures.emplace_back(roll[name.c_str()]);

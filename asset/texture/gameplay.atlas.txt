@@ -1,2 +1,3 @@
 $padding 5
 player.tga:5:5:50:50
+misc.tga:60:5:50:50

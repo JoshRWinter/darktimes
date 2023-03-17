@@ -17,11 +17,11 @@ class DynamicPass
 	NO_COPY_MOVE(DynamicPass);
 
 public:
-	DynamicPass(win::AssetRoll&);
+	explicit DynamicPass(win::AssetRoll&);
 	~DynamicPass();
 
-	void set_projection(const glm::mat4&);
-	void set_view(const glm::mat4&);
+	void set_projection(const glm::mat4&) const;
+	void set_view(const glm::mat4&) const;
 
 	void set_renderables(const std::vector<Renderable>&);
 	void draw();
@@ -30,11 +30,11 @@ private:
 	GLuint program;
 	GLint uniform_projection;
 	GLint uniform_view;
-	GLint uniform_model;
+
+	GLuint transforms;
 
 	GLuint vao;
-	GLuint vbo;
-	GLuint vbo_texcoords;
+	GLuint vbo_vertices;
 	GLuint ebo;
 
 	win::GLAtlas atlas;

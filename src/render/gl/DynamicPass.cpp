@@ -11,60 +11,82 @@ DynamicPass::DynamicPass(win::AssetRoll &roll)
 	glUseProgram(program);
 	uniform_projection = get_uniform(program, "projection");
 	uniform_view = get_uniform(program, "view");
-	uniform_model = get_uniform(program, "model");
 
 	// vertex array
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	// main buffer
-	const float verts[] =
+	std::vector<float> verts;
+
+	// fill up the verts
+	const int gameplay_textures = (int)Texture::gameplay_end - (int)Texture::gameplay_start;
+	for (int i = 0; i < gameplay_textures; ++i)
 	{
-		-0.5f, 0.5f,
-		-0.5f, -0.5f,
-		0.5f,  -0.5f,
-		0.5f, 0.5f
-	};
+		const win::AtlasItem &item = atlas.item(i);
 
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		float v[] =
+		{
+			-0.5f, 0.5f, item.x1, item.y2,
+			-0.5f, -0.5f, item.x1, item.y1,
+			0.5f, -0.5f, item.x2, item.y1,
+			0.5f, 0.5f, item.x2, item.y2
+		};
+
+		for (const float f : v)
+			verts.push_back(f);
+	}
+
+	glGenBuffers(1, &vbo_vertices);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, NULL);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * verts.size(), verts.data(), GL_STATIC_DRAW);
 
-	// element buffer
-	const int elements[] =
+	const unsigned short elements[] =
 	{
 		0, 1, 2, 0, 2, 3
 	};
+
+	// element buffer
 
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-	// texcoords
-	glGenBuffers(1, &vbo_texcoords);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoords);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	// transforms uniform block
+
+	glGenBuffers(1, &transforms);
+	glBindBuffer(GL_UNIFORM_BUFFER, transforms);
+	const auto transforms_index = glGetUniformBlockIndex(program, "transforms");
+	if (transforms_index == GL_INVALID_INDEX) win::bug("no transforms");
+	glUniformBlockBinding(program, transforms_index, 0);
+
+	glBufferStorage(GL_UNIFORM_BUFFER, sizeof(float) * 16, NULL, GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT);
+	auto mem = glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(float) * 16, GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT);
+
+	auto m1 = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.0f, 0.0f, 0.0f));
+	memcpy(mem, glm::value_ptr(m1), sizeof(float) * 16);
 }
 
 DynamicPass::~DynamicPass()
 {
+	glDeleteBuffers(1, &transforms);
 	glDeleteBuffers(1, &ebo);
-	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &vbo_vertices);
 	glDeleteVertexArrays(1, &vao);
 	glDeleteProgram(program);
 }
 
-void DynamicPass::set_projection(const glm::mat4 &projection)
+void DynamicPass::set_projection(const glm::mat4 &projection) const
 {
 	glUseProgram(program);
 	glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
-void DynamicPass::set_view(const glm::mat4 &view)
+void DynamicPass::set_view(const glm::mat4 &view) const
 {
 	glUseProgram(program);
 	glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
@@ -79,21 +101,20 @@ void DynamicPass::draw()
 	const glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	glUseProgram(program);
-	glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-
-	const win::AtlasItem item = atlas.item(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoords);
-	const float tc[] =
-	{
-		item.x1, item.y2,
-		item.x1, item.y1,
-		item.x2, item.y1,
-		item.x2, item.y2
-	};
-	glBufferData(GL_ARRAY_BUFFER, sizeof(tc), tc, GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(vao);
 	glBindTexture(GL_TEXTURE_2D, atlas.texture());
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+	DrawElementsIndirectCommand cmd;
+	cmd.count = 6;
+	cmd.instance_count = 1;
+	cmd.first_index = 0;
+	cmd.base_vertex = 0;
+	cmd.base_instance = 0;
+
+	win::gl_check_error();
+	//glBindBuffer(GL_UNIFORM_BUFFER, transforms);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, &cmd, 1, 0);
+	win::gl_check_error();
 }

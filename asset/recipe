@@ -14,6 +14,7 @@ svg2tga {
 	texture/floor1.svg 50 50
 	texture/floor2.svg 50 50
 	texture/player.svg 50 50 exclude
+	texture/misc.svg 50 50 exclude
 }
 
 atlas {
