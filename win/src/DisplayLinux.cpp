@@ -14,6 +14,8 @@
 #include <win/gl/GL.hpp>
 #endif
 
+using namespace win::gl;
+
 typedef GLXContext (*glXCreateContextAttribsARBProc)(::Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
 static Atom atom_delete_window;
@@ -283,6 +285,8 @@ Display::Display(const DisplayOptions &options)
 	{
 		GLX_CONTEXT_MAJOR_VERSION_ARB, options.gl_major,
 		GLX_CONTEXT_MINOR_VERSION_ARB, options.gl_minor,
+		GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+		options.debug ? GLX_CONTEXT_FLAGS_ARB : GL_NONE, options.debug ? GLX_CONTEXT_DEBUG_BIT_ARB : GL_NONE,
 		None
 	};
 

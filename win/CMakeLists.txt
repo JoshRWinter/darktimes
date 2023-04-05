@@ -20,7 +20,9 @@ add_library(win STATIC
 
 	include/win/Pool.hpp
 
-	include/win/RingBuffer.hpp
+	include/win/ConcurrentRingBuffer.hpp
+
+	include/win/MappedRingBuffer.hpp
 
 	include/win/Atlas.hpp
 	src/Atlas.cpp
