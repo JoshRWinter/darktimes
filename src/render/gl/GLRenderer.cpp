@@ -5,11 +5,15 @@
 
 #include "GLRenderer.hpp"
 
-GLRenderer::GLRenderer(const win::Area<float> &world_area, win::AssetRoll &roll)
+using namespace win::gl;
+
+GLRenderer::GLRenderer(const win::Area<float> &world_area, win::AssetRoll &roll, bool debug)
 	: floor_pass(roll)
 	, prop_pass(roll)
 	, dynamic_pass(roll)
 {
+	glDebugMessageCallback([](GLenum, GLenum, GLuint, GLenum, GLsizei, const GLchar *message, const void*) { fprintf(stderr, "%s\n", message); }, NULL);
+
 	const glm::mat4 projection_matrix = glm::ortho(world_area.left, world_area.right, world_area.bottom, world_area.top);
 
 	floor_pass.set_projection(projection_matrix);
@@ -41,9 +45,7 @@ void GLRenderer::draw()
 	dynamic_pass.draw();
 
 #ifndef NDEBUG
-	auto error = glGetError();
-	if (error != 0)
-		win::bug("GL error " + std::to_string(error));
+	win::gl_check_error();
 #endif
 }
 

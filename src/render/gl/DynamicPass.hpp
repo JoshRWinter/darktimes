@@ -16,6 +16,8 @@ class DynamicPass
 {
 	NO_COPY_MOVE(DynamicPass);
 
+	static constexpr int ubo_size = 2;
+
 public:
 	explicit DynamicPass(win::AssetRoll&);
 	~DynamicPass();
@@ -31,11 +33,11 @@ private:
 	GLint uniform_projection;
 	GLint uniform_view;
 
-	GLuint transforms;
-
 	GLuint vao;
 	GLuint vbo_vertices;
+	GLuint vbo_drawids;
 	GLuint ebo;
+	GLuint ubo_transforms;
 
 	win::GLAtlas atlas;
 };

@@ -44,8 +44,9 @@ int main()
 	display_options.width = win::Display::screen_width();
 	display_options.height = win::Display::screen_height();
 #endif
-	display_options.gl_major = 3;
+	display_options.gl_major = 4;
 	display_options.gl_minor = 3;
+	display_options.debug = false;
 
 	win::Display display(display_options);
 	display.vsync(true);
@@ -78,7 +79,7 @@ int main()
 
 	// renderer setup
 	win::AssetRoll roll("Darktimes.roll");
-	GLRenderer renderer(win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
+	GLRenderer renderer(win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll, display_options.debug);
 	GLUIRenderer uirenderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 
 	// set up the simulation thread

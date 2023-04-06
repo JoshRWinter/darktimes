@@ -2,6 +2,8 @@
 
 #include "GL.hpp"
 
+using namespace win::gl;
+
 int get_uniform(GLuint program, const char *name)
 {
 	int location = glGetUniformLocation(program, name);

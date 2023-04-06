@@ -18,7 +18,7 @@ class GLRenderer
 public:
 	NO_COPY_MOVE(GLRenderer);
 
-	GLRenderer(const win::Area<float> &, win::AssetRoll &);
+	GLRenderer(const win::Area<float>&, win::AssetRoll&, bool debug);
 
 	void set_level_data(const std::vector<Renderable>&, const std::vector<Renderable>&);
 	void set_dynamics(const std::vector<Renderable>&);
