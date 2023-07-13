@@ -4,7 +4,7 @@
 
 int get_uniform(GLuint program, const char *name)
 {
-	int location = glGetUniformLocation(program, name);
+	int location = win::gl::glGetUniformLocation(program, name);
 
 	if (location == -1)
 		win::bug("No uniform " + std::string(name));

@@ -5,14 +5,10 @@
 #include <unordered_map>
 #include <iostream>
 
-#include <GL/gl.h>
-#include <GL/wglext.h>
-
-#include <win/Display.hpp>
-#include <win/Event.hpp>
+#include <win/Win32Display.hpp>
 
 #ifdef WIN_USE_OPENGL
-#include <win/GL.hpp>
+#include <win/GL/GL.hpp>
 #endif
 
 namespace win
@@ -148,9 +144,9 @@ static win::Button get_physical_key(unsigned scan)
 	return it->second;
 }
 
-void Display::win_init_gl(Display &display, HWND hwnd)
+void Win32Display::win_init_gl(HWND hwnd)
 {
-	display.hdc = GetDC(hwnd);
+	hdc = GetDC(hwnd);
 
 	PIXELFORMATDESCRIPTOR pfd;
 	memset(&pfd, 0, sizeof(pfd));
@@ -164,134 +160,129 @@ void Display::win_init_gl(Display &display, HWND hwnd)
 	pfd.iLayerType=PFD_MAIN_PLANE;
 
 	const int attribs[] =
-	{
-		WGL_CONTEXT_MAJOR_VERSION_ARB, display.gl_major, WGL_CONTEXT_MINOR_VERSION_ARB, display.gl_minor, 0
-	};
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, gl_major, WGL_CONTEXT_MINOR_VERSION_ARB, gl_minor, 0
+		};
 
-	SetPixelFormat(display.hdc, ChoosePixelFormat(display.hdc, &pfd), &pfd);
-	HGLRC tmp = wglCreateContext(display.hdc);
-	wglMakeCurrent(display.hdc, tmp);
+	SetPixelFormat(hdc, ChoosePixelFormat(hdc, &pfd), &pfd);
+	HGLRC tmp = wglCreateContext(hdc);
+	wglMakeCurrent(hdc, tmp);
 	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = (decltype(wglCreateContextAttribsARB))wglGetProcAddress("wglCreateContextAttribsARB");
-	display.context = wglCreateContextAttribsARB(display.hdc, NULL, attribs);
-	wglMakeCurrent(display.hdc, display.context);
+	context = wglCreateContextAttribsARB(hdc, NULL, attribs);
+	wglMakeCurrent(hdc, context);
 	wglDeleteContext(tmp);
-	if(display.context == NULL)
+	if(context == NULL)
 	{
-		ReleaseDC(hwnd, display.hdc);
-		MessageBox(NULL, ("This software requires support for at least Opengl " + std::to_string(display.gl_major) + "." + std::to_string(display.gl_minor)).c_str(), "Fatal Error", MB_ICONEXCLAMATION);
+		ReleaseDC(hwnd, hdc);
+		MessageBox(NULL, ("This software requires support for at least Opengl " + std::to_string(gl_major) + "." + std::to_string(gl_minor)).c_str(), "Fatal Error", MB_ICONEXCLAMATION);
 		std::abort();
 	}
 
-	load_gl_extensions();
+	wglSwapIntervalEXT = (decltype(wglSwapIntervalEXT)) wglGetProcAddress("wglSwapIntervalEXT");
 }
 
-void Display::win_term_gl()
+void Win32Display::win_term_gl()
 {
 	wglMakeCurrent(hdc, NULL);
 	wglDeleteContext(context);
 	ReleaseDC(window, hdc);
 }
 
-LRESULT CALLBACK Display::wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
+LRESULT CALLBACK Win32Display::wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	if(msg == WM_NCCREATE)
 	{
 		CREATESTRUCT *cs = (CREATESTRUCT*)lp;
-		Display *d = (win::Display*)cs->lpCreateParams;
+		Win32Display *d = (win::Win32Display*)cs->lpCreateParams;
 		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)d);
 		SetWindowPos(hwnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
 
 		return TRUE;
 	}
 
-	Display *const display_ptr = (win::Display*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	Win32Display *const display_ptr = (win::Win32Display*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 	if(display_ptr == NULL)
 		return DefWindowProc(hwnd, msg, wp, lp);
 
-	Display &display = *display_ptr;
+	Win32Display &display = *display_ptr;
 
 	switch(msg)
 	{
-	case WM_CREATE:
-		win_init_gl(display, hwnd);
-		return 0;
-	case WM_CHAR:
-		if(wp >= ' ' && wp <= '~')
-			display.character_handler(wp);
-		return 0;
-	case WM_KEYDOWN:
-	{
-		const unsigned scancode = (lp >> 16) & 0xff;
-		const Button key = get_physical_key(scancode);
-		if(key == Button::undefined)
+		case WM_CREATE:
+			display.win_init_gl(hwnd);
+			return 0;
+		case WM_CHAR:
+			if(wp >= ' ' && wp <= '~')
+				display.character_handler(wp);
+			return 0;
+		case WM_KEYDOWN:
 		{
-			std::cerr << "Unrecognized virtual key " << wp << " scancode " << scancode << std::endl;
+			const unsigned scancode = (lp >> 16) & 0xff;
+			const Button key = get_physical_key(scancode);
+			if(key == Button::undefined)
+			{
+				std::cerr << "Unrecognized virtual key " << wp << " scancode " << scancode << std::endl;
+				return 0;
+			}
+
+			display.button_handler(key, true);
 			return 0;
 		}
-
-		display.button_handler(get_physical_key(scancode), true);
-		return 0;
-	}
-	case WM_KEYUP:
-	{
-		const unsigned scancode = (lp >> 16) & 0xff;
-		const Button key = get_physical_key(scancode);
-		if(key == Button::undefined)
+		case WM_KEYUP:
 		{
-			std::cerr << "Unrecognized virtual key " << wp << " scancode " << scancode << std::endl;
+			const unsigned scancode = (lp >> 16) & 0xff;
+			const Button key = get_physical_key(scancode);
+			if(key == Button::undefined)
+			{
+				std::cerr << "Unrecognized virtual key " << wp << " scancode " << scancode << std::endl;
+				return 0;
+			}
+
+			display.button_handler(key, false);
 			return 0;
 		}
-
-		display.button_handler(get_physical_key(scancode), false);
-		return 0;
-	}
-	case WM_SYSCOMMAND:
-		if(wp != SC_KEYMENU)
+		case WM_SYSCOMMAND:
+			if(wp != SC_KEYMENU)
+				return DefWindowProc(hwnd, msg, wp, lp);
+		case WM_MOUSEMOVE:
+			display.mouse_handler(LOWORD(lp), HIWORD(lp));
+			return 0;
+		case WM_LBUTTONDOWN:
+			display.button_handler(Button::mouse_left, true);
+			return 0;
+		case WM_LBUTTONUP:
+			display.button_handler(Button::mouse_left, false);
+			return 0;
+		case WM_RBUTTONDOWN:
+			display.button_handler(Button::mouse_right, true);
+			return 0;
+		case WM_RBUTTONUP:
+			display.button_handler(Button::mouse_right, false);
+			return 0;
+		case WM_MBUTTONDOWN:
+			display.button_handler(Button::mouse_middle, true);
+			return 0;
+		case WM_MBUTTONUP:
+			display.button_handler(Button::mouse_middle, false);
+			return 0;
+		case WM_CLOSE:
+			display.window_handler(WindowEvent::close);
+			return 0;
+		case WM_ERASEBKGND:
+			return 0;
+		default:
 			return DefWindowProc(hwnd, msg, wp, lp);
-	case WM_MOUSEMOVE:
-		display.mouse_handler(LOWORD(lp), HIWORD(lp));
-		return 0;
-	case WM_LBUTTONDOWN:
-		display.button_handler(Button::mouse_left, true);
-		return 0;
-	case WM_LBUTTONUP:
-		display.button_handler(Button::mouse_left, false);
-		return 0;
-	case WM_RBUTTONDOWN:
-		display.button_handler(Button::mouse_right, true);
-		return 0;
-	case WM_RBUTTONUP:
-		display.button_handler(Button::mouse_right, false);
-		return 0;
-	case WM_MBUTTONDOWN:
-		display.button_handler(Button::mouse_middle, true);
-		return 0;
-	case WM_MBUTTONUP:
-		display.button_handler(Button::mouse_middle, false);
-		return 0;
-	case WM_CLOSE:
-		display.window_handler(WindowEvent::close);
-		return 0;
-	case WM_ERASEBKGND:
-		return 0;
-	default:
-		return DefWindowProc(hwnd, msg, wp, lp);
 	}
 
 	win::bug("late return from wndproc");
 }
 
-Display::Display(const DisplayOptions &options)
+Win32Display::Win32Display(const DisplayOptions &options)
 {
 	const char *const window_class = "win_window_class";
 
 	gl_major = options.gl_major;
 	gl_minor = options.gl_minor;
-
-	window_handler = default_window_handler;
-	button_handler = default_button_handler;
-	character_handler = default_character_handler;
-	mouse_handler = default_mouse_handler;
 
 	WNDCLASSEX wc;
 	wc.cbSize = sizeof(wc);
@@ -333,14 +324,14 @@ Display::Display(const DisplayOptions &options)
 	UpdateWindow(window);
 }
 
-Display::~Display()
+Win32Display::~Win32Display()
 {
 	win_term_gl();
 	// close the window
 	DestroyWindow(window);
 }
 
-void Display::process()
+void Win32Display::process()
 {
 	MSG msg;
 
@@ -351,12 +342,12 @@ void Display::process()
 	}
 }
 
-void Display::swap()
+void Win32Display::swap()
 {
 	SwapBuffers(hdc);
 }
 
-int Display::width()
+int Win32Display::width()
 {
 	RECT rect;
 	GetClientRect(window, &rect);
@@ -364,7 +355,7 @@ int Display::width()
 	return rect.right;
 }
 
-int Display::height()
+int Win32Display::height()
 {
 	RECT rect;
 	GetClientRect(window, &rect);
@@ -372,48 +363,28 @@ int Display::height()
 	return rect.bottom;
 }
 
-void Display::cursor(bool)
-{
-}
-
-void Display::vsync(bool on)
-{
-	wglSwapIntervalEXT(on);
-}
-
-NativeWindowHandle Display::native_handle()
-{
-	return window;
-}
-
-void Display::register_window_handler(WindowHandler fn)
-{
-	window_handler = std::move(fn);
-}
-
-void Display::register_button_handler(ButtonHandler fn)
-{
-	button_handler = std::move(fn);
-}
-
-void Display::register_character_handler(CharacterHandler fn)
-{
-	character_handler = std::move(fn);
-}
-
-void Display::register_mouse_handler(MouseHandler fn)
-{
-	mouse_handler = std::move(fn);
-}
-
-int Display::screen_width()
+int Win32Display::screen_width()
 {
 	return GetSystemMetrics(SM_CXSCREEN);
 }
 
-int Display::screen_height()
+int Win32Display::screen_height()
 {
 	return GetSystemMetrics(SM_CYSCREEN);
+}
+
+void Win32Display::cursor(bool show)
+{
+}
+
+void Win32Display::vsync(bool on)
+{
+	wglSwapIntervalEXT(on);
+}
+
+NativeWindowHandle Win32Display::native_handle()
+{
+	return window;
 }
 
 }

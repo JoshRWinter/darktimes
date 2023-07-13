@@ -4,9 +4,9 @@
 
 GLUIRenderer::GLUIRenderer(const win::Dimensions<int> &dims, const win::Area<float> &area, win::AssetRoll &roll)
 	: area(area)
-	, font_renderer(dims, area)
-	, font_title(font_renderer, roll["font/CHE-THIS.TTF"], 0.7f)
-	, font_debug(font_renderer, roll["font/NotoSansMono-Regular.ttf"], 0.25f)
+	, text_renderer(dims, area)
+	, text_title(dims, area, 0.7f, roll["font/CHE-THIS.TTF"])
+	, text_debug(dims, area, 0.25f, roll["font/NotoSansMono-Regular.ttf"])
 {
 	levelseed[0] = 0;
 	accumulated_fps = 0;
@@ -30,7 +30,9 @@ void GLUIRenderer::draw()
 		accumulated_fps = 0;
 	}
 
-	font_renderer.draw(font_title, "DARK TIMES", 0.0f, 3.75f, win::Color(1.0f, 1.0f, 1.0f), true);
-	font_renderer.draw(font_debug, levelseed, 0.0f, -4.25f, win::Color(1.0f, 1.0f, 0.0f), true);
-	font_renderer.draw(font_debug, fps_str, area.left + 0.1f, area.top - font_debug.size() , win::Color(1.0f, 1.0f, 0.0f));
+	text_renderer.draw(text_title, "DARK TIMES", 0.0f, 3.75f, win::Color(1.0f, 1.0f, 1.0f), true);
+	text_renderer.draw(text_debug, levelseed, 0.0f, -4.25f, win::Color(1.0f, 1.0f, 0.0f), true);
+	text_renderer.draw(text_debug, fps_str, area.left + 0.1f, area.top - text_debug.font_metric().size, win::Color(1.0f, 1.0f, 0.0f));
+
+	text_renderer.flush();
 }

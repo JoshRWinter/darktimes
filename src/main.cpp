@@ -50,6 +50,8 @@ int main()
 	win::Display display(display_options);
 	display.vsync(true);
 
+	win::load_gl_functions();
+
 	// input handling
 	bool quit = false;
 	std::atomic<bool> simulation_quit = false;

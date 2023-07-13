@@ -8,6 +8,8 @@
 #include "GL.hpp"
 #include "FloorPass.hpp"
 
+using namespace win::gl;
+
 static std::vector<win::Targa> get_floor_textures(win::AssetRoll &roll)
 {
 	std::vector<win::Targa> textures;

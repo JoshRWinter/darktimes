@@ -1,7 +1,5 @@
 #pragma once
 
-//#define WIN_USE_SOUND_INTEGRATION_TESTS
-
 // redifined platform macros for conditional compilation
 #if defined __linux__
 #define WINPLAT_LINUX
@@ -26,6 +24,10 @@
 	classname(classname&&) = delete; \
 	void operator=(const classname&) = delete; \
 	void operator=(classname&&) = delete
+
+#define WIN_NO_COPY(classname) \
+	classname(const classname&) = delete; \
+	void operator=(const classname&) = delete
 
 namespace win
 {

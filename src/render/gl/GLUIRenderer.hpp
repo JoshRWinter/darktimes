@@ -4,8 +4,8 @@
 
 #include <win/AssetRoll.hpp>
 #include <win/Utility.hpp>
-#include <win/FontRenderer.hpp>
-#include <win/Font.hpp>
+#include <win/gl/GLTextRenderer.hpp>
+#include <win/gl/GLFont.hpp>
 
 #include "../../Darktimes.hpp"
 
@@ -21,9 +21,9 @@ public:
 
 private:
 	win::Area<float> area;
-	win::FontRenderer font_renderer;
-	win::Font font_title;
-	win::Font font_debug;
+	win::GLTextRenderer text_renderer;
+	win::GLFont text_title;
+	win::GLFont text_debug;
 
 	char levelseed[20];
 	std::chrono::time_point<std::chrono::high_resolution_clock> last_fps_sample;

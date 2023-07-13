@@ -3,6 +3,8 @@
 #include "GL.hpp"
 #include "DynamicPass.hpp"
 
+using namespace win::gl;
+
 DynamicPass::DynamicPass(win::AssetRoll &roll)
 	: atlas(roll["texture/gameplay.atlas"], win::GLAtlas::Mode::linear)
 {

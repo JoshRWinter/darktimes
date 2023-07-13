@@ -4,6 +4,8 @@
 #include "GL.hpp"
 #include "PropPass.hpp"
 
+using namespace win::gl;
+
 static std::vector<float> get_prop_verts(const std::vector<Renderable> &props)
 {
 	std::vector<float> verts;

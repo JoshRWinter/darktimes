@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/CMakeModules)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(win STATIC
@@ -20,13 +20,17 @@ add_library(win STATIC
 
 	include/win/Pool.hpp
 
-	include/win/RingBuffer.hpp
+	include/win/ConcurrentRingBuffer.hpp
+
+	include/win/MappedRingBuffer.hpp
 
 	include/win/Atlas.hpp
 	src/Atlas.cpp
 
 	include/win/Targa.hpp
 	src/Targa.cpp
+
+	include/win/Math.hpp
 
 	#
 	# gl utility
@@ -38,6 +42,14 @@ add_library(win STATIC
 	include/win/gl/GLAtlas.hpp
 	src/gl/GLAtlas.cpp
 
+	include/win/gl/GLFont.hpp
+	src/gl/GLFont.cpp
+
+	include/win/gl/GLTextRenderer.hpp
+	src/gl/GLTextRenderer.cpp
+
+	include/win/gl/GLMappedRingBuffer.hpp
+
 	#
 	# core
 	#
@@ -45,7 +57,6 @@ add_library(win STATIC
 	include/win/Event.hpp
 
 	include/win/Stream.hpp
-	src/Stream.cpp
 
 	include/win/AssetRoll.hpp
 	src/AssetRoll.cpp
@@ -56,15 +67,22 @@ add_library(win STATIC
 	include/win/AssetRollStreamCompressed.hpp
 	src/AssetRollStreamCompressed.cpp
 
+	include/win/DisplayBase.hpp
+	src/DisplayBase.cpp
+
+	include/win/X11Display.hpp
+	src/X11Display.cpp
+
+	include/win/Win32Display.hpp
+	src/Win32Display.cpp
+
 	include/win/Display.hpp
-	src/DisplayLinux.cpp
-	src/DisplayWindows.cpp
 
 	include/win/Font.hpp
 	src/Font.cpp
 
-	include/win/FontRenderer.hpp
-	src/FontRenderer.cpp
+	include/win/TextRenderer.hpp
+	src/TextRenderer.cpp
 
 	#
 	# sound core
@@ -72,26 +90,21 @@ add_library(win STATIC
 
 	include/win/sound/ActiveSoundStore.hpp
 
-	include/win/sound/FloatPcmProvider.hpp
+	include/win/sound/PcmSource.hpp
 
-	include/win/sound/PcmStream.hpp
-	src/sound/PcmStream.cpp
+	include/win/sound/DecodingPcmSource.hpp
+	src/sound/DecodingPcmSource.cpp
 
-	include/win/sound/SoundEffect.hpp
+	include/win/sound/CachingPcmSource.hpp
+	src/sound/CachingPcmSource.cpp
 
-	include/win/sound/PitchScaleEffect.hpp
-	src/sound/PitchScaleEffect.cpp
-
-	include/win/sound/PcmResource.hpp
-	src/sound/PcmResource.cpp
-
-	include/win/sound/PcmDecoder.hpp
-	src/sound/PcmDecoder.cpp
+	include/win/sound/CachedPcmSource.hpp
+	src/sound/CachedPcmSource.cpp
 
 	include/win/sound/Sound.hpp
 
-	include/win/sound/SoundCache.hpp
-	src/sound/SoundCache.cpp
+	include/win/sound/SoundRepo.hpp
+	src/sound/SoundRepo.cpp
 
 	include/win/sound/SoundMixer.hpp
 	src/sound/SoundMixer.cpp
@@ -109,8 +122,6 @@ add_library(win STATIC
 
 	include/win/sound/SoundEngineLinuxPipeWire.hpp
 	src/sound/SoundEngineLinuxPipeWire.cpp
-
-	include/win/sound/test/SoundIntegrationTests.hpp
 )
 
 if(WIN32)
@@ -121,13 +132,13 @@ if(WIN32)
 		PUBLIC
 		include
 		${OPENGL_INCLUDE_DIRS}
+		include/GL
 		${DSOUND_INCLUDE_DIRS}
 		PRIVATE
 		include/freetype
 		include/ogg
 		include/vorbis
 		include/zlib
-		glm
 		)
 
 	target_link_libraries(win
@@ -164,7 +175,6 @@ else()
 		${PipeWire_INCLUDE_DIRS}
 		${Spa_INCLUDE_DIRS}
 		${PULSEAUDIO_INCLUDE_DIRS}
-		glm
 		)
 
 	target_link_libraries(win
