@@ -7,7 +7,7 @@
 #include <array>
 #include <functional>
 
-#include "../../Texture.hpp"
+#include "../../TextureDefinitions.hpp"
 #include "../../RandomNumberGenerator.hpp"
 
 #include "PropDefs.hpp"
@@ -691,7 +691,7 @@ static std::vector<LevelFloor> generate_linear(RandomNumberGenerator &rand, cons
 					break;
 			}
 
-			LevelFloor floor((Texture)rand.uniform_int(0, 1), x, y, width, height);
+			LevelFloor floor(TextureDefinitions.floor1, x, y, width, height);
 
 			if (floor.collide(existing_floors))
 				continue;
@@ -775,7 +775,7 @@ static std::vector<LevelFloor> generate_grid(RandomNumberGenerator &rand, const 
 			const bool long_horizontal = rand.uniform_int(0, 6) == 0;
 			const bool long_vertical = rand.uniform_int(0, 6) == 0;
 
-			LevelFloor floor((Texture)rand.uniform_int(0, 1), start_x, start_y, long_horizontal ? tile_width * 2.0f : tile_width, long_vertical ? tile_height * 2.0f : tile_height);
+			LevelFloor floor(TextureDefinitions.floor1, start_x, start_y, long_horizontal ? tile_width * 2.0f : tile_width, long_vertical ? tile_height * 2.0f : tile_height);
 
 			bool collision = false;
 			if (floor.collide(existing_floors))
@@ -882,7 +882,7 @@ static std::vector<LevelFloor> generate_impl(RandomNumberGenerator &rand)
 	std::vector<LevelFloor> floors;
 
 	// starting room
-	floors.emplace_back(Texture::level_floor_1, -1.0f, -1.0f, 2.0f, 2.0f);
+	floors.emplace_back(TextureDefinitions.floor1, -1.0f, -1.0f, 2.0f, 2.0f);
 
 	/*
 	// ================ structure testing
@@ -982,25 +982,25 @@ void level_generate(
 
 	// map to entities and components
 
-	for (const auto &wall : walls)
+	for (const auto &floor : floors)
 	{
-		auto &entity = entities.add("wall");
-		entity.add(physicals.add(entity, wall.x, wall.y, wall.w, wall.h, 0.0f));
-		entity.add(atlas_renderables.add(entity, Texture::level_prop_sidetable));
+		auto &entity = entities.add("floor");
+		entity.add(physicals.add(entity, floor.x, floor.y, floor.w, floor.h, 0.0f));
+		entity.add(tile_renderables.add(entity, floor.texture));
 	}
 
 	for (const auto &prop : props)
 	{
 		auto &entity = entities.add("prop");
 		entity.add(physicals.add(entity, prop.x, prop.y, prop.width, prop.height, 0.0f));
-		entity.add(atlas_renderables.add(entity, Texture::level_prop_sidetable));
+		entity.add(atlas_renderables.add(entity, TextureDefinitions.player));
 	}
 
-	for (const auto &floor : floors)
+	for (const auto &wall : walls)
 	{
-		auto &entity = entities.add("floor");
-		entity.add(physicals.add(entity, floor.x, floor.y, floor.w, floor.h, 0.0f));
-		entity.add(tile_renderables.add(entity, floor.texture));
+		auto &entity = entities.add("wall");
+		entity.add(physicals.add(entity, wall.x, wall.y, wall.w, wall.h, 0.0f));
+		entity.add(atlas_renderables.add(entity, TextureDefinitions.player));
 	}
 
 	log_seed(seed);

@@ -3,9 +3,9 @@
 
 #include <win/Display.hpp>
 #include <win/AssetRoll.hpp>
+#include <win/gl/GL.hpp>
 
-#include "render/gl/GLRenderer.hpp"
-#include "render/gl/GLUIRenderer.hpp"
+#include "render/Renderer.hpp"
 #include "sim/Simulation.hpp"
 
 static void button_event(const win::Button button, const bool press, Input &input)
@@ -47,10 +47,10 @@ int main()
 	display_options.gl_major = 3;
 	display_options.gl_minor = 3;
 
+	win::load_gl_functions();
+
 	win::Display display(display_options);
 	display.vsync(true);
-
-	win::load_gl_functions();
 
 	// input handling
 	bool quit = false;
@@ -78,17 +78,15 @@ int main()
 		}
 	});
 
-	// renderer setup
 	win::AssetRoll roll("Darktimes.roll");
-	GLRenderer renderer(win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
-	GLUIRenderer uirenderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
+
+	Renderer renderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 
 	// set up the simulation thread
 	SyncObjectManager<LevelRenderState> level_render_state_som;
 	SyncObjectManager<RenderState> render_state_som;
 	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(level_render_state_som), std::ref(render_state_som), std::ref(input_som));
 
-	renderer.set_center(0.0f, 0.0f);
 	// loop de loop
 	while(!quit)
 	{
@@ -106,7 +104,7 @@ int main()
 		RenderState *rs;
 		if ((rs = render_state_som.reader_acquire()) != NULL)
 		{
-			renderer.set_center(rs->centerx, rs->centery);
+			renderer.set_view(rs->centerx, rs->centery, 0.4f);
 			render_state_som.reader_release(rs);
 		}
 
@@ -114,14 +112,12 @@ int main()
 		LevelRenderState *const lrsso = level_render_state_som.reader_acquire();
 		if (lrsso != NULL)
 		{
-			renderer.set_level_data(lrsso->tile_renderables, lrsso->atlas_renderables);
-			uirenderer.set_seed(lrsso->seed);
+			renderer.set_level_objects(lrsso->renderables);
 
 			level_render_state_som.reader_release(lrsso);
 		}
 
-		renderer.draw();
-		uirenderer.draw();
+		renderer.render();
 
 		display.swap();
 	}

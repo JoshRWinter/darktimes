@@ -4,7 +4,7 @@
 
 struct Renderable
 {
-	Renderable(Texture texture, float x, float y, float w, float h, float rot)
+	Renderable(int texture, float x, float y, float w, float h, float rot)
 		: texture(texture)
 		, x(x)
 		, y(y)
@@ -13,7 +13,7 @@ struct Renderable
 		, rot(rot)
 	{}
 
-	Texture texture;
+	int texture;
 	float x;
 	float y;
 	float w;

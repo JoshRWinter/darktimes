@@ -19,7 +19,7 @@ struct StructureProp
 
 struct StructureFloor
 {
-	StructureFloor(Texture texture, float x, float y, float width, float height, bool skip_prop_generation, const std::vector<StructureProp> &props)
+	StructureFloor(int texture, float x, float y, float width, float height, bool skip_prop_generation, const std::vector<StructureProp> &props)
 		: texture(texture), x(x), y(y), width(width), height(height), skip_prop_generation(skip_prop_generation), prop_spawns(props) {}
 
 	LevelFloor get_floor(LevelSide side, float origin_x, float origin_y) const
@@ -56,7 +56,7 @@ struct StructureFloor
 		return floor;
 	}
 
-	Texture texture;
+	int texture;
 	float x, y;
 	float width, height;
 	bool skip_prop_generation;

@@ -11,14 +11,12 @@ struct LevelRenderState
 
 	LevelRenderState() { reset(); }
 
-	std::vector<Renderable> atlas_renderables;
-	std::vector<Renderable> tile_renderables;
+	std::vector<Renderable> renderables;
 	int seed;
 
 	void reset()
 	{
-		atlas_renderables.clear();
-		tile_renderables.clear();
+		renderables.clear();
 		seed = -1;
 	}
 };

@@ -7,10 +7,10 @@ struct RenderableComponent : Component
 {
 	static constexpr ComponentType ctype = ComponentType::renderable;
 
-	RenderableComponent(Entity &entity, Texture texture)
+	RenderableComponent(Entity &entity, int texture)
 		: Component(ctype, entity)
 		, texture(texture)
 	{}
 
-	Texture texture;
+	int texture;
 };

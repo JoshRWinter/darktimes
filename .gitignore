@@ -1,3 +1,2 @@
 asset/texture/*.tga
-asset/texture/*.png
-asset/texture/*.atlas
+asset/texture/atlas

@@ -12,7 +12,9 @@ set(sources
 
 	# top level nonsense
 	src/Renderable.hpp
-	src/Texture.hpp
+	src/TextureDefinitions.hpp
+	src/TextureDefinitions.cpp
+	src/Textures.txt
 	src/SyncObjectManager.hpp
 	src/LevelRenderState.hpp
 	src/RenderState.hpp
@@ -22,18 +24,13 @@ set(sources
 	src/RandomNumberGenerator.hpp
 
 	# render
-	src/render/gl/GL.hpp
-	src/render/gl/GL.cpp
-	src/render/gl/GLRenderer.hpp
-	src/render/gl/GLRenderer.cpp
-	src/render/gl/GLUIRenderer.hpp
-	src/render/gl/GLUIRenderer.cpp
-	src/render/gl/FloorPass.hpp
-	src/render/gl/FloorPass.cpp
-	src/render/gl/PropPass.hpp
-	src/render/gl/PropPass.cpp
-	src/render/gl/DynamicPass.cpp
-	src/render/gl/DynamicPass.hpp
+	src/render/Renderer.hpp
+	src/render/Renderer.cpp
+	src/render/RendererBackend.hpp
+
+	# gl renderer
+	src/render/gl/GLRendererBackend.hpp
+	src/render/gl/GLRendererBackend.cpp
 
 	# sim
 	src/sim/World.hpp
@@ -63,15 +60,6 @@ set(sources
 	src/sim/levelgen/Structure.cpp
 	src/sim/levelgen/LevelGenerator.hpp
 	src/sim/levelgen/LevelGenerator.cpp
-
-	# more nonsense
-	asset/recipe
-	asset/shader/wall.vert
-	asset/shader/wall.frag
-	asset/shader/floor.vert
-	asset/shader/floor.frag
-	asset/shader/prop.vert
-	asset/shader/prop.frag
 )
 
 if(WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
