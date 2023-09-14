@@ -29,7 +29,6 @@ Font::Font(const Dimensions<int> &screen_pixel_dimensions, const Area<float> &sc
 	if (error)
 		win::bug("Error setting pixel size");
 
-	metric.size = font_size;
 	metric.vertical_advance = (((float)(face->size->metrics.height >> 6)) / screen_pixel_dimensions.width) * (screen_area.right - screen_area.left);
 
 	FT_UInt indices[char_count];
