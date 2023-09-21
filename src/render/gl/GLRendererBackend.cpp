@@ -19,7 +19,7 @@ static int get_uniform(const win::GLProgram &p, const char *un)
 
 GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
 	: resources(TextureDefinitions.textures.size())
-	, text_renderer(screen_dims, projection)
+	, text_renderer(screen_dims, projection, GL_TEXTURE1, true)
 {
 	resources.clear();
 	const auto vertices = load_resources(roll);
@@ -123,6 +123,7 @@ void GLRendererBackend::render(const std::vector<Renderable> &objects)
 			{
 				current_program = mode.floor.program.get();
 				glUseProgram(current_program);
+				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D_ARRAY, mode.floor.tex.get());
 				++shader_switches;
 				++texture_switches;
@@ -148,6 +149,7 @@ void GLRendererBackend::render(const std::vector<Renderable> &objects)
 			if (current_texture != resource.properties.atlas->texture())
 			{
 				current_texture = resource.properties.atlas->texture();
+				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, resource.properties.atlas->texture());
 				++texture_switches;
 			}
@@ -189,6 +191,7 @@ std::tuple<std::vector<float>, std::vector<std::uint16_t>, std::vector<std::uint
 	indices.clear();
 
 	// load atlases
+	glActiveTexture(GL_TEXTURE0);
 	for (const auto path : TextureDefinitions.atlases)
 		atlases.add(roll[path], win::GLAtlas::Mode::linear);
 
@@ -243,6 +246,7 @@ std::tuple<std::vector<float>, std::vector<std::uint16_t>, std::vector<std::uint
 		++index;
 	}
 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, mode.floor.tex.get());
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, floor_width, floor_height, TextureDefinitions.floor_textures.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, floor_data ? floor_data.get() : NULL);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
