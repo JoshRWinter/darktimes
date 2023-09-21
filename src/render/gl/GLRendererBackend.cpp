@@ -19,7 +19,7 @@ static int get_uniform(const win::GLProgram &p, const char *un)
 
 GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
 	: resources(TextureDefinitions.textures.size())
-	, text_renderer(screen_dims, projection, GL_TEXTURE1, true)
+	, text_renderer(screen_dims, projection, GL_TEXTURE2, true)
 {
 	resources.clear();
 	const auto vertices = load_resources(roll);
@@ -44,6 +44,7 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
 	mode.floor.uniform_layer = get_uniform(mode.floor.program, "layer");
 	mode.floor.uniform_tc_scale = get_uniform(mode.floor.program, "tc_scale");
 	glUniformMatrix4fv(mode.floor.uniform_view_projection, 1, GL_FALSE, glm::value_ptr(this->projection));
+	glUniform1i(get_uniform(mode.floor.program, "tex"), 1);
 
 	glBindVertexArray(vao.get());
 
@@ -67,15 +68,14 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
 
 const win::Font &GLRendererBackend::create_font(win::Stream data, float size)
 {
+	glActiveTexture(GL_TEXTURE15);
 	return fonts.add(std::move(text_renderer.create_font(size, std::move(data))));
 }
 
 void GLRendererBackend::draw_text(const win::Font &font, const char *text, float x, float y, bool centered)
 {
-	win::gl_check_error();
 	text_renderer.draw((win::GLFont&)font, text, x, y, centered);
 	text_renderer.flush();
-	win::gl_check_error();
 }
 
 void GLRendererBackend::set_view(float x, float y, float zoom)
@@ -106,12 +106,10 @@ void GLRendererBackend::end()
 void GLRendererBackend::render(const std::vector<Renderable> &objects)
 {
 	GLuint current_program = std::numeric_limits<GLuint>::max();
-	GLuint current_texture = std::numeric_limits<GLuint>::max();
 
 	glBindVertexArray(vao.get());
 
 	int shader_switches = 0;
-	int texture_switches = 0;
 
 	for (const auto &obj : objects)
 	{
@@ -123,10 +121,7 @@ void GLRendererBackend::render(const std::vector<Renderable> &objects)
 			{
 				current_program = mode.floor.program.get();
 				glUseProgram(current_program);
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D_ARRAY, mode.floor.tex.get());
 				++shader_switches;
-				++texture_switches;
 			}
 
 			glUniform2f(mode.floor.uniform_position, obj.x + (obj.w / 2.0f), obj.y + (obj.h / 2.0f));
@@ -146,29 +141,20 @@ void GLRendererBackend::render(const std::vector<Renderable> &objects)
 				glUseProgram(current_program);
 				++shader_switches;
 			}
-			if (current_texture != resource.properties.atlas->texture())
-			{
-				current_texture = resource.properties.atlas->texture();
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, resource.properties.atlas->texture());
-				++texture_switches;
-			}
 
 			glUniform2f(mode.atlas.uniform_position, obj.x + (obj.w / 2.0f), obj.y + (obj.h / 2.0f));
 			glUniform2f(mode.atlas.uniform_size, obj.w, obj.h);
 
 			glDrawElementsBaseVertex(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (void*)(sizeof(std::uint8_t) * 6 * resource.vbo_offset), 0);
-
-			win::gl_check_error();
 		}
 	}
 
 	if (shader_switches > 2)
 		fprintf(stderr, "wow busy boy more than 2 shader switches\n");
-	if (texture_switches > 2)
-		fprintf(stderr, "wow busy boy more than 2 texture switches\n");
 
+#ifndef NDEBUG
 	win::gl_check_error();
+#endif
 }
 
 std::tuple<std::vector<float>, std::vector<std::uint16_t>, std::vector<std::uint8_t>> GLRendererBackend::load_resources(win::AssetRoll &roll)
@@ -191,6 +177,7 @@ std::tuple<std::vector<float>, std::vector<std::uint16_t>, std::vector<std::uint
 	indices.clear();
 
 	// load atlases
+	if (TextureDefinitions.atlases.size() != 1) win::bug("only one atlas is supported atm");
 	glActiveTexture(GL_TEXTURE0);
 	for (const auto path : TextureDefinitions.atlases)
 		atlases.add(roll[path], win::GLAtlas::Mode::linear);
@@ -246,7 +233,7 @@ std::tuple<std::vector<float>, std::vector<std::uint16_t>, std::vector<std::uint
 		++index;
 	}
 
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, mode.floor.tex.get());
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, floor_width, floor_height, TextureDefinitions.floor_textures.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, floor_data ? floor_data.get() : NULL);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
