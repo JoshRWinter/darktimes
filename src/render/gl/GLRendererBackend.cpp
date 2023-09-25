@@ -44,7 +44,6 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
 	mode.floor.uniform_layer = get_uniform(mode.floor.program, "layer");
 	mode.floor.uniform_tc_scale = get_uniform(mode.floor.program, "tc_scale");
 	glUniformMatrix4fv(mode.floor.uniform_view_projection, 1, GL_FALSE, glm::value_ptr(this->projection));
-	glUniform1i(get_uniform(mode.floor.program, "tex"), 1);
 
 	glBindVertexArray(vao.get());
 
@@ -80,7 +79,6 @@ void GLRendererBackend::draw_text(const win::Font &font, const char *text, float
 
 void GLRendererBackend::set_view(float x, float y, float zoom)
 {
-	//const auto view = glm::scale(glm::translate(glm::identity<glm::mat4>(), glm::vec3(-x, -y, 0.0f)), glm::vec3(zoom, zoom, zoom));
 	const auto ident = glm::identity<glm::mat4>();
 	const auto translate = glm::translate(ident, glm::vec3(-x, -y, 0.0f));
 	const auto scale = glm::scale(ident, glm::vec3(zoom, zoom, 0.0f));
@@ -233,7 +231,7 @@ std::tuple<std::vector<float>, std::vector<std::uint16_t>, std::vector<std::uint
 		++index;
 	}
 
-	glActiveTexture(GL_TEXTURE1);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, mode.floor.tex.get());
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, floor_width, floor_height, TextureDefinitions.floor_textures.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, floor_data ? floor_data.get() : NULL);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
