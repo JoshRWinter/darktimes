@@ -5,6 +5,8 @@ shader/floor.vert z
 shader/floor.frag z
 shader/quad.vert z
 shader/quad.frag z
+shader/static_floor.vert z
+shader/static_floor.frag z
 
 svg2tga {
 	texture/floor1.svg 50 50

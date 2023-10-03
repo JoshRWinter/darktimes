@@ -31,6 +31,8 @@ set(sources
 	# gl renderer
 	src/render/gl/GLRendererBackend.hpp
 	src/render/gl/GLRendererBackend.cpp
+	src/render/gl/GLStaticFloorRenderer.hpp
+	src/render/gl/GLStaticFloorRenderer.cpp
 
 	# sim
 	src/sim/World.hpp
