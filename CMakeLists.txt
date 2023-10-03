@@ -31,6 +31,17 @@ set(sources
 	# gl renderer
 	src/render/gl/GLRendererBackend.hpp
 	src/render/gl/GLRendererBackend.cpp
+	src/render/gl/FloorTextureCollection.hpp
+	src/render/gl/FloorTextureCollection.cpp
+	src/render/gl/AtlasTextureCollection.hpp
+	src/render/gl/AtlasTextureCollection.cpp
+	src/render/gl/GLSubRenderer.hpp
+	src/render/gl/GLStaticFloorRenderer.hpp
+	src/render/gl/GLStaticFloorRenderer.cpp
+	src/render/gl/GLStaticAtlasRenderer.hpp
+	src/render/gl/GLStaticAtlasRenderer.cpp
+	src/render/gl/GLDynamicAtlasRenderer.hpp
+	src/render/gl/GLDynamicAtlasRenderer.cpp
 
 	# sim
 	src/sim/World.hpp

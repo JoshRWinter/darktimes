@@ -15,22 +15,19 @@ void Renderer::set_view(float x, float y, float zoom)
 	backend->set_view(x, y, zoom);
 }
 
-void Renderer::set_level_objects(const std::vector<Renderable> &objects)
+void Renderer::set_static_objects(const std::vector<Renderable> &objects)
 {
-	level_objects = objects;
+	static_objects = backend->load_statics(objects);
 }
 
 void Renderer::set_dynamic_objects(const std::vector<Renderable> &objects)
 {
-	dynamic_objects = objects;
 }
 
 void Renderer::render()
 {
-	backend->begin();
-	backend->render(level_objects);
-	backend->render(dynamic_objects);
-	backend->end();
+	backend->render_statics(static_objects);
+	//backend->render(dynamic_objects);
 
 	backend->draw_text(font_title, "DARK TIMES", 0.0f, 3.5f, true);
 

@@ -882,7 +882,7 @@ static std::vector<LevelFloor> generate_impl(RandomNumberGenerator &rand)
 	std::vector<LevelFloor> floors;
 
 	// starting room
-	floors.emplace_back(TextureDefinitions.floor1, -1.0f, -1.0f, 2.0f, 2.0f);
+	floors.emplace_back(TextureDefinitions.floor2, -1.0f, -1.0f, 2.0f, 2.0f);
 
 	/*
 	// ================ structure testing
