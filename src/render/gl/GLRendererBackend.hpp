@@ -8,8 +8,24 @@
 #include <win/AssetRoll.hpp>
 #include <win/Pool.hpp>
 
+#include "FloorTextureCollection.hpp"
+#include "AtlasTextureCollection.hpp"
+
 #include "GLStaticFloorRenderer.hpp"
+#include "GLStaticAtlasRenderer.hpp"
 #include "../RendererBackend.hpp"
+
+enum class GLLoadedObjectType
+{
+	static_floor,
+	static_atlas
+};
+
+struct GLLoadedObject
+{
+	GLLoadedObjectType type;
+	std::uint16_t base_vertex;
+};
 
 class GLRendererBackend : public RendererBackend
 {
@@ -29,11 +45,13 @@ private:
 	static std::vector<win::GLAtlas> load_atlases(win::AssetRoll &roll);
 	win::GLTexture load_floor_textures(win::AssetRoll &roll);
 
-	win::GLTexture floor_texture;
-	std::vector<win::GLAtlas> atlases;
-	std::vector<int> floor_layer_map;
-	std::vector<int> atlas_item_map;
+	FloorTextureCollection floor_textures;
+	AtlasTextureCollection atlases;
+
 	GLStaticFloorRenderer static_floor_renderer;
+	GLStaticAtlasRenderer static_atlas_renderer;
+	std::vector<GLLoadedObject> loaded_objects;
+	std::vector<Renderable> scratch;
 
 	glm::mat4 projection;
 

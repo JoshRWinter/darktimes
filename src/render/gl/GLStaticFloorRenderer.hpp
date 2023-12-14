@@ -3,25 +3,20 @@
 #include <win/AssetRoll.hpp>
 #include <win/gl/GL.hpp>
 
-#include "../../Darktimes.hpp"
 #include "../../Renderable.hpp"
+#include "FloorTextureCollection.hpp"
+#include "GLSubRenderer.hpp"
 
-struct GLStaticFloor
+class GLStaticFloorRenderer : public GLSubRenderer
 {
-	int vertex_offset;
-};
-
-class GLStaticFloorRenderer
-{
-	NO_COPY_MOVE(GLStaticFloorRenderer);
-
 public:
-	explicit GLStaticFloorRenderer(win::AssetRoll &roll);
+	GLStaticFloorRenderer(win::AssetRoll &roll, const FloorTextureCollection &floor_textures);
 
 	void set_view_projection(const glm::mat4 &view);
-	std::vector<const void*> load_static_floors(const std::vector<Renderable> &statics, const std::vector<int> &floor_layer_map);
-	void add(const void *v);
-	void flush();
+	std::uint16_t load(const Renderable &floor);
+	void finalize();
+	void add(std::uint16_t base_vertex);
+	void flush() override;
 
 private:
 	win::GLProgram program;
@@ -30,6 +25,16 @@ private:
 	win::GLVertexArray vao;
 	win::GLBuffer position_texcoord, layer, index;
 
-	std::vector<GLStaticFloor> loaded_static_floors;
-	std::vector<GLStaticFloor*> scene;
+	const std::vector<int> &floor_layer_map;
+	std::vector<std::uint16_t> scene;
+
+	struct LoadStaging
+	{
+		LoadStaging() { count = 0; }
+
+		std::vector<float> position_texcoord;
+		std::vector<std::uint8_t> layer;
+		std::vector<std::uint16_t> index;
+		int count;
+	} staging;
 };

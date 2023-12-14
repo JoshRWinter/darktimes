@@ -112,7 +112,7 @@ int main()
 		LevelRenderState *const lrsso = level_render_state_som.reader_acquire();
 		if (lrsso != NULL)
 		{
-			renderer.set_level_objects(lrsso->renderables);
+			renderer.set_static_objects(lrsso->renderables);
 
 			level_render_state_som.reader_release(lrsso);
 		}
