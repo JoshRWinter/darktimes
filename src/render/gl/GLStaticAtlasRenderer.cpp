@@ -1,4 +1,3 @@
-/*
 #include <glm/gtc/type_ptr.hpp>
 
 #include "../../TextureDefinitions.hpp"
@@ -11,9 +10,9 @@ static std::uint16_t to_ushort(float f)
 	return (std::uint16_t)(f * std::numeric_limits<std::uint16_t>::max());
 }
 
-GLStaticAtlasRenderer::GLStaticAtlasRenderer(win::AssetRoll &roll, const AtlasTextureCollection &atlases)
+GLStaticAtlasRenderer::GLStaticAtlasRenderer(win::AssetRoll &roll, const AtlasTextureCollection &atlas_textures)
 	: program(win::load_gl_shaders(roll["shader/static_atlas.vert"], roll["shader/static_atlas.frag"]))
-	, atlas_map(atlases.get_atlas_map())
+	, atlas_textures(atlas_textures)
 {
 	glUseProgram(program.get());
 	uniform_view_projection = glGetUniformLocation(program.get(), "view_projection");
@@ -48,7 +47,8 @@ std::uint16_t GLStaticAtlasRenderer::load(const Renderable &renderable)
 
 	const auto ident = glm::identity<glm::mat4>();
 
-	const auto translate = glm::translate(ident, glm::vec3(renderable.x + (renderable.w / 2.0f), renderable.y + (renderable.h / 2.0f), 0.0f));
+	const auto translate = glm::translate(ident, glm::vec3(renderable.x + (renderable.w / 2.0f),
+														   renderable.y + (renderable.h / 2.0f), 0.0f));
 	const auto scale = glm::scale(ident, glm::vec3(renderable.w, renderable.h, 0.0f));
 
 	for (int i = 0; i < 4; ++i)
@@ -60,7 +60,8 @@ std::uint16_t GLStaticAtlasRenderer::load(const Renderable &renderable)
 		staging.position.push_back(transformed.y);
 	}
 
-	const auto atlas_item = atlas_map.at(renderable.texture).item();
+	const auto &atlas = *atlas_textures.get_atlas_map().at(TextureDefinitions.textures[renderable.texture].atlas);
+	const auto &atlas_item = atlas.item(TextureDefinitions.textures.at(renderable.texture).atlas_index);
 	staging.texcoord.push_back(to_ushort(atlas_item.x1));
 	staging.texcoord.push_back(to_ushort(atlas_item.y2));
 	staging.texcoord.push_back(to_ushort(atlas_item.x1));
@@ -70,7 +71,7 @@ std::uint16_t GLStaticAtlasRenderer::load(const Renderable &renderable)
 	staging.texcoord.push_back(to_ushort(atlas_item.x2));
 	staging.texcoord.push_back(to_ushort(atlas_item.x2));
 
-	const auto base_index = index * 4;
+	const auto base_index = staging.count * 4;
 	staging.index.push_back(base_index + 0);
 	staging.index.push_back(base_index + 1);
 	staging.index.push_back(base_index + 2);
@@ -78,21 +79,26 @@ std::uint16_t GLStaticAtlasRenderer::load(const Renderable &renderable)
 	staging.index.push_back(base_index + 2);
 	staging.index.push_back(base_index + 3);
 
-		++;
-	}
+	++staging.count;
 
+	if (staging.count * 6 > std::numeric_limits<std::uint16_t>::max())
+		win::bug("static atlas index overflow");
+
+	return staging.count * 6;
+}
+
+void GLStaticAtlasRenderer::finalize()
+{
 	glBindVertexArray(vao.get());
 
 	glBindBuffer(GL_ARRAY_BUFFER, position.get());
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * position_data.size(), position_data.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * staging.position.size(), staging.position.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, texcoord.get());
-	glBufferData(GL_ARRAY_BUFFER, sizeof(std::uint16_t) * texcoord_data.size(), texcoord_data.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(std::uint16_t) * staging.texcoord.size(), staging.texcoord.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->index.get());
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(std::uint16_t) * index_data.size(), index_data.data(), GL_STATIC_DRAW);
-
-	return loaded_items;
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(std::uint16_t) * staging.index.size(), staging.index.data(), GL_STATIC_DRAW);
 }
 
 void GLStaticAtlasRenderer::add(std::uint16_t base_vertex)
@@ -114,5 +120,3 @@ void GLStaticAtlasRenderer::flush()
 
 	scene.clear();
 }
-
- */

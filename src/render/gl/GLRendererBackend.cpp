@@ -10,8 +10,9 @@ using namespace win::gl;
 
 GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
 	: floor_textures(roll)
+	, atlases(roll)
 	, static_floor_renderer(roll, floor_textures)
-	//, static_atlas_renderer(roll, floor_textures)
+	, static_atlas_renderer(roll, atlases)
 	, text_renderer(screen_dims, projection, GL_TEXTURE1, true)
 {
 	fprintf(stderr, "%s\n%s\n%s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
@@ -51,23 +52,23 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
 	const auto vp = projection * view;
 
 	static_floor_renderer.set_view_projection(vp);
-	//static_atlas_renderer.set_view_projection(vp);
+	static_atlas_renderer.set_view_projection(vp);
 }
 
 std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Renderable> &statics)
 {
 	loaded_statics.clear();
+	loaded_statics.reserve(statics.size());
 	std::vector<const void*> result;
 
 	for (const auto &r : statics)
-	{
 		if (TextureDefinitions.textures[r.texture].atlas == -1)
-		{
-			loaded_statics.push_back(static_floor_renderer.load(r));
-		}
-	}
+			loaded_statics.emplace_back(GLLoadedObjectType::floor, static_floor_renderer.load(r));
+		else
+			loaded_statics.emplace_back(GLLoadedObjectType::atlas, static_atlas_renderer.load(r));
 
 	static_floor_renderer.finalize();
+	static_atlas_renderer.finalize();
 
 	for (const auto &i : loaded_statics)
 		result.push_back(&i);
@@ -75,17 +76,28 @@ std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Rende
 	return result;
 }
 
-void GLRendererBackend::render_statics(const std::vector<const void*> &statics)
+void GLRendererBackend::render_start()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
+}
 
+void GLRendererBackend::render_end()
+{
+}
+
+void GLRendererBackend::render_statics(const std::vector<const void*> &statics)
+{
 	for (const auto s : statics)
 	{
-		const auto object = *(const std::uint16_t*)s;
-		static_floor_renderer.add(object);
+		const auto object = *(const GLLoadedObject*)s;
+		if (object.type == GLLoadedObjectType::floor)
+			static_floor_renderer.add(object.base_vertex);
+		else
+			static_atlas_renderer.add(object.base_vertex);
 	}
 
 	static_floor_renderer.flush();
+	static_atlas_renderer.flush();
 
 #ifndef NDEBUG
 	win::gl_check_error();

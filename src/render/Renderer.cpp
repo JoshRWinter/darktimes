@@ -26,7 +26,9 @@ void Renderer::set_dynamic_objects(const std::vector<Renderable> &objects)
 
 void Renderer::render()
 {
+	backend->render_start();
 	backend->render_statics(static_objects);
+	//backend->render_statics(std::vector<std::uint16_t> { })
 	//backend->render(dynamic_objects);
 
 	backend->draw_text(font_title, "DARK TIMES", 0.0f, 3.5f, true);
@@ -44,5 +46,6 @@ void Renderer::render()
 	}
 
 	backend->draw_text(font_debug, fpsbuf, -7.9f, 4.3f);
+	backend->render_end();
 }
 

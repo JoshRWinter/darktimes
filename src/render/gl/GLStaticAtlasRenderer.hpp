@@ -1,4 +1,3 @@
-/*
 #pragma once
 
 #include <vector>
@@ -6,7 +5,6 @@
 #include <glm/glm.hpp>
 
 #include <win/AssetRoll.hpp>
-#include <win/Atlas.hpp>
 #include <win/gl/GL.hpp>
 
 #include "../../Renderable.hpp"
@@ -29,22 +27,16 @@ private:
 	win::GLProgram program;
 	int uniform_view_projection;
 
+	const AtlasTextureCollection &atlas_textures;
+
 	win::GLVertexArray vao;
 	win::GLBuffer position, texcoord, index;
 
-	const std::vector<win::GLAtlas*> atlas_map;
 	std::vector<std::uint16_t> scene;
 
 	struct LoadStaging
 	{
-		LoadStaging() { reset(); }
-		void reset()
-		{
-			position.clear();
-			texcoord.clear();
-			index.clear();
-			count = 0;
-		}
+		LoadStaging() { count = 0; }
 
 		std::vector<float> position;
 		std::vector<std::uint16_t> texcoord;
@@ -52,5 +44,3 @@ private:
 		int count;
 	} staging;
 };
-
- */
