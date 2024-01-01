@@ -46,6 +46,7 @@ public:
 	void render_statics(const std::vector<const void*> &statics) override;
 
 private:
+	TextureMap texture_map;
 	FloorTextureCollection floor_textures;
 	AtlasTextureCollection atlases;
 

@@ -147,7 +147,7 @@ struct LevelFloorConnector
 
 struct LevelFloor
 {
-	LevelFloor(int texture, float x, float y, float w, float h, bool skip_prop_generation = false)
+	LevelFloor(Texture texture, float x, float y, float w, float h, bool skip_prop_generation = false)
 		: texture(texture), skip_prop_generation(skip_prop_generation), x(x), y(y), w(w), h(h)  {}
 
 	bool collide(const LevelFloor &rhs, float tolerance = 0.05f) const { return x + w > rhs.x + tolerance && x < (rhs.x + rhs.w) - tolerance && y + h > rhs.y + tolerance && y < (rhs.y + rhs.h) - tolerance; }
@@ -160,7 +160,7 @@ struct LevelFloor
 		return false;
 	}
 
-	int texture;
+	Texture texture;
 	float x, y, w, h;
 	bool skip_prop_generation;
 	std::vector<LevelFloorConnector> connectors;

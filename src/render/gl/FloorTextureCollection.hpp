@@ -4,15 +4,16 @@
 #include <win/gl/GL.hpp>
 
 #include "../../Darktimes.hpp"
+#include "../TextureMap.hpp"
 
 class FloorTextureCollection
 {
 	NO_COPY_MOVE(FloorTextureCollection);
 
 public:
-	explicit FloorTextureCollection(win::AssetRoll &roll);
+	FloorTextureCollection(win::AssetRoll &roll, const TextureMap &texture_map);
 
-	const std::vector<int> &get_layer_map() const;
+	const int &get_layer(Texture texture) const;
 
 private:
 	win::GLTexture tex;

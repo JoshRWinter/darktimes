@@ -1,6 +1,0 @@
-ATLAS(atlas, "texture/atlas")
-
-TEXTURE(player, atlas, 0)
-
-FLOOR_TEXTURE(floor1, "texture/floor1.tga")
-FLOOR_TEXTURE(floor2, "texture/floor2.tga")

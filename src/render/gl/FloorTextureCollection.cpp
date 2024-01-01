@@ -1,9 +1,8 @@
 #include <win/Targa.hpp>
 
-#include "../../TextureDefinitions.hpp"
 #include "FloorTextureCollection.hpp"
 
-FloorTextureCollection::FloorTextureCollection(win::AssetRoll &roll)
+FloorTextureCollection::FloorTextureCollection(win::AssetRoll &roll, const TextureMap &texture_map)
 {
 	int width = -1, height = -1;
 
@@ -15,19 +14,28 @@ FloorTextureCollection::FloorTextureCollection(win::AssetRoll &roll)
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	// -1 initialize a bunch of entries in the map
-	map.resize(TextureDefinitions.textures.size(), -1);
+	map.resize((int)Texture::max_texture, -1);
 
-	int index = 0;
-	for (const auto i : TextureDefinitions.floor_textures)
+	int floor_texture_count = 0;
+	for (int i = 0; i < (int)Texture::max_texture; ++i)
+		if (texture_map[(Texture)i].layer_index != -1)
+			++floor_texture_count;
+
+	for (int i = 0; i < (int)Texture::max_texture; ++i)
 	{
-		win::Targa tga(roll[TextureDefinitions.textures[i].resource]);
-		map[i] = index;
+		const auto &item = texture_map[(Texture)i];
+
+		if (item.layer_index == -1)
+			continue;
+
+		win::Targa tga(roll[item.asset_path]);
+		map[i] = item.layer_index;
 
 		if (width == -1)
 		{
 			width = tga.width();
 			height = tga.height();
-			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, width, height, TextureDefinitions.floor_textures.size(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, width, height, floor_texture_count, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		}
 
 		if (width != tga.width() || height != tga.height())
@@ -36,12 +44,15 @@ FloorTextureCollection::FloorTextureCollection(win::AssetRoll &roll)
 		if (tga.bpp() != 24 && false)
 			win::bug("Prefer 24 bit color for floor textures");
 
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, index, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, tga.data());
-		++index;
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, item.layer_index, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, tga.data());
 	}
+
+#ifndef NDEBUG
+	win::gl_check_error();
+#endif
 }
 
-const std::vector<int> &FloorTextureCollection::get_layer_map() const
+const int &FloorTextureCollection::get_layer(Texture texture) const
 {
-	return map;
+	return map[(int)texture];
 }

@@ -2,9 +2,9 @@
 
 enum class Texture
 {
-	level_floor_start = 0,
-	level_floor_1 = 0,
-	level_floor_end = level_floor_1,
-	level_prop_sidetable,
-	player
+	floor1,
+	floor2,
+	player,
+
+	max_texture
 };

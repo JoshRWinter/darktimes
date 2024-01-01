@@ -12,9 +12,7 @@ set(sources
 
 	# top level nonsense
 	src/Renderable.hpp
-	src/TextureDefinitions.hpp
-	src/TextureDefinitions.cpp
-	src/Textures.txt
+	src/Texture.hpp
 	src/SyncObjectManager.hpp
 	src/LevelRenderState.hpp
 	src/RenderState.hpp
@@ -27,6 +25,8 @@ set(sources
 	src/render/Renderer.hpp
 	src/render/Renderer.cpp
 	src/render/RendererBackend.hpp
+	src/render/TextureMap.hpp
+	src/render/TextureMap.txt
 
 	# gl renderer
 	src/render/gl/GLRendererBackend.hpp

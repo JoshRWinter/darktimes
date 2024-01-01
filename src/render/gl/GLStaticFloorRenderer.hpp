@@ -19,9 +19,10 @@ public:
 	void flush() override;
 
 private:
-    const FloorTextureCollection &floortextures;
 	win::GLProgram program;
 	int uniform_view_projection;
+
+	const FloorTextureCollection &floortextures;
 
 	win::GLVertexArray vao;
 	win::GLBuffer position_texcoord, layer, index;

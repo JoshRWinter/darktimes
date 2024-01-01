@@ -1,6 +1,5 @@
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../../TextureDefinitions.hpp"
 #include "GLStaticAtlasRenderer.hpp"
 
 using namespace win::gl;
@@ -10,8 +9,9 @@ static std::uint16_t to_ushort(float f)
 	return (std::uint16_t)(f * std::numeric_limits<std::uint16_t>::max());
 }
 
-GLStaticAtlasRenderer::GLStaticAtlasRenderer(win::AssetRoll &roll, const AtlasTextureCollection &atlas_textures)
+GLStaticAtlasRenderer::GLStaticAtlasRenderer(win::AssetRoll &roll, const TextureMap &texture_map, AtlasTextureCollection &atlas_textures)
 	: program(win::load_gl_shaders(roll["shader/static_atlas.vert"], roll["shader/static_atlas.frag"]))
+	, texture_map(texture_map)
 	, atlas_textures(atlas_textures)
 {
 	glUseProgram(program.get());
@@ -60,8 +60,8 @@ std::uint16_t GLStaticAtlasRenderer::load(const Renderable &renderable)
 		staging.position.push_back(transformed.y);
 	}
 
-	const auto &atlas = *atlas_textures.get_atlas_map().at(TextureDefinitions.textures[renderable.texture].atlas);
-	const auto &atlas_item = atlas.item(TextureDefinitions.textures.at(renderable.texture).atlas_index);
+	const auto &atlas = atlas_textures.get_atlas(renderable.texture);
+	const auto &atlas_item = atlas.item(texture_map[renderable.texture].atlas_index);
 	staging.texcoord.push_back(to_ushort(atlas_item.x1));
 	staging.texcoord.push_back(to_ushort(atlas_item.y2));
 	staging.texcoord.push_back(to_ushort(atlas_item.x1));
@@ -84,7 +84,11 @@ std::uint16_t GLStaticAtlasRenderer::load(const Renderable &renderable)
 	if (staging.count * 6 > std::numeric_limits<std::uint16_t>::max())
 		win::bug("static atlas index overflow");
 
-	return staging.count * 6;
+#ifndef NDEBUG
+	win::gl_check_error();
+#endif
+
+	return (staging.count - 1) * 6;
 }
 
 void GLStaticAtlasRenderer::finalize()
@@ -108,6 +112,9 @@ void GLStaticAtlasRenderer::add(std::uint16_t base_vertex)
 
 void GLStaticAtlasRenderer::flush()
 {
+	if (scene.empty())
+		return;
+
 	glUseProgram(program.get());
 	glBindVertexArray(vao.get());
 

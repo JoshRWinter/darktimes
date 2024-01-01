@@ -4,15 +4,14 @@
 #include <win/Targa.hpp>
 
 #include "GLRendererBackend.hpp"
-#include "../../TextureDefinitions.hpp"
 
 using namespace win::gl;
 
 GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
-	: floor_textures(roll)
-	, atlases(roll)
+	: floor_textures(roll, texture_map)
+	, atlases(roll, texture_map)
 	, static_floor_renderer(roll, floor_textures)
-	, static_atlas_renderer(roll, atlases)
+	, static_atlas_renderer(roll, texture_map, atlases)
 	, text_renderer(screen_dims, projection, GL_TEXTURE1, true)
 {
 	fprintf(stderr, "%s\n%s\n%s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
@@ -62,7 +61,7 @@ std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Rende
 	std::vector<const void*> result;
 
 	for (const auto &r : statics)
-		if (TextureDefinitions.textures[r.texture].atlas == -1)
+		if (texture_map[r.texture].atlas_index == -1)
 			loaded_statics.emplace_back(GLLoadedObjectType::floor, static_floor_renderer.load(r));
 		else
 			loaded_statics.emplace_back(GLLoadedObjectType::atlas, static_atlas_renderer.load(r));

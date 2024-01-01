@@ -1,4 +1,4 @@
-#include "../../TextureDefinitions.hpp"
+#include "../../Texture.hpp"
 #include "PlayerEntity.hpp"
 
 void PlayerEntity::create(
@@ -11,5 +11,5 @@ void PlayerEntity::create(
 	auto &ent = entities.add("player");
 	ent.add(physicals.add(ent, 0.0f, 0.0f, width, height, 0.0f));
 	ent.add(players.add(ent));
-	ent.add(renderables.add(ent, TextureDefinitions.player));
+	ent.add(renderables.add(ent, Texture::player));
 }

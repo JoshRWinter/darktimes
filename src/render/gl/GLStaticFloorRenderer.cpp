@@ -57,7 +57,7 @@ std::uint16_t GLStaticFloorRenderer::load(const Renderable &floor)
 		staging.position_texcoord.push_back(tc.t * floor.h);
 	}
 
-	const int layer_index = floortextures.get_layer_map().at(floor.texture);
+	const int layer_index = floortextures.get_layer(floor.texture);
 	if (layer_index > std::numeric_limits<std::uint8_t>::max())
 		win::bug("overflow");
 
@@ -79,7 +79,7 @@ std::uint16_t GLStaticFloorRenderer::load(const Renderable &floor)
 	if (staging.count * 6 > std::numeric_limits<std::uint16_t>::max())
 		win::bug("static floor index overflow");
 
-	return staging.count * 6;
+	return (staging.count - 1) * 6;
 }
 
 void GLStaticFloorRenderer::finalize()
@@ -112,6 +112,9 @@ void GLStaticFloorRenderer::add(std::uint16_t base_vertex)
 
 void GLStaticFloorRenderer::flush()
 {
+	if (scene.empty())
+		return;
+
 	glUseProgram(program.get());
 	glBindVertexArray(vao.get());
 
