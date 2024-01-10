@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <win/AssetRoll.hpp>
 #include <win/gl/GL.hpp>
 
@@ -13,8 +15,7 @@ public:
 	GLStaticFloorRenderer(win::AssetRoll &roll, const FloorTextureCollection &floortextures);
 
 	void set_view_projection(const glm::mat4 &view);
-	std::uint16_t load(const Renderable &floor);
-	void finalize();
+	std::vector<std::uint16_t> load(const std::vector<Renderable> &renderables);
 	void add(std::uint16_t item);
 	void flush() override;
 
@@ -28,14 +29,4 @@ private:
 	win::GLBuffer position_texcoord, layer, index;
 
 	std::vector<std::uint16_t> scene;
-
-	struct LoadStaging
-	{
-		LoadStaging() { count = 0; }
-
-		std::vector<float> position_texcoord;
-		std::vector<std::uint8_t> layer;
-		std::vector<std::uint16_t> index;
-		int count;
-	} staging;
 };

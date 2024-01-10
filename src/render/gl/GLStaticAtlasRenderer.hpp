@@ -17,8 +17,7 @@ public:
 	GLStaticAtlasRenderer(win::AssetRoll &roll, const TextureAssetMap &texture_map, AtlasTextureCollection &atlas_textures);
 
 	void set_view_projection(const glm::mat4 &view_projection);
-	std::uint16_t load(const Renderable &items);
-	void finalize();
+	std::vector<std::uint16_t> load(const std::vector<Renderable> &renderables);
 
 	void add(std::uint16_t base_vertex);
 	void flush() override;
@@ -34,14 +33,4 @@ private:
 	win::GLBuffer position, texcoord, index;
 
 	std::vector<std::uint16_t> scene;
-
-	struct LoadStaging
-	{
-		LoadStaging() { count = 0; }
-
-		std::vector<float> position;
-		std::vector<std::uint16_t> texcoord;
-		std::vector<std::uint16_t> index;
-		int count;
-	} staging;
 };

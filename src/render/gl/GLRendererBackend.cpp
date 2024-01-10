@@ -59,22 +59,36 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
 std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Renderable> &statics)
 {
 	loaded_statics.clear();
-	loaded_statics.reserve(statics.size());
-	std::vector<const void*> result;
 
-	for (const auto &r : statics)
-		if (texture_map[r.texture].atlas_index == -1)
-			loaded_statics.emplace_back(GLLoadedObjectType::floor, static_floor_renderer.load(r));
+	std::vector<Renderable> floor_renderables, atlas_renderables;
+
+	for (const auto &s : statics)
+	{
+		if (texture_map[s.texture].atlas_index == -1)
+			floor_renderables.push_back(s);
 		else
-			loaded_statics.emplace_back(GLLoadedObjectType::atlas, static_atlas_renderer.load(r));
+			atlas_renderables.push_back(s);
+	}
 
-	static_floor_renderer.finalize();
-	static_atlas_renderer.finalize();
+	const auto floor_statics = static_floor_renderer.load(floor_renderables);
+	const auto atlas_statics = static_atlas_renderer.load(atlas_renderables);
 
-	for (const auto &i : loaded_statics)
-		result.push_back(&i);
+	int floor_index = 0;
+	int atlas_index = 0;
+	for (const auto &s : statics)
+	{
+		if (texture_map[s.texture].atlas_index == -1)
+			loaded_statics.emplace_back(GLLoadedObjectType::floor, floor_statics.at(floor_index++));
+		else
+			loaded_statics.emplace_back(GLLoadedObjectType::atlas, atlas_statics.at(atlas_index++));
+	}
 
-	return result;
+	std::vector<const void*> results;
+
+	for (const auto &s : loaded_statics)
+		results.push_back(&s);
+
+	return results;
 }
 
 void GLRendererBackend::load_dynamics()

@@ -35,8 +35,10 @@ void GLStaticAtlasRenderer::set_view_projection(const glm::mat4 &view_projection
 	glUniformMatrix4fv(uniform_view_projection, 1, GL_FALSE, glm::value_ptr(view_projection));
 }
 
-std::uint16_t GLStaticAtlasRenderer::load(const Renderable &renderable)
+std::vector<std::uint16_t> GLStaticAtlasRenderer::load(const std::vector<Renderable> &renderables)
 {
+	std::vector<std::uint16_t> results;
+
 	const float verts[] =
 	{
 		-0.5f, 0.5f,
@@ -47,58 +49,63 @@ std::uint16_t GLStaticAtlasRenderer::load(const Renderable &renderable)
 
 	const auto ident = glm::identity<glm::mat4>();
 
-	const auto translate = glm::translate(ident, glm::vec3(renderable.x + (renderable.w / 2.0f),
-														   renderable.y + (renderable.h / 2.0f), 0.0f));
-	const auto scale = glm::scale(ident, glm::vec3(renderable.w, renderable.h, 0.0f));
+	std::vector<float> position_data;
+	std::vector<std::uint16_t> texcoord_data;
+	std::vector<std::uint16_t> index_data;
 
-	for (int i = 0; i < 4; ++i)
+	int count = 0;
+	for (const auto &renderable : renderables)
 	{
-		const glm::vec4 raw(verts[(i * 2) + 0], verts[(i * 2) + 1], 0.0f, 1.0f);
-		const auto transformed = translate * scale * raw;
+		if (count * 6 > std::numeric_limits<std::uint16_t>::max())
+			win::bug("static atlas index overflow");
 
-		staging.position.push_back(transformed.x);
-		staging.position.push_back(transformed.y);
+		const auto translate = glm::translate(ident, glm::vec3(renderable.x + (renderable.w / 2.0f), renderable.y + (renderable.h / 2.0f), 0.0f));
+		const auto scale = glm::scale(ident, glm::vec3(renderable.w, renderable.h, 0.0f));
+
+		for (int i = 0; i < 4; ++i)
+		{
+			const glm::vec4 raw(verts[(i * 2) + 0], verts[(i * 2) + 1], 0.0f, 1.0f);
+			const auto transformed = translate * scale * raw;
+
+			position_data.push_back(transformed.x);
+			position_data.push_back(transformed.y);
+		}
+
+		const auto &atlas = atlas_textures.get_atlas(renderable.texture);
+		const auto &atlas_item = atlas.item(texture_map[renderable.texture].atlas_index);
+		texcoord_data.push_back(to_ushort(atlas_item.x1));
+		texcoord_data.push_back(to_ushort(atlas_item.y2));
+		texcoord_data.push_back(to_ushort(atlas_item.x1));
+		texcoord_data.push_back(to_ushort(atlas_item.y1));
+		texcoord_data.push_back(to_ushort(atlas_item.x2));
+		texcoord_data.push_back(to_ushort(atlas_item.y1));
+		texcoord_data.push_back(to_ushort(atlas_item.x2));
+		texcoord_data.push_back(to_ushort(atlas_item.x2));
+
+		const auto base_index = count * 4;
+		index_data.push_back(base_index + 0);
+		index_data.push_back(base_index + 1);
+		index_data.push_back(base_index + 2);
+		index_data.push_back(base_index + 0);
+		index_data.push_back(base_index + 2);
+		index_data.push_back(base_index + 3);
+
+		results.push_back(count * 6);
+		++count;
 	}
 
-	const auto &atlas = atlas_textures.get_atlas(renderable.texture);
-	const auto &atlas_item = atlas.item(texture_map[renderable.texture].atlas_index);
-	staging.texcoord.push_back(to_ushort(atlas_item.x1));
-	staging.texcoord.push_back(to_ushort(atlas_item.y2));
-	staging.texcoord.push_back(to_ushort(atlas_item.x1));
-	staging.texcoord.push_back(to_ushort(atlas_item.y1));
-	staging.texcoord.push_back(to_ushort(atlas_item.x2));
-	staging.texcoord.push_back(to_ushort(atlas_item.y1));
-	staging.texcoord.push_back(to_ushort(atlas_item.x2));
-	staging.texcoord.push_back(to_ushort(atlas_item.x2));
-
-	const auto base_index = staging.count * 4;
-	staging.index.push_back(base_index + 0);
-	staging.index.push_back(base_index + 1);
-	staging.index.push_back(base_index + 2);
-	staging.index.push_back(base_index + 0);
-	staging.index.push_back(base_index + 2);
-	staging.index.push_back(base_index + 3);
-
-	++staging.count;
-
-	if (staging.count * 6 > std::numeric_limits<std::uint16_t>::max())
-		win::bug("static atlas index overflow");
-
-	return (staging.count - 1) * 6;
-}
-
-void GLStaticAtlasRenderer::finalize()
-{
 	glBindVertexArray(vao.get());
 
 	glBindBuffer(GL_ARRAY_BUFFER, position.get());
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * staging.position.size(), staging.position.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * position_data.size(), position_data.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, texcoord.get());
-	glBufferData(GL_ARRAY_BUFFER, sizeof(std::uint16_t) * staging.texcoord.size(), staging.texcoord.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(std::uint16_t) * texcoord_data.size(), texcoord_data.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->index.get());
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(std::uint16_t) * staging.index.size(), staging.index.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(std::uint16_t) * index_data.size(), index_data.data(), GL_STATIC_DRAW);
+
+	return results;
 }
 
 void GLStaticAtlasRenderer::add(std::uint16_t base_vertex)

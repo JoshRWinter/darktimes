@@ -31,8 +31,10 @@ void GLStaticFloorRenderer::set_view_projection(const glm::mat4 &view)
 	glUniformMatrix4fv(uniform_view_projection, 1, GL_FALSE, glm::value_ptr(view));
 }
 
-std::uint16_t GLStaticFloorRenderer::load(const Renderable &floor)
+std::vector<std::uint16_t> GLStaticFloorRenderer::load(const std::vector<Renderable> &renderables)
 {
+	std::vector<std::uint16_t> results;
+
 	static const float verts[] =
 	{
 		-0.5f, 0.5f, 0.0f, 1.0f,
@@ -42,63 +44,65 @@ std::uint16_t GLStaticFloorRenderer::load(const Renderable &floor)
 	};
 
 	static const auto ident = glm::identity<glm::mat4>();
-	const auto scale = glm::scale(ident, glm::vec3(floor.w, floor.h, 0.0f));
-	const auto translate = glm::translate(ident, glm::vec3(floor.x + (floor.w / 2.0f), floor.y + (floor.h / 2.0f), 0.0f));
 
-	for (int i = 0; i < 4; ++i)
+	std::vector<float> position_texcoord_data;
+	std::vector<std::uint8_t> layer_data;
+	std::vector<std::uint16_t> index_data;
+
+	int count = 0;
+	for (const auto &renderable : renderables)
 	{
-		const glm::vec4 raw(verts[(i * 4) + 0], verts[(i * 4) + 1], 0.0f, 1.0f);
-		const glm::vec2 tc(verts[(i * 4) + 2], verts[(i * 4) + 3]);
-		const auto transformed = translate * scale * raw;
+		if (count * 6 > std::numeric_limits<std::uint16_t>::max())
+			win::bug("static floor index overflow");
 
-		staging.position_texcoord.push_back(transformed.x);
-		staging.position_texcoord.push_back(transformed.y);
-		staging.position_texcoord.push_back(tc.s * floor.w);
-		staging.position_texcoord.push_back(tc.t * floor.h);
+		const auto scale = glm::scale(ident, glm::vec3(renderable.w, renderable.h, 0.0f));
+		const auto translate = glm::translate(ident, glm::vec3(renderable.x + (renderable.w / 2.0f), renderable.y + (renderable.h / 2.0f), 0.0f));
+
+		for (int i = 0; i < 4; ++i)
+		{
+			const glm::vec4 raw(verts[(i * 4) + 0], verts[(i * 4) + 1], 0.0f, 1.0f);
+			const glm::vec2 tc(verts[(i * 4) + 2], verts[(i * 4) + 3]);
+			const auto transformed = translate * scale * raw;
+
+			position_texcoord_data.push_back(transformed.x);
+			position_texcoord_data.push_back(transformed.y);
+			position_texcoord_data.push_back(tc.s * renderable.w);
+			position_texcoord_data.push_back(tc.t * renderable.h);
+		}
+
+		const int layer_index = floortextures.get_layer(renderable.texture);
+		if (layer_index > std::numeric_limits<std::uint8_t>::max())
+			win::bug("overflow");
+
+		layer_data.push_back(layer_index);
+		layer_data.push_back(layer_index);
+		layer_data.push_back(layer_index);
+		layer_data.push_back(layer_index);
+
+		const int base_index = count * 4;
+		index_data.push_back(base_index + 0);
+		index_data.push_back(base_index + 1);
+		index_data.push_back(base_index + 2);
+		index_data.push_back(base_index + 0);
+		index_data.push_back(base_index + 2);
+		index_data.push_back(base_index + 3);
+
+		results.push_back(count * 6);
+		++count;
 	}
 
-	const int layer_index = floortextures.get_layer(floor.texture);
-	if (layer_index > std::numeric_limits<std::uint8_t>::max())
-		win::bug("overflow");
-
-	staging.layer.push_back(layer_index);
-	staging.layer.push_back(layer_index);
-	staging.layer.push_back(layer_index);
-	staging.layer.push_back(layer_index);
-
-	const int base_index = staging.count * 4;
-	staging.index.push_back(base_index + 0);
-	staging.index.push_back(base_index + 1);
-	staging.index.push_back(base_index + 2);
-	staging.index.push_back(base_index + 0);
-	staging.index.push_back(base_index + 2);
-	staging.index.push_back(base_index + 3);
-
-	++staging.count;
-
-	if (staging.count * 6 > std::numeric_limits<std::uint16_t>::max())
-		win::bug("static floor index overflow");
-
-	return (staging.count - 1) * 6;
-}
-
-void GLStaticFloorRenderer::finalize()
-{
 	glBindVertexArray(vao.get());
 
 	glBindBuffer(GL_ARRAY_BUFFER, position_texcoord.get());
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * staging.position_texcoord.size(), staging.position_texcoord.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * position_texcoord_data.size(), position_texcoord_data.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, layer.get());
-	glBufferData(GL_ARRAY_BUFFER, sizeof(std::uint8_t) * staging.layer.size(), staging.layer.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(std::uint8_t) * layer_data.size(), layer_data.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index.get());
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(std::uint16_t) * staging.index.size(), staging.index.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(std::uint16_t) * index_data.size(), index_data.data(), GL_STATIC_DRAW);
 
-	staging.position_texcoord.clear();
-	staging.layer.clear();
-	staging.index.clear();
-	staging.count = 0;
+	return results;
 }
 
 void GLStaticFloorRenderer::add(std::uint16_t base_vertex)
