@@ -13,6 +13,7 @@
 
 #include "GLStaticFloorRenderer.hpp"
 #include "GLStaticAtlasRenderer.hpp"
+#include "GLDynamicAtlasRenderer.hpp"
 #include "../RendererBackend.hpp"
 
 enum class GLLoadedObjectType : std::uint16_t
@@ -41,17 +42,20 @@ public:
 	void draw_text(const win::Font &font, const char *text, float x, float y, bool centered) override;
 	void set_view(float x, float y, float zoom) override;
 	std::vector<const void*> load_statics(const std::vector<Renderable> &statics) override;
+	void load_dynamics() override;
 	void render_start() override;
 	void render_end() override;
 	void render_statics(const std::vector<const void*> &statics) override;
+	void render_dynamics(const std::vector<Renderable> &dynamics) override;
 
 private:
-	TextureMap texture_map;
+	TextureAssetMap texture_map;
 	FloorTextureCollection floor_textures;
 	AtlasTextureCollection atlases;
 
 	GLStaticFloorRenderer static_floor_renderer;
 	GLStaticAtlasRenderer static_atlas_renderer;
+	GLDynamicAtlasRenderer dynamic_atlas_renderer;
 	std::vector<GLLoadedObject> loaded_statics;
 
 	glm::mat4 projection;

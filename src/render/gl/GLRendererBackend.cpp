@@ -12,6 +12,7 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
 	, atlases(roll, texture_map)
 	, static_floor_renderer(roll, floor_textures)
 	, static_atlas_renderer(roll, texture_map, atlases)
+	, dynamic_atlas_renderer(roll, texture_map, atlases)
 	, text_renderer(screen_dims, projection, GL_TEXTURE1, true)
 {
 	fprintf(stderr, "%s\n%s\n%s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
@@ -52,6 +53,7 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
 
 	static_floor_renderer.set_view_projection(vp);
 	static_atlas_renderer.set_view_projection(vp);
+	dynamic_atlas_renderer.set_view_projection(vp);
 }
 
 std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Renderable> &statics)
@@ -73,6 +75,11 @@ std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Rende
 		result.push_back(&i);
 
 	return result;
+}
+
+void GLRendererBackend::load_dynamics()
+{
+	dynamic_atlas_renderer.load_all();
 }
 
 void GLRendererBackend::render_start()
@@ -97,6 +104,18 @@ void GLRendererBackend::render_statics(const std::vector<const void*> &statics)
 
 	static_floor_renderer.flush();
 	static_atlas_renderer.flush();
+
+#ifndef NDEBUG
+	win::gl_check_error();
+#endif
+}
+
+void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
+{
+	for (const auto &d : dynamics)
+		dynamic_atlas_renderer.add(d);
+
+	dynamic_atlas_renderer.flush();
 
 #ifndef NDEBUG
 	win::gl_check_error();

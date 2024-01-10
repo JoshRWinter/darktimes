@@ -8,6 +8,7 @@ Renderer::Renderer(const win::Dimensions<int> &screen_dims, const win::Area<floa
 	, font_title(backend->create_font(roll["font/CHE-THIS.TTF"], 0.8f))
 	, font_debug(backend->create_font(roll["font/NotoSansMono-Regular.ttf"], 0.1f))
 {
+	backend->load_dynamics();
 }
 
 void Renderer::set_view(float x, float y, float zoom)
@@ -15,19 +16,21 @@ void Renderer::set_view(float x, float y, float zoom)
 	backend->set_view(x, y, zoom);
 }
 
-void Renderer::set_static_objects(const std::vector<Renderable> &objects)
+void Renderer::load_statics(const std::vector<Renderable> &statics)
 {
-	static_objects = backend->load_statics(objects);
+	static_objects = backend->load_statics(statics);
 }
 
-void Renderer::set_dynamic_objects(const std::vector<Renderable> &objects)
+void Renderer::load_dynamics()
 {
+	backend->load_dynamics();
 }
 
-void Renderer::render()
+void Renderer::render(const std::vector<Renderable> &dynamics)
 {
 	backend->render_start();
 	backend->render_statics(static_objects);
+	backend->render_dynamics(dynamics);
 
 	backend->draw_text(font_title, "DARK TIMES", 0.0f, 3.5f, true);
 

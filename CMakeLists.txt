@@ -25,8 +25,8 @@ set(sources
 	src/render/Renderer.hpp
 	src/render/Renderer.cpp
 	src/render/RendererBackend.hpp
-	src/render/TextureMap.hpp
-	src/render/TextureMap.txt
+	src/render/TextureAssetMap.hpp
+	src/render/TextureAssetMap.txt
 
 	# gl renderer
 	src/render/gl/GLRendererBackend.hpp

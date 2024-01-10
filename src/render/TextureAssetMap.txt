@@ -1,0 +1,6 @@
+ATLAS(atlas, "texture/atlas");
+
+ATLAS_TEXTURE(player, atlas, 0, DYNAMIC);
+
+FLOOR_TEXTURE(floor1, "texture/floor1.tga", 0, STATIC);
+FLOOR_TEXTURE(floor2, "texture/floor2.tga", 1, STATIC);

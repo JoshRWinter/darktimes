@@ -99,10 +99,6 @@ void GLStaticFloorRenderer::finalize()
 	staging.layer.clear();
 	staging.index.clear();
 	staging.count = 0;
-
-#ifndef NDEBUG
-    win::gl_check_error();
-#endif
 }
 
 void GLStaticFloorRenderer::add(std::uint16_t base_vertex)
@@ -118,7 +114,7 @@ void GLStaticFloorRenderer::flush()
 	glUseProgram(program.get());
 	glBindVertexArray(vao.get());
 
-	for (const auto &bv : scene)
+	for (const auto bv : scene)
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)(sizeof(std::uint16_t) * bv));
 
 #ifndef NDEBUG

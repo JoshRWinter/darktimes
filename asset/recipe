@@ -1,14 +1,12 @@
 font/NotoSansMono-Regular.ttf
 font/CHE-THIS.TTF
 
-shader/floor.vert z
-shader/floor.frag z
-shader/quad.vert z
-shader/quad.frag z
 shader/static_floor.vert z
 shader/static_floor.frag z
 shader/static_atlas.vert z
 shader/static_atlas.frag z
+shader/dynamic_atlas.vert z
+shader/dynamic_atlas.frag z
 
 svg2tga {
 	texture/floor1.svg 50 50

@@ -9,7 +9,7 @@ static std::uint16_t to_ushort(float f)
 	return (std::uint16_t)(f * std::numeric_limits<std::uint16_t>::max());
 }
 
-GLStaticAtlasRenderer::GLStaticAtlasRenderer(win::AssetRoll &roll, const TextureMap &texture_map, AtlasTextureCollection &atlas_textures)
+GLStaticAtlasRenderer::GLStaticAtlasRenderer(win::AssetRoll &roll, const TextureAssetMap &texture_map, AtlasTextureCollection &atlas_textures)
 	: program(win::load_gl_shaders(roll["shader/static_atlas.vert"], roll["shader/static_atlas.frag"]))
 	, texture_map(texture_map)
 	, atlas_textures(atlas_textures)
@@ -83,10 +83,6 @@ std::uint16_t GLStaticAtlasRenderer::load(const Renderable &renderable)
 
 	if (staging.count * 6 > std::numeric_limits<std::uint16_t>::max())
 		win::bug("static atlas index overflow");
-
-#ifndef NDEBUG
-	win::gl_check_error();
-#endif
 
 	return (staging.count - 1) * 6;
 }

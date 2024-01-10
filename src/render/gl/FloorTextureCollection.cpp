@@ -2,7 +2,7 @@
 
 #include "FloorTextureCollection.hpp"
 
-FloorTextureCollection::FloorTextureCollection(win::AssetRoll &roll, const TextureMap &texture_map)
+FloorTextureCollection::FloorTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map)
 {
 	int width = -1, height = -1;
 

@@ -1,13 +1,11 @@
 #pragma once
 
-/*
 #include <vector>
 
 #include <glm/glm.hpp>
 
 #include <win/AssetRoll.hpp>
 #include <win/gl/GL.hpp>
-#include <win/gl/GLAtlas.hpp>
 
 #include "../../Renderable.hpp"
 #include "AtlasTextureCollection.hpp"
@@ -16,12 +14,11 @@
 class GLDynamicAtlasRenderer : public GLSubRenderer
 {
 public:
-	explicit GLDynamicAtlasRenderer(win::AssetRoll &roll);
+	GLDynamicAtlasRenderer(win::AssetRoll &roll, const TextureAssetMap &texture_map, const AtlasTextureCollection &atlas_textures);
 
-	void set_atlases(const std::vector<win::GLAtlas> &atlases);
 	void set_view_projection(const glm::mat4 &view_projection);
-	std::uint16_t load(const Renderable &renderable);
-	void add(const Renderable &renderable, std::uint32_t base_vertex);
+	void load_all();
+	void add(const Renderable &renderable);
 	void flush() override;
 
 private:
@@ -31,12 +28,12 @@ private:
 	int uniform_size;
 	int uniform_rotation;
 
+	const TextureAssetMap &texture_map;
+	const AtlasTextureCollection &atlas_textures;
+	std::uint16_t base_vertex_map[(int)Texture::max_texture];
+
 	win::GLVertexArray vao;
 	win::GLBuffer position, texcoord, index;
 
-	const std::vector<win::GLAtlas> *atlases;
-	GLuint current_texture;
-
-	std::vector<GLDynamicAtlasSceneItem> scene;
+	std::vector<const Renderable*> scene;
 };
- */

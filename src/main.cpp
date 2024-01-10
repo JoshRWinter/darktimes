@@ -112,12 +112,18 @@ int main()
 		LevelRenderState *const lrsso = level_render_state_som.reader_acquire();
 		if (lrsso != NULL)
 		{
-			renderer.set_static_objects(lrsso->renderables);
+			renderer.load_statics(lrsso->renderables);
 
 			level_render_state_som.reader_release(lrsso);
 		}
 
-		renderer.render();
+		std::vector<Renderable> renderables;
+		static float x = 0.0f, y = 0.0f, rot = 0.0f;
+		x+= 0.001f;
+		y+= 0.001f;
+		rot+= 0.1f;
+		renderables.emplace_back(Texture::player, x, y, x * 1.1f, y * 1.1f, rot);
+		renderer.render(renderables);
 
 		display.swap();
 	}
