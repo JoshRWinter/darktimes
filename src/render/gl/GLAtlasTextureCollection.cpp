@@ -1,8 +1,8 @@
 #include <cstring>
 
-#include "AtlasTextureCollection.hpp"
+#include "GLAtlasTextureCollection.hpp"
 
-AtlasTextureCollection::AtlasTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map)
+GLAtlasTextureCollection::GLAtlasTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map)
 {
 	std::vector<const char*> seen;
 	map.reserve((int)Texture::max_texture);
@@ -27,12 +27,12 @@ AtlasTextureCollection::AtlasTextureCollection(win::AssetRoll &roll, const Textu
 #endif
 }
 
-const win::GLAtlas &AtlasTextureCollection::get_atlas(Texture texture) const
+const win::GLAtlas &GLAtlasTextureCollection::get_atlas(Texture texture) const
 {
 	return *map[(int)texture];
 }
 
-const win::GLAtlas *AtlasTextureCollection::find(const char *asset_path, const TextureAssetMap &texture_map) const
+const win::GLAtlas *GLAtlasTextureCollection::find(const char *asset_path, const TextureAssetMap &texture_map) const
 {
 	for (int i = 0; i < map.size(); ++i)
 	{

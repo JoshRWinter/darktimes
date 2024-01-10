@@ -9,10 +9,8 @@ static std::uint16_t to_ushort(float f)
 	return (std::uint16_t)(f * std::numeric_limits<std::uint16_t>::max());
 }
 
-GLDynamicAtlasRenderer::GLDynamicAtlasRenderer(win::AssetRoll &roll, const TextureAssetMap &texture_map, const AtlasTextureCollection &atlas_textures)
+GLDynamicAtlasRenderer::GLDynamicAtlasRenderer(win::AssetRoll &roll)
 	: program(win::load_gl_shaders(roll["shader/dynamic_atlas.vert"], roll["shader/dynamic_atlas.frag"]))
-	, texture_map(texture_map)
-	, atlas_textures(atlas_textures)
 {
 	glUseProgram(program.get());
 	uniform_view_projection = glGetUniformLocation(program.get(), "view_projection");
@@ -41,7 +39,7 @@ void GLDynamicAtlasRenderer::set_view_projection(const glm::mat4 &view_projectio
 	glUniformMatrix4fv(uniform_view_projection, 1, GL_FALSE, glm::value_ptr(view_projection));
 }
 
-void GLDynamicAtlasRenderer::load_all()
+void GLDynamicAtlasRenderer::load_all(const GLAtlasTextureCollection &atlas_textures, const TextureAssetMap &texture_map)
 {
 	std::vector<float> position_data;
 	std::vector<std::uint16_t> texcoord_data;

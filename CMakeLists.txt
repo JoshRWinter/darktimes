@@ -31,10 +31,10 @@ set(sources
 	# gl renderer
 	src/render/gl/GLRendererBackend.hpp
 	src/render/gl/GLRendererBackend.cpp
-	src/render/gl/FloorTextureCollection.hpp
-	src/render/gl/FloorTextureCollection.cpp
-	src/render/gl/AtlasTextureCollection.hpp
-	src/render/gl/AtlasTextureCollection.cpp
+	src/render/gl/GLFloorTextureCollection.hpp
+	src/render/gl/GLFloorTextureCollection.cpp
+	src/render/gl/GLAtlasTextureCollection.hpp
+	src/render/gl/GLAtlasTextureCollection.cpp
 	src/render/gl/GLSubRenderer.hpp
 	src/render/gl/GLStaticFloorRenderer.hpp
 	src/render/gl/GLStaticFloorRenderer.cpp

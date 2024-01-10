@@ -10,19 +10,12 @@ using namespace win::gl;
 GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
 	: floor_textures(roll, texture_map)
 	, atlases(roll, texture_map)
-	, static_floor_renderer(roll, floor_textures)
-	, static_atlas_renderer(roll, texture_map, atlases)
-	, dynamic_atlas_renderer(roll, texture_map, atlases)
+	, static_floor_renderer(roll)
+	, static_atlas_renderer(roll)
+	, dynamic_atlas_renderer(roll)
 	, text_renderer(screen_dims, projection, GL_TEXTURE1, true)
 {
 	fprintf(stderr, "%s\n%s\n%s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
-
-	/*
-	 * AYYYYYYYYYYYYY
-	 * limit index depth
-	 * limit atlas count
-	 * fix 32bit bullshit
-	 */
 
 	this->projection = glm::ortho(projection.left, projection.right, projection.bottom, projection.top);
 
@@ -70,8 +63,8 @@ std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Rende
 			atlas_renderables.push_back(s);
 	}
 
-	const auto floor_statics = static_floor_renderer.load(floor_renderables);
-	const auto atlas_statics = static_atlas_renderer.load(atlas_renderables);
+	const auto floor_statics = static_floor_renderer.load(floor_renderables, floor_textures);
+	const auto atlas_statics = static_atlas_renderer.load(atlas_renderables, atlases, texture_map);
 
 	int floor_index = 0;
 	int atlas_index = 0;
@@ -93,7 +86,7 @@ std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Rende
 
 void GLRendererBackend::load_dynamics()
 {
-	dynamic_atlas_renderer.load_all();
+	dynamic_atlas_renderer.load_all(atlases, texture_map);
 }
 
 void GLRendererBackend::render_start()

@@ -6,12 +6,12 @@
 #include "../../Darktimes.hpp"
 #include "../TextureAssetMap.hpp"
 
-class FloorTextureCollection
+class GLFloorTextureCollection
 {
-	NO_COPY_MOVE(FloorTextureCollection);
+	NO_COPY_MOVE(GLFloorTextureCollection);
 
 public:
-	FloorTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map);
+	GLFloorTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map);
 
 	const int &get_layer(Texture texture) const;
 

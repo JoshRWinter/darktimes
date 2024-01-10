@@ -8,16 +8,16 @@
 #include <win/gl/GL.hpp>
 
 #include "../../Renderable.hpp"
-#include "AtlasTextureCollection.hpp"
+#include "GLAtlasTextureCollection.hpp"
 #include "GLSubRenderer.hpp"
 
 class GLDynamicAtlasRenderer : public GLSubRenderer
 {
 public:
-	GLDynamicAtlasRenderer(win::AssetRoll &roll, const TextureAssetMap &texture_map, const AtlasTextureCollection &atlas_textures);
+	explicit GLDynamicAtlasRenderer(win::AssetRoll &roll);
 
 	void set_view_projection(const glm::mat4 &view_projection);
-	void load_all();
+	void load_all(const GLAtlasTextureCollection &atlas_textures, const TextureAssetMap &texture_map);
 	void add(const Renderable &renderable);
 	void flush() override;
 
@@ -28,8 +28,6 @@ private:
 	int uniform_size;
 	int uniform_rotation;
 
-	const TextureAssetMap &texture_map;
-	const AtlasTextureCollection &atlas_textures;
 	std::uint16_t base_vertex_map[(int)Texture::max_texture];
 
 	win::GLVertexArray vao;

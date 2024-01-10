@@ -4,9 +4,8 @@
 
 using namespace win::gl;
 
-GLStaticFloorRenderer::GLStaticFloorRenderer(win::AssetRoll &roll, const FloorTextureCollection &floortextures)
+GLStaticFloorRenderer::GLStaticFloorRenderer(win::AssetRoll &roll)
 	: program(win::load_gl_shaders(roll["shader/static_floor.vert"], roll["shader/static_floor.frag"]))
-	, floortextures(floortextures)
 {
 	glUseProgram(program.get());
 	uniform_view_projection = glGetUniformLocation(program.get(), "view_projection");
@@ -31,7 +30,7 @@ void GLStaticFloorRenderer::set_view_projection(const glm::mat4 &view)
 	glUniformMatrix4fv(uniform_view_projection, 1, GL_FALSE, glm::value_ptr(view));
 }
 
-std::vector<std::uint16_t> GLStaticFloorRenderer::load(const std::vector<Renderable> &renderables)
+std::vector<std::uint16_t> GLStaticFloorRenderer::load(const std::vector<Renderable> &renderables, const GLFloorTextureCollection &floor_textures)
 {
 	std::vector<std::uint16_t> results;
 
@@ -70,7 +69,7 @@ std::vector<std::uint16_t> GLStaticFloorRenderer::load(const std::vector<Rendera
 			position_texcoord_data.push_back(tc.t * renderable.h);
 		}
 
-		const int layer_index = floortextures.get_layer(renderable.texture);
+		const int layer_index = floor_textures.get_layer(renderable.texture);
 		if (layer_index > std::numeric_limits<std::uint8_t>::max())
 			win::bug("overflow");
 

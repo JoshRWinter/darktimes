@@ -8,12 +8,12 @@
 #include "../../Darktimes.hpp"
 #include "../TextureAssetMap.hpp"
 
-class AtlasTextureCollection
+class GLAtlasTextureCollection
 {
-	NO_COPY_MOVE(AtlasTextureCollection);
+	NO_COPY_MOVE(GLAtlasTextureCollection);
 
 public:
-	AtlasTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map);
+	GLAtlasTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map);
 
 	const win::GLAtlas &get_atlas(Texture texture) const;
 

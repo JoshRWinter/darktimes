@@ -8,8 +8,8 @@
 #include <win/AssetRoll.hpp>
 #include <win/Pool.hpp>
 
-#include "FloorTextureCollection.hpp"
-#include "AtlasTextureCollection.hpp"
+#include "GLFloorTextureCollection.hpp"
+#include "GLAtlasTextureCollection.hpp"
 
 #include "GLStaticFloorRenderer.hpp"
 #include "GLStaticAtlasRenderer.hpp"
@@ -50,8 +50,8 @@ public:
 
 private:
 	TextureAssetMap texture_map;
-	FloorTextureCollection floor_textures;
-	AtlasTextureCollection atlases;
+	GLFloorTextureCollection floor_textures;
+	GLAtlasTextureCollection atlases;
 
 	GLStaticFloorRenderer static_floor_renderer;
 	GLStaticAtlasRenderer static_atlas_renderer;

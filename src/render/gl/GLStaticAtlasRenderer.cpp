@@ -9,10 +9,8 @@ static std::uint16_t to_ushort(float f)
 	return (std::uint16_t)(f * std::numeric_limits<std::uint16_t>::max());
 }
 
-GLStaticAtlasRenderer::GLStaticAtlasRenderer(win::AssetRoll &roll, const TextureAssetMap &texture_map, AtlasTextureCollection &atlas_textures)
+GLStaticAtlasRenderer::GLStaticAtlasRenderer(win::AssetRoll &roll)
 	: program(win::load_gl_shaders(roll["shader/static_atlas.vert"], roll["shader/static_atlas.frag"]))
-	, texture_map(texture_map)
-	, atlas_textures(atlas_textures)
 {
 	glUseProgram(program.get());
 	uniform_view_projection = glGetUniformLocation(program.get(), "view_projection");
@@ -35,7 +33,7 @@ void GLStaticAtlasRenderer::set_view_projection(const glm::mat4 &view_projection
 	glUniformMatrix4fv(uniform_view_projection, 1, GL_FALSE, glm::value_ptr(view_projection));
 }
 
-std::vector<std::uint16_t> GLStaticAtlasRenderer::load(const std::vector<Renderable> &renderables)
+std::vector<std::uint16_t> GLStaticAtlasRenderer::load(const std::vector<Renderable> &renderables, const GLAtlasTextureCollection &atlases, const TextureAssetMap &texture_map)
 {
 	std::vector<std::uint16_t> results;
 
@@ -71,7 +69,7 @@ std::vector<std::uint16_t> GLStaticAtlasRenderer::load(const std::vector<Rendera
 			position_data.push_back(transformed.y);
 		}
 
-		const auto &atlas = atlas_textures.get_atlas(renderable.texture);
+		const auto &atlas = atlases.get_atlas(renderable.texture);
 		const auto &atlas_item = atlas.item(texture_map[renderable.texture].atlas_index);
 		texcoord_data.push_back(to_ushort(atlas_item.x1));
 		texcoord_data.push_back(to_ushort(atlas_item.y2));

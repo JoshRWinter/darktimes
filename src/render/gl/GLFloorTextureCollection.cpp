@@ -1,8 +1,8 @@
 #include <win/Targa.hpp>
 
-#include "FloorTextureCollection.hpp"
+#include "GLFloorTextureCollection.hpp"
 
-FloorTextureCollection::FloorTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map)
+GLFloorTextureCollection::GLFloorTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map)
 {
 	int width = -1, height = -1;
 
@@ -52,7 +52,7 @@ FloorTextureCollection::FloorTextureCollection(win::AssetRoll &roll, const Textu
 #endif
 }
 
-const int &FloorTextureCollection::get_layer(Texture texture) const
+const int &GLFloorTextureCollection::get_layer(Texture texture) const
 {
 	return map[(int)texture];
 }
