@@ -30,6 +30,12 @@ struct GLLoadedObject
 	std::uint16_t base_vertex;
 };
 
+class GLDummyRenderer : public GLSubRenderer
+{
+public:
+	void flush() override {};
+};
+
 class GLRendererBackend : public RendererBackend
 {
 	WIN_NO_COPY_MOVE(GLRendererBackend);
@@ -49,6 +55,9 @@ public:
 	void render_dynamics(const std::vector<Renderable> &dynamics) override;
 
 private:
+	GLDummyRenderer dummy_renderer;
+	GLSubRenderer *current_renderer;
+
 	TextureAssetMap texture_map;
 	GLFloorTextureCollection floor_textures;
 	GLAtlasTextureCollection atlases;

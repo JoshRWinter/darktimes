@@ -8,7 +8,8 @@
 using namespace win::gl;
 
 GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
-	: floor_textures(roll, texture_map)
+	: current_renderer(&dummy_renderer)
+	, floor_textures(roll, texture_map)
 	, atlases(roll, texture_map)
 	, static_floor_renderer(roll)
 	, static_atlas_renderer(roll)
@@ -96,6 +97,7 @@ void GLRendererBackend::render_start()
 
 void GLRendererBackend::render_end()
 {
+	current_renderer->flush();
 }
 
 void GLRendererBackend::render_statics(const std::vector<const void*> &statics)
@@ -104,13 +106,26 @@ void GLRendererBackend::render_statics(const std::vector<const void*> &statics)
 	{
 		const auto object = *(const GLLoadedObject*)s;
 		if (object.type == GLLoadedObjectType::floor)
-			static_floor_renderer.add(object.base_vertex);
-		else
-			static_atlas_renderer.add(object.base_vertex);
-	}
+		{
+			if (current_renderer != &static_floor_renderer)
+			{
+				current_renderer->flush();
+				current_renderer = &static_floor_renderer;
+			}
 
-	static_floor_renderer.flush();
-	static_atlas_renderer.flush();
+			static_floor_renderer.add(object.base_vertex);
+		}
+		else
+		{
+			if (current_renderer != &static_atlas_renderer)
+			{
+				current_renderer->flush();
+				current_renderer = &static_atlas_renderer;
+			}
+
+			static_atlas_renderer.add(object.base_vertex);
+		}
+	}
 
 #ifndef NDEBUG
 	win::gl_check_error();
@@ -122,7 +137,8 @@ void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
 	for (const auto &d : dynamics)
 		dynamic_atlas_renderer.add(d);
 
-	dynamic_atlas_renderer.flush();
+	current_renderer->flush();
+	current_renderer = &dynamic_atlas_renderer;
 
 #ifndef NDEBUG
 	win::gl_check_error();
