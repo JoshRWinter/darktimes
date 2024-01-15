@@ -14,12 +14,10 @@ set(sources
 	src/Renderable.hpp
 	src/Texture.hpp
 	src/SyncObjectManager.hpp
-	src/LevelRenderState.hpp
-	src/RenderState.hpp
-	src/Input.hpp
-	src/RenderState.hpp
-	src/RandomNumberGenerator.cpp
 	src/RandomNumberGenerator.hpp
+	src/RandomNumberGenerator.cpp
+	src/Game.hpp
+	src/Game.cpp
 
 	# render
 	src/render/Renderer.hpp
@@ -43,6 +41,15 @@ set(sources
 	src/render/gl/GLDynamicAtlasRenderer.hpp
 	src/render/gl/GLDynamicAtlasRenderer.cpp
 
+	# level gen nonsense
+	src/levelgen/LevelObjects.hpp
+	src/levelgen/PropDefs.hpp
+	src/levelgen/StructureDefs.hpp
+	src/levelgen/Structure.hpp
+	src/levelgen/Structure.cpp
+	src/levelgen/LevelGenerator.hpp
+	src/levelgen/LevelGenerator.cpp
+
 	# sim
 	src/sim/World.hpp
 	src/sim/Simulation.cpp
@@ -62,15 +69,6 @@ set(sources
 	# systems
 	src/sim/system/PlayerSystem.hpp
 	src/sim/system/PlayerSystem.cpp
-
-	# level gen nonsense
-	src/sim/levelgen/LevelObjects.hpp
-	src/sim/levelgen/PropDefs.hpp
-	src/sim/levelgen/StructureDefs.hpp
-	src/sim/levelgen/Structure.hpp
-	src/sim/levelgen/Structure.cpp
-	src/sim/levelgen/LevelGenerator.hpp
-	src/sim/levelgen/LevelGenerator.cpp
 )
 
 if(WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))

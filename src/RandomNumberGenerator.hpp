@@ -9,7 +9,7 @@ class RandomNumberGenerator
 	NO_COPY_MOVE(RandomNumberGenerator);
 
 public:
-	RandomNumberGenerator(int);
+	explicit RandomNumberGenerator(int);
 
 	bool one_in(int);
 	int uniform_int(int, int);

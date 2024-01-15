@@ -7,8 +7,8 @@
 #include <array>
 #include <functional>
 
-#include "../../Texture.hpp"
-#include "../../RandomNumberGenerator.hpp"
+#include "../Texture.hpp"
+#include "../RandomNumberGenerator.hpp"
 
 #include "PropDefs.hpp"
 #include "StructureDefs.hpp"
@@ -962,46 +962,20 @@ static void log_seed(int seed)
 // entry point
 void level_generate(
 	int seed,
-	win::Pool<Entity> &entities,
-	win::Pool<PhysicalComponent> &physicals,
-	win::Pool<RenderableComponent> &atlas_renderables,
-	win::Pool<RenderableComponent> &tile_renderables
+	std::vector<LevelFloor> &floors,
+	std::vector<LevelWall> &walls,
+	std::vector<LevelProp> &props
 )
 {
 	RandomNumberGenerator rand(seed);
 
-	std::vector<LevelFloor> floors;
 	do
 	{
 		floors = generate_impl(rand);
 	} while (floors.empty());
 
-	const std::vector<LevelWall> walls = generate_walls(floors);
-
-	const std::vector<LevelProp> props = generate_props(rand, floors);
-
-	// map to entities and components
-
-	for (const auto &floor : floors)
-	{
-		auto &entity = entities.add("floor");
-		entity.add(physicals.add(entity, floor.x, floor.y, floor.w, floor.h, 0.0f));
-		entity.add(tile_renderables.add(entity, floor.texture));
-	}
-
-	for (const auto &prop : props)
-	{
-		auto &entity = entities.add("prop");
-		entity.add(physicals.add(entity, prop.x, prop.y, prop.width, prop.height, 0.0f));
-		entity.add(atlas_renderables.add(entity, Texture::player));
-	}
-
-	for (const auto &wall : walls)
-	{
-		auto &entity = entities.add("wall");
-		entity.add(physicals.add(entity, wall.x, wall.y, wall.w, wall.h, 0.0f));
-		entity.add(atlas_renderables.add(entity, Texture::player));
-	}
+	walls = generate_walls(floors);
+	props = generate_props(rand, floors);
 
 	log_seed(seed);
 }

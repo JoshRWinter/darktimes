@@ -1,36 +1,13 @@
-#include <chrono>
-#include <thread>
-
 #include <win/Display.hpp>
 #include <win/AssetRoll.hpp>
 #include <win/gl/GL.hpp>
 
-#include "render/Renderer.hpp"
-#include "sim/Simulation.hpp"
-
-static void button_event(const win::Button button, const bool press, Input &input)
-{
-	switch (button)
-	{
-		case win::Button::left:
-			input.left = press;
-			break;
-		case win::Button::right:
-			input.right = press;
-			break;
-		case win::Button::down:
-			input.down = press;
-			break;
-		case win::Button::up:
-			input.up = press;
-			break;
-
-		default: break;
-	}
-}
+#include "Game.hpp"
 
 int main()
 {
+	win::AssetRoll roll("Darktimes.roll");
+
 	// display setup
 	win::DisplayOptions display_options;
 #ifndef NDEBUG
@@ -52,84 +29,12 @@ int main()
 	win::Display display(display_options);
 	display.vsync(true);
 
-	// input handling
-	bool quit = false;
-	std::atomic<bool> simulation_quit = false;
+	Game game(display, roll);
 
-	Input input;
-	SyncObjectManager<Input> input_som;
+	display.register_button_handler([&game](win::Button button, bool press) { game.button_event(button, press); });
+	display.register_window_handler([&game](win::WindowEvent event) { game.stop(); });
 
-	display.register_button_handler([&quit, &input, &input_som](win::Button button, bool press)
-	{
-		if (button == win::Button::esc)
-			quit = true;
-
-		button_event(button, press, input);
-	});
-
-	display.register_window_handler([&quit](win::WindowEvent event)
-	{
-		switch (event)
-		{
-			case win::WindowEvent::close:
-				quit = true;
-				break;
-			default: break;
-		}
-	});
-
-	win::AssetRoll roll("Darktimes.roll");
-
-	Renderer renderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
-
-	// set up the simulation thread
-	SyncObjectManager<LevelRenderState> level_render_state_som;
-	SyncObjectManager<RenderState> render_state_som;
-	std::thread simulation_thread(simulation, std::ref(simulation_quit), std::ref(level_render_state_som), std::ref(render_state_som), std::ref(input_som));
-
-	// loop de loop
-	while(!quit)
-	{
-		display.process();
-
-		// publish the latest inputs
-		Input *i;
-		if ((i = input_som.writer_acquire()) != NULL)
-		{
-			*i = input;
-			input_som.writer_release(i);
-		}
-
-		// gather the latest info about render state
-		RenderState *rs;
-		if ((rs = render_state_som.reader_acquire()) != NULL)
-		{
-			renderer.set_view(rs->centerx, rs->centery, 0.4f);
-			render_state_som.reader_release(rs);
-		}
-
-		// see if the sim has published a new level layout
-		LevelRenderState *const lrsso = level_render_state_som.reader_acquire();
-		if (lrsso != NULL)
-		{
-			renderer.load_statics(lrsso->renderables);
-
-			level_render_state_som.reader_release(lrsso);
-		}
-
-		std::vector<Renderable> renderables;
-		static float x = 0.0f, y = 0.0f, rot = 0.0f;
-		x+= 0.001f;
-		y+= 0.001f;
-		rot+= 0.1f;
-		renderables.emplace_back(Texture::player, x, y, x * 1.1f, y * 1.1f, rot);
-		renderer.render(renderables);
-
-		display.swap();
-	}
-
-	simulation_quit = true;
-	simulation_thread.join();
+	game.play();
 
 	return 0;
 }

@@ -7,7 +7,6 @@ void player_system(
 	win::Pool<PhysicalComponent> &physicals,
 	win::Pool<RenderableComponent> &renderables,
 	win::Pool<PlayerComponent> &players,
-	const Input &input,
 	float &centerx,
 	float &centery
 )
@@ -23,6 +22,7 @@ void player_system(
 	auto &player = *players.begin();
 	auto &phys = player.entity.rget<PhysicalComponent>();
 
+	/*
 	const float scoot = 0.4f;
 	if (input.up)
 		phys.y += scoot;
@@ -32,6 +32,7 @@ void player_system(
 		phys.x -= scoot;
 	if (input.right)
 		phys.x += scoot;
+	 */
 
 	// center the screen on the player
 	centerx = phys.x + (PlayerEntity::width / 2.0f);

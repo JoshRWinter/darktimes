@@ -25,11 +25,10 @@ template <typename T> struct SyncObject : T
 };
 
 // good for multi-reader / single-writer
-template <typename T> class SyncObjectManager
+template <typename T, int slots = 2> class SyncObjectManager
 {
 	NO_COPY_MOVE(SyncObjectManager);
 
-	static constexpr int slots = 2;
 	static_assert(slots > 0, "slots must be greater than 0");
 
 public:
