@@ -21,5 +21,6 @@ private:
 	win::Display &display;
 	win::AssetRoll &roll;
 	Simulation sim;
+	GameInput input;
 	bool quit;
 };

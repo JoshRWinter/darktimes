@@ -18,6 +18,8 @@ set(sources
 	src/RandomNumberGenerator.cpp
 	src/Game.hpp
 	src/Game.cpp
+	src/GameInput.hpp
+	src/RenderableWorldState.hpp
 
 	# render
 	src/render/Renderer.hpp
@@ -52,6 +54,7 @@ set(sources
 
 	# sim
 	src/sim/World.hpp
+	src/sim/World.cpp
 	src/sim/Simulation.cpp
 	src/sim/Simulation.hpp
 

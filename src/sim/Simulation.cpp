@@ -23,31 +23,64 @@ Simulation::~Simulation()
 void Simulation::reset(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props)
 {
 	SimulationResetCommand *so;
-	while ((so = som_level_package.writer_acquire()) == NULL)
-	{
-		so->floors = floors;
-		so->walls = walls;
-		so->props = props;
+	while ((so = som_level_package.writer_acquire()) == NULL);
 
-		som_level_package.writer_release(so);
-	}
+	so->floors = floors;
+	so->walls = walls;
+	so->props = props;
+
+	som_level_package.writer_release(so);
+}
+
+void Simulation::set_input(const GameInput &input)
+{
+	GameInput *so;
+	while ((so = som_input.writer_acquire()) == NULL);
+
+	*so = input;
+	som_input.writer_release(so);
+}
+
+RenderableWorldState *Simulation::get_state(RenderableWorldState *previous)
+{
+	if (previous != NULL)
+		som_state.reader_release(previous);
+
+	return som_state.reader_acquire();
 }
 
 void Simulation::simulation(Simulation &sim)
 {
+	World world;
+
 	auto tick_start = std::chrono::high_resolution_clock::now();
 	while (!sim.stop_flag)
 	{
-		sim.tick();
+		// pass thru input;
+		GameInput *input;
+		if ((input = sim.som_input.reader_acquire()) != NULL)
+		{
+			world.set_input(*input);
+			sim.som_input.reader_release(input);
+		}
 
+		// run the world simulation
+		world.tick();
+
+		// gather the results;
+		{
+			RenderableWorldState state = world.get_state();
+			RenderableWorldState *so;
+
+			while ((so = sim.som_state.writer_acquire()) == NULL);
+			*so = state;
+			sim.som_state.writer_release(so);
+		}
+
+		// wait until time for next tick;
 		while (std::chrono::duration<float, std::milli>(std::chrono::high_resolution_clock::now() - tick_start).count() < 16.66666f)
 			std::this_thread::sleep_for(std::chrono::microseconds (1));
 
 		tick_start = std::chrono::high_resolution_clock::now();
 	}
-}
-
-void Simulation::tick()
-{
-
 }

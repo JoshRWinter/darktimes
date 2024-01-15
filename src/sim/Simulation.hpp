@@ -4,6 +4,8 @@
 #include <atomic>
 
 #include "../Darktimes.hpp"
+#include "../GameInput.hpp"
+#include "../RenderableWorldState.hpp"
 #include "../SyncObjectManager.hpp"
 #include "../levelgen/LevelObjects.hpp"
 
@@ -24,14 +26,16 @@ public:
 	~Simulation();
 
 	void reset(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props);
+	void set_input(const GameInput &input);
+	RenderableWorldState *get_state(RenderableWorldState *previous);
 
 private:
 	// all private methods called by "thread" thread
 	static void simulation(Simulation &sim);
-	void tick();
 
 	SyncObjectManager<SimulationResetCommand, 1> som_level_package;
-
+	SyncObjectManager<GameInput, 2> som_input;
+	SyncObjectManager<RenderableWorldState, 2> som_state;
 	std::atomic<bool> stop_flag;
 	std::thread thread;
 };

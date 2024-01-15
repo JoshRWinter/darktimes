@@ -29,19 +29,52 @@ void Game::play()
 	renderer.load_statics(renderables);
 	renderer.set_view(0.0f, 0.0f, 0.5);
 
+	RenderableWorldState *state = NULL;
 	while (!quit)
 	{
 		display.process();
 
+		// send the latest inputs
+		sim.set_input(input);
+
+		// get the latest world state from the simulation
+		state = sim.get_state(state);
+
+		// configure renderer for current frame
+		if (state != NULL)
+		{
+			renderer.set_view(state->centerx, state->centery, 0.5f);
+		}
+
+		// render
 		renderer.render({});
+
+		// swap display front and back buffers
 		display.swap();
 	}
 }
 
 void Game::button_event(win::Button button, bool press)
 {
-	if (button == win::Button::esc)
-		quit = true;
+	switch (button)
+	{
+		case win::Button::esc:
+			quit = true;
+			break;
+		case win::Button::left:
+			input.left = press;
+			break;
+		case win::Button::right:
+			input.right = press;
+			break;
+		case win::Button::down:
+			input.down = press;
+			break;
+		case win::Button::up:
+			input.up = press;
+			break;
+		default: break;
+	}
 }
 
 void Game::mouse_event(float x, float y)

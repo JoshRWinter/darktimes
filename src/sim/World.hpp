@@ -2,16 +2,29 @@
 
 #include <win/Pool.hpp>
 
+#include "../Darktimes.hpp"
+#include "../GameInput.hpp"
+#include "../RenderableWorldState.hpp"
+
 #include "entity/Entity.hpp"
 #include "component/Component.hpp"
 #include "component/PhysicalComponent.hpp"
 #include "component/RenderableComponent.hpp"
 #include "component/PlayerComponent.hpp"
 
-struct World
+class World
 {
-	~World() { clear(); }
+	NO_COPY_MOVE(World);
 
+public:
+	World() = default;
+
+	void set_input(const GameInput &i);
+	RenderableWorldState get_state();
+	void tick();
+
+private:
+	GameInput input;
 	win::Pool<Entity> entities;
 	win::Pool<PhysicalComponent> physicals;
 	win::Pool<RenderableComponent> atlas_renderables;
@@ -19,15 +32,4 @@ struct World
 	win::Pool<PlayerComponent> players;
 
 	float centerx = 0.0f, centery = 0.0f;
-
-	void clear()
-	{
-		for (auto &ent : entities)
-			ent.clear();
-
-		entities.clear();
-		physicals.clear();
-		atlas_renderables.clear();
-		players.clear();
-	}
 };
