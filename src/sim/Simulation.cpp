@@ -52,24 +52,26 @@ RenderableWorldState *Simulation::get_state(RenderableWorldState *previous)
 void Simulation::simulation(Simulation &sim)
 {
 	World world;
+	GameInput input;
 
 	auto tick_start = std::chrono::high_resolution_clock::now();
 	while (!sim.stop_flag)
 	{
-		// pass thru input;
-		GameInput *input;
-		if ((input = sim.som_input.reader_acquire()) != NULL)
+		// take int account newest input
 		{
-			world.set_input(*input);
-			sim.som_input.reader_release(input);
+			GameInput *so;
+			if ((so = sim.som_input.reader_acquire()) != NULL)
+			{
+				input = *so;
+				sim.som_input.reader_release(so);
+			}
 		}
 
 		// run the world simulation
-		world.tick();
+		const auto state = world.tick(input);
 
-		// gather the results;
+		// upload the results;
 		{
-			RenderableWorldState state = world.get_state();
 			RenderableWorldState *so;
 
 			while ((so = sim.som_state.writer_acquire()) == NULL);

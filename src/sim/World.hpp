@@ -19,12 +19,9 @@ class World
 public:
 	World() = default;
 
-	void set_input(const GameInput &i);
-	RenderableWorldState get_state();
-	void tick();
+	RenderableWorldState tick(const GameInput &input);
 
 private:
-	GameInput input;
 	win::Pool<Entity> entities;
 	win::Pool<PhysicalComponent> physicals;
 	win::Pool<RenderableComponent> atlas_renderables;
