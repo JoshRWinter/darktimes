@@ -37,7 +37,7 @@ GLFloorTextureCollection::GLFloorTextureCollection(win::AssetRoll &roll, const T
 		{
 			width = tga.width();
 			height = tga.height();
-			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, width, height, floor_texture_count, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, width, height, floor_texture_count, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
 		}
 
 		if (width != tga.width() || height != tga.height())
@@ -46,7 +46,7 @@ GLFloorTextureCollection::GLFloorTextureCollection(win::AssetRoll &roll, const T
 		if (tga.bpp() != 24 && false)
 			win::bug("Prefer 24 bit color for floor textures");
 
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, item.layer_index, width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE, tga.data());
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, item.layer_index, width, height, 1, GL_BGRA, GL_UNSIGNED_BYTE, tga.data());
 	}
 
 #ifndef NDEBUG
