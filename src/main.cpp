@@ -24,10 +24,10 @@ int main()
 	display_options.gl_major = 3;
 	display_options.gl_minor = 3;
 
-	win::load_gl_functions();
-
 	win::Display display(display_options);
 	display.vsync(true);
+
+	win::load_gl_functions();
 
 	Game game(display, roll);
 

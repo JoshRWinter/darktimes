@@ -2,6 +2,8 @@
 
 #include "GLFloorTextureCollection.hpp"
 
+using namespace win::gl;
+
 GLFloorTextureCollection::GLFloorTextureCollection(win::AssetRoll &roll, const TextureAssetMap &texture_map)
 {
 	int width = -1, height = -1;
