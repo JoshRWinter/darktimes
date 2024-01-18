@@ -2,12 +2,12 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="120.95499mm"
-   height="120.95499mm"
-   viewBox="0 0 120.95499 120.95499"
+   width="129.95876mm"
+   height="129.61856mm"
+   viewBox="0 0 129.95876 129.61856"
    version="1.1"
    id="svg5"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20, custom)"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
    sodipodi:docname="floor2.svg"
    inkscape:export-filename="/home/josh/programming/darktimes/asset/texture/floor2.png"
    inkscape:export-xdpi="139.73738"
@@ -27,21 +27,30 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.77771465"
-     inkscape:cx="-469.96672"
-     inkscape:cy="-107.36586"
+     inkscape:cx="301.52447"
+     inkscape:cy="166.51351"
      inkscape:window-width="2560"
-     inkscape:window-height="1424"
+     inkscape:window-height="1413"
      inkscape:window-x="0"
-     inkscape:window-y="16"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     inkscape:showpageshadow="0"
+     inkscape:deskcolor="#505050" />
   <defs
      id="defs2" />
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-54.853191,-79.611492)">
+     transform="translate(-49.069687,-74.848602)">
+    <rect
+       style="fill:#000000;stroke-width:0.264583"
+       id="rect1"
+       width="129.95876"
+       height="129.61856"
+       x="49.069687"
+       y="74.848602" />
     <circle
        style="fill:#ff2644;fill-opacity:1;stroke-width:3.375"
        id="path1792"

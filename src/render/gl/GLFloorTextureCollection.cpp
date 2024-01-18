@@ -23,6 +23,7 @@ GLFloorTextureCollection::GLFloorTextureCollection(win::AssetRoll &roll, const T
 		if (texture_map[(Texture)i].layer_index != -1)
 			++floor_texture_count;
 
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	for (int i = 0; i < (int)Texture::max_texture; ++i)
 	{
 		const auto &item = texture_map[(Texture)i];
@@ -33,21 +34,22 @@ GLFloorTextureCollection::GLFloorTextureCollection(win::AssetRoll &roll, const T
 		win::Targa tga(roll[item.asset_path]);
 		map[i] = item.layer_index;
 
+		if (tga.bpp() != 24)
+			win::bug("Floor textures must have 24 bit color depth");
+
 		if (width == -1)
 		{
 			width = tga.width();
 			height = tga.height();
-			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, width, height, floor_texture_count, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, width, height, floor_texture_count, 0, GL_BGR, GL_UNSIGNED_BYTE, NULL);
 		}
 
 		if (width != tga.width() || height != tga.height())
 			win::bug("All floor textures must be same dimensions!");
 
-		if (tga.bpp() != 24 && false)
-			win::bug("Prefer 24 bit color for floor textures");
-
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, item.layer_index, width, height, 1, GL_BGRA, GL_UNSIGNED_BYTE, tga.data());
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, item.layer_index, width, height, 1, GL_BGR, GL_UNSIGNED_BYTE, tga.data());
 	}
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 #ifndef NDEBUG
 	win::gl_check_error();
