@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "PlayerSystem.hpp"
 
 #include "../entity/PlayerEntity.hpp"
@@ -7,8 +9,7 @@ void player_system(
 	win::Pool<PhysicalComponent> &physicals,
 	win::Pool<RenderableComponent> &renderables,
 	win::Pool<PlayerComponent> &players,
-	float &centerx,
-	float &centery
+	const GameInput &input
 )
 {
 	if (players.size() == 0)
@@ -20,9 +21,8 @@ void player_system(
 		);
 
 	auto &player = *players.begin();
-	auto &phys = player.entity.rget<PhysicalComponent>();
+	auto &phys = player.entity.get<PhysicalComponent>();
 
-	/*
 	const float scoot = 0.4f;
 	if (input.up)
 		phys.y += scoot;
@@ -32,9 +32,7 @@ void player_system(
 		phys.x -= scoot;
 	if (input.right)
 		phys.x += scoot;
-	 */
 
-	// center the screen on the player
-	centerx = phys.x + (PlayerEntity::width / 2.0f);
-	centery = phys.y + (PlayerEntity::height / 2.0f);
+	const float aim = atan2f(input.y, input.x);
+	phys.rot = aim;
 }

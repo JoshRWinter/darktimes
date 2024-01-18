@@ -31,6 +31,7 @@ int main()
 
 	Game game(display, roll);
 
+	display.register_mouse_handler([&game](int x, int y) { game.mouse_event(x, y); });
 	display.register_button_handler([&game](win::Button button, bool press) { game.button_event(button, press); });
 	display.register_window_handler([&game](win::WindowEvent event) { game.stop(); });
 

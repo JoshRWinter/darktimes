@@ -15,12 +15,13 @@ public:
 	explicit Renderer(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll);
 
 	void set_view(float x, float y, float zoom);
-	void load_statics(const std::vector<Renderable> &statics);
-	void load_dynamics();
-	void render(const std::vector<Renderable> &dynamics);
+	void set_statics(const std::vector<Renderable> &statics);
+	void set_dynamics(const std::vector<Renderable> &dynamics);
+	void render();
 
 private:
 	std::vector<const void*> static_objects;
+	std::vector<Renderable> dynamics;
 	std::unique_ptr<RendererBackend> backend;
 
 	const win::Font &font_title;

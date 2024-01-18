@@ -16,17 +16,17 @@ void Renderer::set_view(float x, float y, float zoom)
 	backend->set_view(x, y, zoom);
 }
 
-void Renderer::load_statics(const std::vector<Renderable> &statics)
+void Renderer::set_statics(const std::vector<Renderable> &statics)
 {
 	static_objects = backend->load_statics(statics);
 }
 
-void Renderer::load_dynamics()
+void Renderer::set_dynamics(const std::vector<Renderable> &dynamics)
 {
-	backend->load_dynamics();
+	this->dynamics = dynamics;
 }
 
-void Renderer::render(const std::vector<Renderable> &dynamics)
+void Renderer::render()
 {
 	backend->render_start();
 	backend->render_statics(static_objects);

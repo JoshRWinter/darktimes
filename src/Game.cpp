@@ -6,6 +6,8 @@ Game::Game(win::Display &display, win::AssetRoll &roll)
 	: display(display)
 	, roll(roll)
 	, quit(false)
+	, display_width(display.width())
+	, display_height(display.height())
 {}
 
 void Game::play()
@@ -26,7 +28,7 @@ void Game::play()
 	for (const auto &p : props)
 		renderables.emplace_back(Texture::player, p.x, p.y, p.width, p.height, 0.0f);
 
-	renderer.load_statics(renderables);
+	renderer.set_statics(renderables);
 	renderer.set_view(0.0f, 0.0f, 0.5);
 
 	RenderableWorldState *state = NULL;
@@ -44,10 +46,10 @@ void Game::play()
 		if (state != NULL)
 		{
 			renderer.set_view(state->centerx, state->centery, 0.5f);
+			renderer.set_dynamics(state->renderables);
 		}
 
-		// render
-		renderer.render({});
+		renderer.render();
 
 		// swap display front and back buffers
 		display.swap();
@@ -77,8 +79,10 @@ void Game::button_event(win::Button button, bool press)
 	}
 }
 
-void Game::mouse_event(float x, float y)
+void Game::mouse_event(int x, int y)
 {
+	input.x = ((x / (float)display_width) * 16) - 8.0f;
+	input.y = -(((y / (float)display_height) * 9) - 4.5f);
 }
 
 void Game::stop()

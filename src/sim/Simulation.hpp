@@ -34,8 +34,8 @@ private:
 	static void simulation(Simulation &sim);
 
 	SyncObjectManager<SimulationResetCommand, 1> som_level_package;
-	SyncObjectManager<GameInput, 2> som_input;
-	SyncObjectManager<RenderableWorldState, 2> som_state;
+	SyncObjectManager<GameInput, 3> som_input;
+	SyncObjectManager<RenderableWorldState, 3> som_state;
 	std::atomic<bool> stop_flag;
 	std::thread thread;
 };

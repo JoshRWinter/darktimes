@@ -18,15 +18,13 @@ class World
 
 public:
 	World() = default;
+	~World();
 
-	RenderableWorldState tick(const GameInput &input);
+	void tick(const GameInput &input, RenderableWorldState &state);
 
 private:
 	win::Pool<Entity> entities;
 	win::Pool<PhysicalComponent> physicals;
-	win::Pool<RenderableComponent> atlas_renderables;
-	win::Pool<RenderableComponent> tile_renderables;
+	win::Pool<RenderableComponent> renderables;
 	win::Pool<PlayerComponent> players;
-
-	float centerx = 0.0f, centery = 0.0f;
 };

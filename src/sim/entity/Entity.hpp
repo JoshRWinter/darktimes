@@ -51,7 +51,7 @@ public:
 		}
 	}
 
-	template <typename T> T &rget()
+	template <typename T> T &get()
 	{
 		for (auto &component : components)
 			if (component.occupied && component.component->type == T::ctype)
@@ -60,7 +60,7 @@ public:
 		win::bug("No component with type " + std::to_string((int)T::ctype) + " on entity " + name);
 	}
 
-	template <typename T> T *get()
+	template <typename T> T *get_optional()
 	{
 		for (auto &component : components)
 			if (component.occupied && component.component->type == T::ctype)

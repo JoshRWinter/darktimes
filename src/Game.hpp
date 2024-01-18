@@ -14,7 +14,7 @@ public:
 	Game(win::Display &display, win::AssetRoll &roll);
 	void play();
 	void button_event(win::Button button, bool press);
-	void mouse_event(float x, float y);
+	void mouse_event(int x, int y);
 	void stop();
 
 private:
@@ -23,4 +23,6 @@ private:
 	Simulation sim;
 	GameInput input;
 	bool quit;
+	int display_width;
+	int display_height;
 };

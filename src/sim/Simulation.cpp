@@ -2,10 +2,7 @@
 #include <chrono>
 
 #include "Simulation.hpp"
-
 #include "World.hpp"
-
-#include "system/PlayerSystem.hpp"
 
 Simulation::Simulation()
 	: stop_flag(false)
@@ -53,6 +50,7 @@ void Simulation::simulation(Simulation &sim)
 {
 	World world;
 	GameInput input;
+	RenderableWorldState *state;
 
 	auto tick_start = std::chrono::high_resolution_clock::now();
 	while (!sim.stop_flag)
@@ -67,17 +65,16 @@ void Simulation::simulation(Simulation &sim)
 			}
 		}
 
+		// prepare a sync object for writing world state into
+		while ((state = sim.som_state.writer_acquire()) == NULL);
+
+		state->renderables.clear();
+
 		// run the world simulation
-		const auto state = world.tick(input);
+		world.tick(input, *state);
 
-		// upload the results;
-		{
-			RenderableWorldState *so;
-
-			while ((so = sim.som_state.writer_acquire()) == NULL);
-			*so = state;
-			sim.som_state.writer_release(so);
-		}
+		// send up the results
+		sim.som_state.writer_release(state);
 
 		// wait until time for next tick;
 		while (std::chrono::duration<float, std::milli>(std::chrono::high_resolution_clock::now() - tick_start).count() < 16.66666f)
