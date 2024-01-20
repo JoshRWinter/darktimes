@@ -63,15 +63,19 @@ void Game::button_event(win::Button button, bool press)
 		case win::Button::esc:
 			quit = true;
 			break;
+		case win::Button::a:
 		case win::Button::left:
 			input.left = press;
 			break;
+		case win::Button::d:
 		case win::Button::right:
 			input.right = press;
 			break;
+		case win::Button::s:
 		case win::Button::down:
 			input.down = press;
 			break;
+		case win::Button::w:
 		case win::Button::up:
 			input.up = press;
 			break;
