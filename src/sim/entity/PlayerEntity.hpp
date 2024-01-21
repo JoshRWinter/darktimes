@@ -11,8 +11,8 @@ struct PlayerEntity
 {
 	PlayerEntity() = delete;
 
-	static constexpr float width = 2.0f;
-	static constexpr float height = 2.0f;
+	static constexpr float width = 0.4f;
+	static constexpr float height = 0.4f;
 
 	static void create(
 		win::Pool<Entity>&,

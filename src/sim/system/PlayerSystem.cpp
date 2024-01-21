@@ -23,7 +23,8 @@ void player_system(
 	auto &player = *players.begin();
 	auto &phys = player.entity.get<PhysicalComponent>();
 
-	const float scoot = 0.4f;
+	// movement
+	const float scoot = 0.1f;
 	if (input.up)
 		phys.y += scoot;
 	if (input.down)
@@ -33,6 +34,16 @@ void player_system(
 	if (input.right)
 		phys.x += scoot;
 
+	// aim direction
 	const float aim = atan2f(input.y, input.x);
 	phys.rot = aim;
+
+	// collision
+	for (const auto &p : physicals)
+	{
+		if (&p == &phys)
+			continue;
+
+		phys.correct(p);
+	}
 }

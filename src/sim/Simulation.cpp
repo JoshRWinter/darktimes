@@ -65,6 +65,16 @@ void Simulation::simulation(Simulation &sim)
 			}
 		}
 
+		// see if there's a level update
+		{
+			SimulationResetCommand *so;
+			if ((so = sim.som_level_package.reader_acquire()) != NULL)
+			{
+				world.reset(so->floors, so->walls, so->props);
+				sim.som_level_package.reader_release(so);
+			}
+		}
+
 		// prepare a sync object for writing world state into
 		while ((state = sim.som_state.writer_acquire()) == NULL);
 

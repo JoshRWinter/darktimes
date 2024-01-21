@@ -136,7 +136,7 @@ void GLDynamicAtlasRenderer::flush()
 			win::bug("dynamic atlas invalid base_vertex");
 #endif
 
-		glUniform2f(uniform_position, renderable->x, renderable->y);
+		glUniform2f(uniform_position, renderable->x + (renderable->w / 2.0f), renderable->y + (renderable->h / 2.0f));
 		glUniform2f(uniform_size, renderable->w, renderable->h);
 		glUniform1f(uniform_rotation, renderable->rot);
 

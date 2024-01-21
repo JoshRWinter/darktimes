@@ -5,6 +5,7 @@
 #include "../Darktimes.hpp"
 #include "../GameInput.hpp"
 #include "../RenderableWorldState.hpp"
+#include "../levelgen/LevelObjects.hpp"
 
 #include "entity/Entity.hpp"
 #include "component/Component.hpp"
@@ -20,6 +21,7 @@ public:
 	World() = default;
 	~World();
 
+	void reset(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props);
 	void tick(const GameInput &input, RenderableWorldState &state);
 
 private:

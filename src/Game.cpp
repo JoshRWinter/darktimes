@@ -30,6 +30,7 @@ void Game::play()
 
 	renderer.set_statics(renderables);
 	renderer.set_view(0.0f, 0.0f, 0.5);
+	renderer.set_view(0.0f, 0.0f, 0.0);
 
 	RenderableWorldState *state = NULL;
 	while (!quit)
@@ -45,7 +46,7 @@ void Game::play()
 		// configure renderer for current frame
 		if (state != NULL)
 		{
-			renderer.set_view(state->centerx, state->centery, 0.5f);
+			renderer.set_view(state->centerx, state->centery, 1.0f);
 			renderer.set_dynamics(state->renderables);
 		}
 

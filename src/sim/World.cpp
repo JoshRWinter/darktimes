@@ -1,10 +1,29 @@
 #include "World.hpp"
 #include "system/PlayerSystem.hpp"
 
+#include "entity/PlayerEntity.hpp"
+
 World::~World()
 {
 	for (auto &entity : entities)
 		entity.clear();
+}
+
+void World::reset(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props)
+{
+	for (auto &entity : entities)
+		entity.clear();
+
+	entities.clear();
+	physicals.clear();
+	renderables.clear();
+	players.clear();
+
+	for (const auto &wall : walls)
+	{
+		auto &ent = entities.add("wall");
+		physicals.add(ent, wall.x, wall.y, wall.w, wall.h, 0.0f);
+	}
 }
 
 void World::tick(const GameInput &input, RenderableWorldState &state)
@@ -19,6 +38,6 @@ void World::tick(const GameInput &input, RenderableWorldState &state)
 	}
 
 	const auto &player_physical = (*players.begin()).entity.get<PhysicalComponent>();
-	state.centerx = player_physical.x;
-	state.centery = player_physical.y;
+	state.centerx = player_physical.x + (PlayerEntity::width / 2.0f);
+	state.centery = player_physical.y + (PlayerEntity::height / 2.0f);
 }
