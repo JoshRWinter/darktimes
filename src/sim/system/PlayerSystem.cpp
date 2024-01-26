@@ -5,6 +5,7 @@
 #include "../entity/PlayerEntity.hpp"
 
 void player_system(
+	BlockMap<PhysicalComponent> &blockmap,
 	win::Pool<Entity> &entities,
 	win::Pool<PhysicalComponent> &physicals,
 	win::Pool<RenderableComponent> &renderables,
@@ -39,11 +40,8 @@ void player_system(
 	phys.rot = aim;
 
 	// collision
-	for (const auto &p : physicals)
+	for (const auto &p : blockmap.iterate(BlockMapLocation(phys.x, phys.y, phys.w, phys.h)))
 	{
-		if (&p == &phys)
-			continue;
-
 		phys.correct(p);
 	}
 }

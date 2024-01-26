@@ -19,16 +19,37 @@ void World::reset(const std::vector<LevelFloor> &floors, const std::vector<Level
 	renderables.clear();
 	players.clear();
 
+	float leftmost = INFINITY, rightmost = INFINITY, bottommost = INFINITY, topmost = INFINITY;
 	for (const auto &wall : walls)
 	{
 		auto &ent = entities.add("wall");
-		physicals.add(ent, wall.x, wall.y, wall.w, wall.h, 0.0f);
+		auto &phys = physicals.add(ent, wall.x, wall.y, wall.w, wall.h, 0.0f);
+
+		if (leftmost == INFINITY || phys.x < leftmost)
+			leftmost = phys.x;
+		if (rightmost == INFINITY || phys.x + phys.w > rightmost)
+			rightmost = phys.x + phys.w;
+		if (bottommost == INFINITY || phys.y < bottommost)
+			bottommost = phys.y;
+		if (topmost == INFINITY || phys.y + phys.h > topmost)
+			topmost = phys.y + phys.h;
 	}
+
+	if (leftmost == INFINITY || rightmost == INFINITY || bottommost == INFINITY || topmost == INFINITY)
+		win::bug("Block map initialization woes");
+
+	blockmap.reset(1.0f, leftmost, rightmost, bottommost, topmost);
+
+	for (auto &phys : physicals)
+		blockmap.add(BlockMapLocation(phys.x, phys.y, phys.w, phys.h), phys);
 }
 
 void World::tick(const GameInput &input, RenderableWorldState &state)
 {
-	player_system(entities, physicals, renderables, players, input);
+	if (physicals.size() == 0)
+		return; // world not initialized yet
+
+	player_system(blockmap, entities, physicals, renderables, players, input);
 
 	// map renderables
 	for (const auto &r : renderables)
