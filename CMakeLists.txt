@@ -57,7 +57,6 @@ set(sources
 	src/sim/World.cpp
 	src/sim/Simulation.hpp
 	src/sim/Simulation.cpp
-	src/sim/BlockMap.hpp
 
 	# entities
 	src/sim/entity/Entity.hpp

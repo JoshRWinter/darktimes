@@ -1,11 +1,12 @@
 #include <cmath>
 
-#include "PlayerSystem.hpp"
+#include <win/BlockMap.hpp>
 
+#include "PlayerSystem.hpp"
 #include "../entity/PlayerEntity.hpp"
 
 void player_system(
-	BlockMap<PhysicalComponent> &blockmap,
+	win::BlockMap<PhysicalComponent> &blockmap,
 	win::Pool<Entity> &entities,
 	win::Pool<PhysicalComponent> &physicals,
 	win::Pool<RenderableComponent> &renderables,
@@ -40,7 +41,7 @@ void player_system(
 	phys.rot = aim;
 
 	// collision
-	for (const auto &p : blockmap.iterate(BlockMapLocation(phys.x, phys.y, phys.w, phys.h)))
+	for (const auto &p : blockmap.iterate(win::BlockMapLocation(phys.x, phys.y, phys.w, phys.h)))
 	{
 		phys.correct(p);
 	}

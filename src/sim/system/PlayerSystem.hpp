@@ -1,8 +1,8 @@
 #pragma once
 
 #include <win/Pool.hpp>
+#include <win/BlockMap.hpp>
 
-#include "../BlockMap.hpp"
 #include "../../GameInput.hpp"
 #include "../entity/Entity.hpp"
 #include "../component/PhysicalComponent.hpp"
@@ -10,7 +10,7 @@
 #include "../component/PlayerComponent.hpp"
 
 void player_system(
-	BlockMap<PhysicalComponent> &blockmap,
+	win::BlockMap<PhysicalComponent> &blockmap,
 	win::Pool<Entity> &entities,
 	win::Pool<PhysicalComponent> &physicals,
 	win::Pool<RenderableComponent> &renderables,

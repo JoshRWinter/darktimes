@@ -1,13 +1,13 @@
 #pragma once
 
 #include <win/Pool.hpp>
+#include <win/BlockMap.hpp>
 
 #include "../Darktimes.hpp"
 #include "../GameInput.hpp"
 #include "../RenderableWorldState.hpp"
 #include "../levelgen/LevelObjects.hpp"
 
-#include "BlockMap.hpp"
 #include "entity/Entity.hpp"
 #include "component/Component.hpp"
 #include "component/PhysicalComponent.hpp"
@@ -26,7 +26,7 @@ public:
 	void tick(const GameInput &input, RenderableWorldState &state);
 
 private:
-	BlockMap<PhysicalComponent> blockmap;
+	win::BlockMap<PhysicalComponent> blockmap;
 	win::Pool<Entity> entities;
 	win::Pool<PhysicalComponent> physicals;
 	win::Pool<RenderableComponent> renderables;

@@ -41,7 +41,7 @@ void World::reset(const std::vector<LevelFloor> &floors, const std::vector<Level
 	blockmap.reset(1.0f, leftmost, rightmost, bottommost, topmost);
 
 	for (auto &phys : physicals)
-		blockmap.add(BlockMapLocation(phys.x, phys.y, phys.w, phys.h), phys);
+		blockmap.add(win::BlockMapLocation(phys.x, phys.y, phys.w, phys.h), phys);
 }
 
 void World::tick(const GameInput &input, RenderableWorldState &state)
