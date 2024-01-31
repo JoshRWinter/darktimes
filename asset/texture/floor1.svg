@@ -2,81 +2,72 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="95.087631mm"
-   height="94.747421mm"
-   viewBox="0 0 95.087631 94.747421"
+   width="101.33047mm"
+   height="101.33047mm"
+   viewBox="0 0 101.33047 101.33048"
    version="1.1"
-   id="svg5"
-   sodipodi:docname="floor1.svg"
+   id="svg1"
    inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
-   inkscape:export-filename="/home/josh/programming/darktimes/asset/texture/floor1.png"
-   inkscape:export-xdpi="104.99773"
-   inkscape:export-ydpi="104.99773"
+   sodipodi:docname="floor1.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
-     id="namedview7"
+     id="namedview1"
      pagecolor="#505050"
      bordercolor="#eeeeee"
      borderopacity="1"
-     inkscape:pageshadow="0"
+     inkscape:showpageshadow="0"
      inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
-     showgrid="false"
-     inkscape:zoom="0.77771465"
-     inkscape:cx="32.788376"
-     inkscape:cy="261.66409"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="172.35728"
+     inkscape:cy="206.12163"
      inkscape:window-width="2560"
-     inkscape:window-height="1413"
+     inkscape:window-height="1440"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1"
-     inkscape:showpageshadow="0"
-     inkscape:deskcolor="#505050" />
+     shape-rendering="crispEdges"
+     showborder="false" />
   <defs
-     id="defs2" />
+     id="defs1" />
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-51.524952,-98.082787)">
+     transform="translate(-13.005608,-68.796855)">
     <rect
-       style="fill:#000000;stroke-width:0.264583"
+       style="fill:#bc843a;fill-opacity:1;stroke:#a37446;stroke-width:1.33047;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
        id="rect1"
-       width="95.087631"
-       height="94.747421"
-       x="51.524952"
-       y="98.082787" />
-    <circle
-       style="fill:#ffff44;stroke-width:3.375"
-       id="path1550"
-       cx="99.008568"
-       cy="145.73651"
-       r="45.442379" />
-    <ellipse
-       style="fill:#ffff44;stroke:#000000;stroke-width:3.375;stroke-opacity:1"
-       id="path1654"
-       cx="82.977798"
-       cy="132.14799"
-       rx="11.053036"
-       ry="7.3990588" />
-    <ellipse
-       style="fill:#ffff44;stroke:#000000;stroke-width:3.375;stroke-opacity:1"
-       id="path1678"
-       cx="115.6599"
-       cy="132.79958"
-       rx="13.262373"
-       ry="7.901031" />
-    <ellipse
-       style="fill:#ffff44;stroke:#000000;stroke-width:3.375;stroke-opacity:1"
-       id="path1680"
-       cx="98.314178"
-       cy="162.80864"
-       rx="21.598742"
-       ry="8.669879" />
+       width="100"
+       height="24.999998"
+       x="13.670843"
+       y="69.46209" />
+    <rect
+       style="fill:#b67931;fill-opacity:1;stroke:#a37446;stroke-width:1.33047;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2"
+       width="100"
+       height="24.999998"
+       x="13.670843"
+       y="94.46209" />
+    <rect
+       style="fill:#bc8234;fill-opacity:1;stroke:#a37446;stroke-width:1.33047;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3"
+       width="100"
+       height="24.999998"
+       x="13.670843"
+       y="119.46209" />
+    <rect
+       style="fill:#bd8639;fill-opacity:1;stroke:#a37446;stroke-width:1.33047;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4"
+       width="100"
+       height="24.999998"
+       x="13.670843"
+       y="144.4621" />
   </g>
 </svg>

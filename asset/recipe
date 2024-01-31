@@ -9,8 +9,9 @@ shader/dynamic_atlas.vert z
 shader/dynamic_atlas.frag z
 
 svg2tga {
-	texture/floor1.svg 50 50
-	texture/floor2.svg 50 50
+	texture/floor1.svg 120 120
+	texture/floor2.svg 120 120
+
 	texture/player.svg 50 50 exclude
 }
 
