@@ -45,6 +45,7 @@ set(sources
 
 	# level gen nonsense
 	src/levelgen/LevelObjects.hpp
+	src/levelgen/LevelObjectsInternal.hpp
 	src/levelgen/PropDefs.hpp
 	src/levelgen/StructureDefs.hpp
 	src/levelgen/Structure.hpp

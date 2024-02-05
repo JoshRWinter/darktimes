@@ -78,7 +78,7 @@ std::vector<std::uint16_t> GLStaticAtlasRenderer::load(const std::vector<Rendera
 		texcoord_data.push_back(to_ushort(atlas_item.x2));
 		texcoord_data.push_back(to_ushort(atlas_item.y1));
 		texcoord_data.push_back(to_ushort(atlas_item.x2));
-		texcoord_data.push_back(to_ushort(atlas_item.x2));
+		texcoord_data.push_back(to_ushort(atlas_item.y2));
 
 		const auto base_index = count * 4;
 		index_data.push_back(base_index + 0);

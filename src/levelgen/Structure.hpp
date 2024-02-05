@@ -3,14 +3,20 @@
 #include <vector>
 
 #include <win/Win.hpp>
-#include "LevelObjects.hpp"
+#include "LevelObjectsInternal.hpp"
+#include "PropDefs.hpp"
 
+/*
 void correct_structure_properties(const LevelSide side, const float origin_x, const float origin_y, const float source_x, const float source_y, const float source_width, const float source_height, float &out_x, float &out_y, float &out_width, float &out_height);
 
 struct StructureProp
 {
 	StructureProp(LevelPropOrientation orientation, float x, float y, const LevelPropDefinition &propdef)
-		: orientation(orientation), x(x), y(y), propdef(propdef) {}
+		: orientation(orientation)
+		, x(x)
+		, y(y)
+		, propdef(propdef)
+	{}
 
 	LevelPropOrientation orientation;
 	float x, y;
@@ -20,15 +26,22 @@ struct StructureProp
 struct StructureFloor
 {
 	StructureFloor(Texture texture, float x, float y, float width, float height, bool skip_prop_generation, const std::vector<StructureProp> &props)
-		: texture(texture), x(x), y(y), width(width), height(height), skip_prop_generation(skip_prop_generation), prop_spawns(props) {}
+		: texture(texture)
+		, x(x)
+		, y(y)
+		, width(width)
+		, height(height)
+		, skip_prop_generation(skip_prop_generation)
+		, prop_spawns(props)
+	{}
 
-	LevelFloor get_floor(LevelSide side, float origin_x, float origin_y) const
+	LevelFloorInternal get_floor(LevelSide side, float origin_x, float origin_y) const
 	{
 		float out_x, out_y, out_width, out_height;
 
 		correct_structure_properties(side, origin_x, origin_y, x, y, width, height, out_x, out_y, out_width, out_height);
 
-		LevelFloor floor(texture, out_x, out_y, out_width, out_height, skip_prop_generation);
+		LevelFloorInternal floor(texture, out_x, out_y, out_width, out_height, skip_prop_generation);
 
 		for (const StructureProp &prop : prop_spawns)
 		{
@@ -77,3 +90,4 @@ struct Structure
 	std::vector<StructureFloor> floors;
 	std::vector<StructureFloorConnection> connections;
 };
+ */

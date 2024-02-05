@@ -17,7 +17,10 @@ void Game::play()
 	std::vector<LevelFloor> floors;
 	std::vector<LevelWall> walls;
 	std::vector<LevelProp> props;
-	level_generate(69, floors, walls, props);
+
+	LevelGenerator generator;
+	generator.generate(69, floors, walls, props);
+
 	sim.reset(floors, walls, props);
 
 	std::vector<Renderable> renderables;
@@ -26,7 +29,7 @@ void Game::play()
 	for (const auto &w : walls)
 		renderables.emplace_back(Texture::player, w.x, w.y, w.w, w.h, 0.0f);
 	for (const auto &p : props)
-		renderables.emplace_back(Texture::player, p.x, p.y, p.width, p.height, 0.0f);
+		renderables.emplace_back(Texture::large_table, p.x, p.y, p.w, p.h, 0.0f);
 
 	renderer.set_statics(renderables);
 	renderer.set_view(0.0f, 0.0f, 0.5);

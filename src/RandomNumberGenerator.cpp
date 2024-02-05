@@ -4,6 +4,11 @@ RandomNumberGenerator::RandomNumberGenerator(int seed)
 	: mersenne(seed)
 {}
 
+void RandomNumberGenerator::reseed(int seed)
+{
+	mersenne = std::mt19937(seed);
+}
+
 bool RandomNumberGenerator::one_in(int chances)
 {
 	return std::uniform_int_distribution<int>(1, chances)(mersenne) == 1;

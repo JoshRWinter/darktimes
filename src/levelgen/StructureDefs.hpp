@@ -3,6 +3,7 @@
 #include "Structure.hpp"
 #include "PropDefs.hpp"
 
+/*
 inline Structure small1
 {
 	std::vector<StructureFloor>
@@ -60,3 +61,4 @@ inline std::vector<Structure> structure_defs
 	small2,
 	small3
 };
+ */
