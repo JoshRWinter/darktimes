@@ -49,7 +49,6 @@ set(sources
 	src/levelgen/PropDefs.hpp
 	src/levelgen/StructureDefs.hpp
 	src/levelgen/Structure.hpp
-	src/levelgen/Structure.cpp
 	src/levelgen/LevelGenerator.hpp
 	src/levelgen/LevelGenerator.cpp
 

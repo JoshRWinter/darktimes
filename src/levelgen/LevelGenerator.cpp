@@ -31,62 +31,6 @@
 static constexpr float MIN_WALL_LENGTH = 1.8f;
 static constexpr float DOOR_LENGTH = 1.0f;
 
-
-/*
-// make some predefined hand crafted rooms
-static std::vector<LevelFloorInternal> generate_structure(RandomNumberGenerator &rand, const std::vector<LevelFloorInternal> &existing_floors, const LevelFloorInternal &start_floor, const LevelSide start_side, int force_index = -1)
-{
-	std::vector<LevelFloorInternal> generated;
-
-	const Structure &s = structure_defs.at(force_index == -1 ? rand.uniform_int(0, structure_defs.size() - 1) : force_index);
-
-	if (s.floors.size() < 1)
-		win::bug("short structure");
-
-	const StructureFloor &first_structure_floor = s.floors.at(0);
-
-	float origin_x, origin_y;
-	switch (start_side)
-	{
-		case LevelSide::top:
-			origin_x = (start_floor.x + (start_floor.w / 2.0f)) - (first_structure_floor.width / 2.0f);
-			origin_y = start_floor.y + start_floor.h;
-			break;
-		case LevelSide::left:
-			origin_x = start_floor.x;
-			origin_y = (start_floor.y + (start_floor.h / 2.0f)) - (first_structure_floor.width / 2.0f);
-			break;
-		case LevelSide::bottom:
-			origin_x = (start_floor.x + (start_floor.w / 2.0f)) + (first_structure_floor.width / 2.0f);
-			origin_y = start_floor.y;
-			break;
-		case LevelSide::right:
-			origin_x = start_floor.x + start_floor.w;
-			origin_y = (start_floor.y + (start_floor.h / 2.0f)) + (first_structure_floor.width / 2.0f);
-			break;
-	}
-
-	for (const auto &sfloor : s.floors)
-	{
-		const LevelFloorInternal floor = sfloor.get_floor(start_side, origin_x, origin_y);
-
-		if (floor.collide(existing_floors))
-			return {};
-		if (floor.collide(generated))
-			win::bug("mangled structure");
-
-		generated.push_back(floor);
-	}
-
-	for (const StructureFloorConnection &c : s.connections)
-	{
-		connect(generated.at(c.index_x), generated.at(c.index_y));
-	}
-
-	return generated;
-}
- */
-
 // entry point
 void LevelGenerator::generate(int seed, std::vector<LevelFloor> &floors, std::vector<LevelWall> &walls, std::vector<LevelProp> &props)
 {
@@ -121,10 +65,10 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 
 	/*
 	// ================ structure testing
-	for (const auto &f : generate_structure(floors.at(0), LevelSide::top, 0))
+	for (const auto &f : generate_structure(floors, floors.at(0), LevelSide::right, 0))
 		floors.push_back(f);
-	connect(floors.at(0), floors.at(1));
-	return true;
+	if (!connect(floors.at(0), floors.at(1)) && false) win::bug("no connection");
+	return floors;
 	*/
 
 	auto grid_generator = [this, &floors](const LevelFloorInternal& start_floor, LevelSide side)
@@ -137,19 +81,17 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 		return generate_linear(floors, start_floor, side);
 	};
 
-	/*
-	auto structure_generator = [&rand, &floors](const LevelFloorInternal &start_floor, LevelSide side)
+	auto structure_generator = [this, &floors](const LevelFloorInternal &start_floor, LevelSide side)
 	{
-		return generate_structure(rand, floors, start_floor, side);
+		return generate_structure(floors, start_floor, side);
 	};
-	 */
 
 	const std::vector<std::pair<GeneratorFunction, int>> generators =
-		{
-			std::make_pair(grid_generator, 5),
-			//std::make_pair(structure_generator, 1),
-			std::make_pair(linear_generator, 2)
-		};
+	{
+		std::make_pair(grid_generator, 5),
+		std::make_pair(structure_generator, 1),
+		std::make_pair(linear_generator, 2)
+	};
 
 	int last_generator = -1;
 	int attempt = 0;
@@ -396,6 +338,29 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_linear(const std::vecto
 	return generated;
 }
 
+// make some predefined hand crafted rooms
+std::vector<LevelFloorInternal> LevelGenerator::generate_structure(const std::vector<LevelFloorInternal> &existing_floors, const LevelFloor &start_floor, const LevelSide side, int index)
+{
+	// pick a structure definition
+	const StructureDefinition &s = *structure_defs.at(index == -1 ? rand.uniform_int(0, structure_defs.size() - 1) : index);
+
+	// spawn the structure
+	std::vector<LevelFloorInternal> generated = s.spawn(existing_floors, start_floor, side);
+
+	// structure spawn failed for some reason (floor intersection)
+	if (generated.empty())
+		return {};
+
+	// connect the floors
+	for (const auto &c : s.connections)
+	{
+		if (!connect(generated.at(c.index_x), generated.at(c.index_y)))
+			win::bug("Structure " + std::to_string(index) + ": couldn't connect floors " + std::to_string(c.index_x) + " and " + std::to_string(c.index_y));
+	}
+
+	return generated;
+}
+
 // of some existing floors, find one to serve as a starting point for a future segment
 std::vector<int> LevelGenerator::find_start_candidates(const std::vector<LevelFloorInternal> &floors)
 {
@@ -630,7 +595,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_props(const std::vector<
 
 	for (const auto &floor : floors)
 	{
-		const std::vector<PropExcluder> door_excluders = generate_door_excluders(floor);
+		const std::vector<LevelPropExcluder> door_excluders = generate_door_excluders(floor);
 
 		// debugging
 		//for (const LevelProp &excluder : door_excluders)
@@ -639,7 +604,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_props(const std::vector<
 		std::vector<LevelPropInternal> spawned_props;
 		if (floor.prop_spawns.size() > 0)
 		{
-			//spawned_props = generate_props_from_spawns(floor, door_excluders);
+			spawned_props = generate_props_from_spawns(floor, door_excluders);
 
 			for (const LevelPropInternal &prop : spawned_props)
 				props.push_back(prop);
@@ -663,9 +628,9 @@ std::vector<LevelPropInternal> LevelGenerator::generate_props(const std::vector<
 }
 
 // generate excluders around door openings
-std::vector<PropExcluder> LevelGenerator::generate_door_excluders(const LevelFloorInternal &floor)
+std::vector<LevelPropExcluder> LevelGenerator::generate_door_excluders(const LevelFloorInternal &floor)
 {
-	std::vector<PropExcluder> excluders;
+	std::vector<LevelPropExcluder> excluders;
 
 	for (const LevelFloorConnector &connector : floor.connectors)
 	{
@@ -710,7 +675,7 @@ std::vector<PropExcluder> LevelGenerator::generate_door_excluders(const LevelFlo
 }
 
 // generate some brand-new props for a given floor. randomly.
-std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFloorInternal &floor, const std::vector<PropExcluder> &excluders)
+std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFloorInternal &floor, const std::vector<LevelPropExcluder> &excluders)
 {
 	std::vector<LevelPropInternal> props;
 
@@ -719,13 +684,13 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 	{
 		const LevelPropDefinition propdef = PropDefinitions::rugs.at(rand.uniform_int(0, PropDefinitions::rugs.size() - 1));
 
-		LevelPropOrientation orientations[4] { LevelPropOrientation::left, LevelPropOrientation::right, LevelPropOrientation::down, LevelPropOrientation::up };
-		const LevelPropOrientation orientation = orientations[rand.uniform_int(0, 3)];
+		LevelSide sides[4] { LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top };
+		const LevelSide orientation = sides[rand.uniform_int(0, 3)];
 
 		const float x = (floor.x + (floor.w / 2.0f)) - (propdef.get_width(orientation) / 2.0f);
 		const float y = (floor.y + (floor.h / 2.0f)) - (propdef.get_height(orientation) / 2.0f);
 
-		const auto rug = propdef.instantiate(orientation, x, y);
+		const auto rug = propdef.spawn(orientation, x, y);
 
 		const float width_pct = propdef.get_width(orientation) / floor.w;
 		const float height_pct = propdef.get_height(orientation) / floor.h;
@@ -750,33 +715,28 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 			const float table_margin = 0.075f;
 
 			float x, y;
-			LevelPropOrientation orientation;
 
 			switch (side)
 			{
 				case LevelSide::left:
-					orientation = LevelPropOrientation::right;
 					x = floor.x + table_margin;
-					y = rand.uniform_real(floor.y, (floor.y + floor.h) - propdef.get_height(orientation));
+					y = rand.uniform_real(floor.y, (floor.y + floor.h) - propdef.get_height(side));
 					break;
 				case LevelSide::right:
-					orientation = LevelPropOrientation::left;
-					x = ((floor.x + floor.w) - propdef.get_width(orientation)) - table_margin;
-					y = rand.uniform_real(floor.y, (floor.y + floor.h) - propdef.get_height(orientation));
+					x = ((floor.x + floor.w) - propdef.get_width(side)) - table_margin;
+					y = rand.uniform_real(floor.y, (floor.y + floor.h) - propdef.get_height(side));
 					break;
 				case LevelSide::bottom:
-					orientation = LevelPropOrientation::up;
-					x = rand.uniform_real(floor.x, (floor.x + floor.w) - propdef.get_width(orientation));
+					x = rand.uniform_real(floor.x, (floor.x + floor.w) - propdef.get_width(side));
 					y = floor.y + table_margin;
 					break;
 				case LevelSide::top:
-					orientation = LevelPropOrientation::down;
-					x = rand.uniform_real(floor.x, (floor.x + floor.w) - propdef.get_width(orientation));
-					y = ((floor.y + floor.h) - propdef.get_height(orientation)) - table_margin;
+					x = rand.uniform_real(floor.x, (floor.x + floor.w) - propdef.get_width(side));
+					y = ((floor.y + floor.h) - propdef.get_height(side)) - table_margin;
 					break;
 			}
 
-			const auto prop = propdef.instantiate(orientation, x, y);
+			const auto prop = propdef.spawn(side, x, y);
 
 			if (!prop.collide(props) && !prop.collide(excluders))
 			{
@@ -791,13 +751,13 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 	{
 		const LevelPropDefinition &propdef = PropDefinitions::center_tables.at(rand.uniform_int(0, PropDefinitions::center_tables.size() - 1));
 
-		LevelPropOrientation orientations[4] { LevelPropOrientation::left, LevelPropOrientation::right, LevelPropOrientation::down, LevelPropOrientation::up };
-		const LevelPropOrientation orientation = orientations[rand.uniform_int(0, 3)];
+		LevelSide sides[4] { LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top };
+		const LevelSide orientation = sides[rand.uniform_int(0, 3)];
 
 		const float x = (floor.x + (floor.w / 2.0f)) - (propdef.get_width(orientation) / 2.0f);
 		const float y = (floor.y + (floor.h / 2.0f)) - (propdef.get_height(orientation) / 2.0f);
 
-		const auto table = propdef.instantiate(orientation, x, y);
+		const auto table = propdef.spawn(orientation, x, y);
 
 		if (!table.collide(props) && !table.collide(excluders))
 			props.push_back(table);
@@ -806,13 +766,12 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 	return props;
 }
 
-/*
 // some floors have pre-defined prop spawns. handle those
-static std::vector<LevelPropInternal> generate_props_from_spawns(const LevelFloorInternal &floor, const std::vector<LevelPropInternal> &excluders)
+std::vector<LevelPropInternal> LevelGenerator::generate_props_from_spawns(const LevelFloorInternal &floor, const std::vector<LevelPropExcluder> &excluders)
 {
 	std::vector<LevelPropInternal> props;
 
-	for (const LevelPropInternal &prop : floor.prop_spawns)
+	for (const auto &prop : floor.prop_spawns)
 	{
 		if (!prop.collide(props) && !prop.collide(excluders))
 			props.push_back(prop);
@@ -820,7 +779,6 @@ static std::vector<LevelPropInternal> generate_props_from_spawns(const LevelFloo
 
 	return props;
 }
- */
 
 // generate those lil dooly-bobs between floors
 std::vector<LevelPropInternal> LevelGenerator::generate_transition_strips(const LevelFloorInternal &floor)
@@ -831,20 +789,20 @@ std::vector<LevelPropInternal> LevelGenerator::generate_transition_strips(const 
 
 	for (const LevelFloorConnector &con : floor.connectors)
 	{
-		LevelPropOrientation o;
+		LevelSide o;
 
 		float x = 0.0f, y = 0.0f;
 		switch (con.side)
 		{
 			case LevelSide::left:
-				o = LevelPropOrientation::left;
+				o = LevelSide::left;
 				x = floor.x - (def.get_width(o) / 2.0f);
 				y = con.start;
 				break;
 			case LevelSide::right:
 				continue;
 			case LevelSide::bottom:
-				o = LevelPropOrientation::down;
+				o = LevelSide::bottom;
 				x = con.start;
 				y = floor.y - (def.get_height(o) / 2.0f);
 				break;
@@ -852,7 +810,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_transition_strips(const 
 				continue;
 		}
 
-		LevelPropInternal strip = def.instantiate(o, x, y);
+		LevelPropInternal strip = def.spawn(o, x, y);
 
 		props.push_back(strip);
 	}

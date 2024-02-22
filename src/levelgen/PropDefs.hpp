@@ -26,34 +26,34 @@ struct LevelPropDefinition
 		, height(height)
 	{}
 
-	LevelPropInternal instantiate(LevelPropOrientation orientation, float x, float y) const
+	LevelPropInternal spawn(LevelSide side, float x, float y) const
 	{
 		float w, h;
-		switch (orientation)
+		switch (side)
 		{
-			case LevelPropOrientation::left:
-			case LevelPropOrientation::right:
-				w = w;
+			case LevelSide::left:
+			case LevelSide::right:
+				w = width;
 				h = height;
 				break;
-			case LevelPropOrientation::down:
-			case LevelPropOrientation::up:
+			case LevelSide::bottom:
+			case LevelSide::top:
 				w = height;
 				h = width;
 				break;
 		}
 
-		return LevelPropInternal(texture, orientation, collision_class, collides_with_class, x, y, w, h, excluder_padding_x, excluder_padding_y);
+		return LevelPropInternal(texture, side, collision_class, collides_with_class, x, y, w, h, excluder_padding_x, excluder_padding_y);
 	}
 
-	float get_width(LevelPropOrientation orientation) const
+	float get_width(LevelSide side) const
 	{
-		return orientation == LevelPropOrientation::left || orientation == LevelPropOrientation::right ? width : height;
+		return side == LevelSide::left || side == LevelSide::right ? width : height;
 	}
 
-	float get_height(LevelPropOrientation orientation) const
+	float get_height(LevelSide side) const
 	{
-		return orientation == LevelPropOrientation::left || orientation == LevelPropOrientation::right ? height : width;
+		return side == LevelSide::left || side == LevelSide::right ? height : width;
 	}
 
 private:
@@ -66,9 +66,8 @@ private:
 	float height;
 };
 
-class PropDefinitions
+struct PropDefinitions
 {
-public:
 	inline static std::vector<LevelPropDefinition> side_tables =
 	{
 		LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_furniture, LevelPropDefinition::collision_class_excluder | LevelPropDefinition::collision_class_furniture, 0.36f, 0.7f)

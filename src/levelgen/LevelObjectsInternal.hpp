@@ -2,17 +2,9 @@
 
 #include "LevelObjects.hpp"
 
-enum class LevelSide
+struct LevelPropExcluder
 {
-	left,
-	right,
-	bottom,
-	top
-};
-
-struct PropExcluder
-{
-	PropExcluder(float x, float y, float w, float h)
+	LevelPropExcluder(float x, float y, float w, float h)
 		: x(x), y(y), w(w), h(h) {}
 
 	float x, y, w, h;
@@ -20,8 +12,8 @@ struct PropExcluder
 
 struct LevelPropInternal : LevelProp
 {
-	LevelPropInternal(Texture texture, LevelPropOrientation orientation, int collision_class, int collides_with_class, float x, float y, float w, float h, float excluder_padding_y, float excluder_padding_x)
-		: LevelProp(texture, orientation, x, y, w, h)
+	LevelPropInternal(Texture texture, LevelSide side, int collision_class, int collides_with_class, float x, float y, float w, float h, float excluder_padding_y, float excluder_padding_x)
+		: LevelProp(texture, side, x, y, w, h)
 		, collision_class(collision_class)
 		, collides_with_class(collides_with_class)
 		, excluder_padding_x(excluder_padding_x)
@@ -48,7 +40,7 @@ struct LevelPropInternal : LevelProp
 			y - excluder_padding_y < other.y + other.h + other.excluder_padding_y;
 	}
 
-	bool collide(const std::vector<PropExcluder> &others) const
+	bool collide(const std::vector<LevelPropExcluder> &others) const
 	{
 		for (const auto &other : others)
 		{
@@ -59,7 +51,7 @@ struct LevelPropInternal : LevelProp
 		return false;
 	}
 
-	bool collide(const PropExcluder &other) const
+	bool collide(const LevelPropExcluder &other) const
 	{
 		return x + w + excluder_padding_x > other.x &&
 			   x - excluder_padding_x < other.x + other.w &&

@@ -4,19 +4,19 @@
 
 #include "../Texture.hpp"
 
-enum class LevelPropOrientation
+enum class LevelSide
 {
 	left,
-	down,
 	right,
-	up
+	bottom,
+	top
 };
 
 struct LevelProp
 {
-	LevelProp(Texture texture, LevelPropOrientation orientation, float x, float y, float w, float h)
+	LevelProp(Texture texture, LevelSide side, float x, float y, float w, float h)
 		: texture(texture)
-		, orientation(orientation)
+		, side(side)
 		, x(x)
 		, y(y)
 		, w(w)
@@ -24,7 +24,7 @@ struct LevelProp
 	{}
 
 	Texture texture;
-	LevelPropOrientation orientation;
+	LevelSide side;
 	float x, y, w, h;
 };
 
