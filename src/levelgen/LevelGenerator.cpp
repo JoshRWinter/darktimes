@@ -34,7 +34,6 @@ static constexpr float DOOR_LENGTH = 1.0f;
 // entry point
 void LevelGenerator::generate(int seed, std::vector<LevelFloor> &floors, std::vector<LevelWall> &walls, std::vector<LevelProp> &props)
 {
-	this->seed = seed;
 	rand.reseed(seed);
 	log_seed(seed);
 
@@ -48,6 +47,12 @@ void LevelGenerator::generate(int seed, std::vector<LevelFloor> &floors, std::ve
 
 	for (const auto &p : generate_props(generated_floors))
 		props.push_back(p);
+
+#ifndef NDEBUG
+	fputs("=============================\n", stderr);
+	fprintf(stderr, "LevelGenerator health report:\nrestarts: %d\niterations: %d\n", health.restarts, health.iterations);
+	fputs("=============================\n", stderr);
+#endif
 }
 
 ///////////////////////////////////////////
@@ -57,6 +62,9 @@ void LevelGenerator::generate(int seed, std::vector<LevelFloor> &floors, std::ve
 // generates segments and mushes em together
 std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 {
+	// reset the health object
+	health = decltype(health)();
+
 	std::vector<LevelFloorInternal> floors;
 
 	// starting room
@@ -105,6 +113,9 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 
 			last_generator = -1;
 			attempt = 0;
+
+			++health.restarts;
+			health.iterations = 0;
 		}
 
 		// pick a generator
@@ -117,6 +128,8 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 
 		const auto &generator = generators.at(generator_index);
 		generate_segment(floors, generator.second, floors.size() == 1 ? LevelSide::top : random_side(), generator.first);
+
+		++health.iterations;
 	}
 
 	return floors;

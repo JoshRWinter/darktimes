@@ -47,5 +47,10 @@ private:
 	static void log_seed(int seed);
 
 	RandomNumberGenerator rand;
-	int seed;
+
+	struct HealthReport
+	{
+		int restarts = 0;
+		int iterations = 0;
+	} health;
 };
