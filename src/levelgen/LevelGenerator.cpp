@@ -94,7 +94,7 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 		return generate_structure(floors, start_floor, side);
 	};
 
-	const std::vector<std::pair<GeneratorFunction, int>> generators =
+	const std::array<std::pair<GeneratorFunction, int>, 3> generators =
 	{
 		std::make_pair(grid_generator, 5),
 		std::make_pair(structure_generator, 1),
@@ -123,7 +123,7 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 		do
 		{
 			generator_index = rand.uniform_int(0, generators.size() - 1);
-		} while (generators.size() > 1 && generator_index == last_generator);
+		} while (generator_index == last_generator);
 		last_generator = generator_index;
 
 		const auto &generator = generators.at(generator_index);
@@ -562,8 +562,8 @@ std::vector<LevelWallInternal> LevelGenerator::generate_walls(const std::vector<
 				const float y = side == LevelSide::bottom ? floor.y - LevelWallInternal::HALFWIDTH : ((floor.y + floor.h) - LevelWallInternal::HALFWIDTH);
 				float startx = floor.x;
 
-				walls.emplace_back(startx, y, connectors.size() > 0 ? (connectors.at(0).start - startx) : floor.w, LevelWallInternal::WIDTH);
-				if (connectors.size() > 0)
+				walls.emplace_back(startx, y, !connectors.empty() ? (connectors.at(0).start - startx) : floor.w, LevelWallInternal::WIDTH);
+				if (!connectors.empty())
 					startx = connectors.at(0).stop;
 
 				for (int i = 0; i < connectors.size(); ++i)
@@ -579,8 +579,8 @@ std::vector<LevelWallInternal> LevelGenerator::generate_walls(const std::vector<
 				const float x = side == LevelSide::left ? floor.x - LevelWallInternal::HALFWIDTH : ((floor.x + floor.w) - LevelWallInternal::HALFWIDTH);
 				float starty = floor.y;
 
-				walls.emplace_back(x, starty, LevelWallInternal::WIDTH, connectors.size() > 0 ? (connectors.at(0).start - starty) : floor.h);
-				if (connectors.size() > 0)
+				walls.emplace_back(x, starty, LevelWallInternal::WIDTH, !connectors.empty() ? (connectors.at(0).start - starty) : floor.h);
+				if (!connectors.empty())
 					starty = connectors.at(0).stop;
 
 				for (int i = 0; i < connectors.size(); ++i)
@@ -615,7 +615,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_props(const std::vector<
 		//props.push_back(excluder);
 
 		std::vector<LevelPropInternal> spawned_props;
-		if (floor.prop_spawns.size() > 0)
+		if (!floor.prop_spawns.empty())
 		{
 			spawned_props = generate_props_from_spawns(floor, door_excluders);
 
