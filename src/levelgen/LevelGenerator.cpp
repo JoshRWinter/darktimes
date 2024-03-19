@@ -32,7 +32,7 @@ static constexpr float MIN_WALL_LENGTH = 1.8f;
 static constexpr float DOOR_LENGTH = 1.0f;
 
 // entry point
-void LevelGenerator::generate(int seed, std::vector<LevelFloor> &floors, std::vector<LevelWall> &walls, std::vector<LevelProp> &props)
+void LevelGenerator::generate(int seed)
 {
 	rand.reseed(seed);
 	log_seed(seed);
@@ -62,6 +62,11 @@ void LevelGenerator::generate(int seed, std::vector<LevelFloor> &floors, std::ve
 // generates segments and mushes em together
 std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 {
+	// reset the level state
+	floors.clear();
+	walls.clear();
+	props.clear();
+
 	// reset the health object
 	health = decltype(health)();
 

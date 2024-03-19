@@ -14,21 +14,17 @@ void Game::play()
 {
 	Renderer renderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
 
-	std::vector<LevelFloor> floors;
-	std::vector<LevelWall> walls;
-	std::vector<LevelProp> props;
-
 	LevelGenerator generator;
-	generator.generate(69, floors, walls, props);
+	generator.generate(69);
 
-	sim.reset(floors, walls, props);
+	sim.reset(generator.floors, generator.walls, generator.props);
 
 	std::vector<Renderable> renderables;
-	for (const auto &f : floors)
+	for (const auto &f : generator.floors)
 		renderables.emplace_back(f.texture, f.x, f.y, f.w, f.h, 0.0f);
-	for (const auto &w : walls)
+	for (const auto &w : generator.walls)
 		renderables.emplace_back(Texture::player, w.x, w.y, w.w, w.h, 0.0f);
-	for (const auto &p : props)
+	for (const auto &p : generator.props)
 		renderables.emplace_back(Texture::large_table, p.x, p.y, p.w, p.h, 0.0f);
 
 	renderer.set_statics(renderables);
