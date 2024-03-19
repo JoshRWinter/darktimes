@@ -68,20 +68,25 @@ private:
 
 struct PropDefinitions
 {
-	inline static std::vector<LevelPropDefinition> side_tables =
+	static const PropDefinitions &get() { static PropDefinitions pd; return pd; }
+
+	std::vector<LevelPropDefinition> side_tables =
 	{
 		LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_furniture, LevelPropDefinition::collision_class_excluder | LevelPropDefinition::collision_class_furniture, 0.36f, 0.7f)
 	};
 
-	inline static std::vector<LevelPropDefinition> center_tables =
+	std::vector<LevelPropDefinition> center_tables =
 	{
 		LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_furniture, LevelPropDefinition::collision_class_excluder | LevelPropDefinition::collision_class_furniture, 0.5f, 0.5f, 0.1f, 0.1f)
 	};
 
-	inline static std::vector<LevelPropDefinition> rugs =
+	std::vector<LevelPropDefinition> rugs =
 	{
 		LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_rug, LevelPropDefinition::collision_class_rug, 1.0f, 2.0f, 0.0f, 0.0f)
 	};
 
-	inline static LevelPropDefinition floor_transition_strip = LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_debris, 0.0f, 0.025f, 1.0f, 0.0f, 0.0f);
+	LevelPropDefinition floor_transition_strip = LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_debris, 0.0f, 0.025f, 1.0f, 0.0f, 0.0f);
+
+private:
+	PropDefinitions() = default;
 };

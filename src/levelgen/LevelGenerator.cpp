@@ -73,7 +73,7 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 
 	/*
 	// ================ structure testing
-	for (const auto &f : generate_structure(floors, floors.at(0), LevelSide::right, 0))
+	for (const auto &f : generate_structure(floors, floors.at(0), LevelSide::top, 0))
 		floors.push_back(f);
 	if (!connect(floors.at(0), floors.at(1)) && false) win::bug("no connection");
 	return floors;
@@ -354,8 +354,10 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_linear(const std::vecto
 // make some predefined hand crafted rooms
 std::vector<LevelFloorInternal> LevelGenerator::generate_structure(const std::vector<LevelFloorInternal> &existing_floors, const LevelFloor &start_floor, const LevelSide side, int index)
 {
+	const auto &defs = StructureDefinitions::get();
+
 	// pick a structure definition
-	const StructureDefinition &s = *structure_defs.at(index == -1 ? rand.uniform_int(0, structure_defs.size() - 1) : index);
+	const StructureDefinition &s = *defs.all.at(index == -1 ? rand.uniform_int(0, defs.all.size() - 1) : index);
 
 	// spawn the structure
 	std::vector<LevelFloorInternal> generated = s.spawn(existing_floors, start_floor, side);
@@ -695,7 +697,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 	// generate some rugs
 	if (rand.one_in(2))
 	{
-		const LevelPropDefinition propdef = PropDefinitions::rugs.at(rand.uniform_int(0, PropDefinitions::rugs.size() - 1));
+		const LevelPropDefinition propdef = PropDefinitions::get().rugs.at(rand.uniform_int(0, PropDefinitions::get().rugs.size() - 1));
 
 		LevelSide sides[4] { LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top };
 		const LevelSide orientation = sides[rand.uniform_int(0, 3)];
@@ -723,7 +725,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 
 		for (int j = 0; j < attempts; ++j)
 		{
-			const LevelPropDefinition &propdef = PropDefinitions::side_tables.at(rand.uniform_int(0, PropDefinitions::side_tables.size() - 1));
+			const LevelPropDefinition &propdef = PropDefinitions::get().side_tables.at(rand.uniform_int(0, PropDefinitions::get().side_tables.size() - 1));
 			const LevelSide side = random_side();
 			const float table_margin = 0.075f;
 
@@ -762,7 +764,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 	// generate some center tables
 	if (rand.one_in(3))
 	{
-		const LevelPropDefinition &propdef = PropDefinitions::center_tables.at(rand.uniform_int(0, PropDefinitions::center_tables.size() - 1));
+		const LevelPropDefinition &propdef = PropDefinitions::get().center_tables.at(rand.uniform_int(0, PropDefinitions::get().center_tables.size() - 1));
 
 		LevelSide sides[4] { LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top };
 		const LevelSide orientation = sides[rand.uniform_int(0, 3)];
@@ -798,7 +800,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_transition_strips(const 
 {
 	std::vector<LevelPropInternal> props;
 
-	const LevelPropDefinition &def = PropDefinitions::floor_transition_strip;
+	const LevelPropDefinition &def = PropDefinitions::get().floor_transition_strip;
 
 	for (const LevelFloorConnector &con : floor.connectors)
 	{

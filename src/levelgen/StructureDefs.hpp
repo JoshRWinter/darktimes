@@ -56,12 +56,13 @@ struct StructureDefinition
 		// place prop spawns
 		for (const auto &prop : props)
 		{
-			auto &floor = generated.at(prop.floor_index);
 			auto &original_floor = floors.at(prop.floor_index);
 			auto p = prop.propdef.spawn(prop.side, original_floor.x + prop.x, original_floor.y + prop.y);
 			reorient(p.x, p.y, p.w, p.h, side);
 			p.x += start_x;
 			p.y += start_y;
+
+			auto &floor = generated.at(prop.floor_index);
 			floor.prop_spawns.push_back(p);
 		}
 
@@ -103,58 +104,71 @@ struct StructureDefinition
 	}
 };
 
-inline StructureDefinition small1
+struct StructureDefinitions
 {
-	std::vector<LevelFloorInternal>
-	{
-		LevelFloorInternal(Texture::floor1, 0.0f, 0.0f, 4.0f, 2.0f, true),
-		LevelFloorInternal(Texture::floor1, -1.0f, 2.0f, 6.0f, 2.0f, false),
-	},
+	static const StructureDefinitions &get() { static StructureDefinitions sd; return sd; }
 
-	std::vector<StructureFloorConnection>
+	StructureDefinition small1
 	{
-		StructureFloorConnection(0, 1)
-	}
-};
+		std::vector<LevelFloorInternal>
+		{
+			LevelFloorInternal(Texture::floor1, 0.0f, 0.0f, 4.0f, 2.0f, true),
+			LevelFloorInternal(Texture::floor1, -1.0f, 2.0f, 6.0f, 2.0f, true),
+		},
 
-inline StructureDefinition small2
-{
-	std::vector<LevelFloorInternal>
+		std::vector<StructureFloorConnection>
+		{
+			StructureFloorConnection(0, 1)
+		},
+
+		std::vector<StructureProp>
+		{
+			StructureProp(1, LevelSide::right, 0.0f, 0.0f, PropDefinitions::get().side_tables.at(0))
+		}
+	};
+
+	StructureDefinition small2
 	{
-		LevelFloorInternal(Texture::floor1, 0.0f, 0.0f, 3.6f, 6.0f, false),
-		LevelFloorInternal(Texture::floor1, 3.6f, 1.5f, 4.0f, 3.0f, false),
-		LevelFloorInternal(Texture::floor1, -2.0f, 6.0f, 7.0f, 3.0f, false)
-	},
+		std::vector<LevelFloorInternal>
+		{
+			LevelFloorInternal(Texture::floor1, 0.0f, 0.0f, 3.6f, 6.0f, false),
+			LevelFloorInternal(Texture::floor1, 3.6f, 1.5f, 4.0f, 3.0f, false),
+			LevelFloorInternal(Texture::floor1, -2.0f, 6.0f, 7.0f, 3.0f, false)
+		},
 
-	std::vector<StructureFloorConnection>
+		std::vector<StructureFloorConnection>
+		{
+			StructureFloorConnection(0, 1),
+			StructureFloorConnection(0, 2)
+		}
+	};
+
+	StructureDefinition small3
 	{
-		StructureFloorConnection(0, 1),
-		StructureFloorConnection(0, 2)
-	}
-};
+		std::vector<LevelFloorInternal>
+		{
+			LevelFloorInternal(Texture::floor1, 0.0f, 0.0f, 8.0f, 2.2f, false),
+			LevelFloorInternal(Texture::floor1, 4.9f, 2.2f, 4.0f, 7.4f, false),
+			LevelFloorInternal(Texture::floor1, -3.0f, -0.5f, 3.0f, 6.2f, false),
+			LevelFloorInternal(Texture::floor1, -2.5f, 5.7f, 7.4f, 2.2f, false)
+		},
 
-inline StructureDefinition small3
-{
-	std::vector<LevelFloorInternal>
+		std::vector<StructureFloorConnection>
+		{
+			StructureFloorConnection(0, 1),
+			StructureFloorConnection(0, 2),
+			StructureFloorConnection(2, 3),
+			StructureFloorConnection(1, 3),
+		}
+	};
+
+	std::vector<StructureDefinition*> all
 	{
-		LevelFloorInternal(Texture::floor1, 0.0f, 0.0f, 8.0f, 2.2f, false),
-		LevelFloorInternal(Texture::floor1, 4.9f, 2.2f, 4.0f, 7.4f, false),
-		LevelFloorInternal(Texture::floor1, -3.0f, -0.5f, 3.0f, 6.2f, false),
-		LevelFloorInternal(Texture::floor1, -2.5f, 5.7f, 7.4f, 2.2f, false)
-	},
+		&small1,
+		&small2,
+		&small3
+	};
 
-	std::vector<StructureFloorConnection>
-	{
-		StructureFloorConnection(0, 1),
-		StructureFloorConnection(0, 2),
-		StructureFloorConnection(2, 3),
-		StructureFloorConnection(1, 3),
-	}
-};
-
-inline std::vector<StructureDefinition*> structure_defs
-{
-	&small1,
-	&small2,
-	&small3
+private:
+	StructureDefinitions() = default;
 };
