@@ -22,9 +22,9 @@ public:
 	LevelGenerator() = default;
 	void generate(int seed);
 
-	std::vector<LevelFloor> floors;
-	std::vector<LevelWall> walls;
-	std::vector<LevelProp> props;
+	std::vector<LevelFloor> level_floors;
+	std::vector<LevelWall> level_walls;
+	std::vector<LevelProp> level_props;
 
 private:
 	std::vector<LevelFloorInternal> generate_impl();

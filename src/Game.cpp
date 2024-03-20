@@ -82,20 +82,20 @@ void Game::generate_level(Renderer &renderer)
 	LevelGenerator generator;
 	generator.generate(69);
 
-	sim.reset(generator.floors, generator.walls, generator.props);
+	sim.reset(generator.level_floors, generator.level_walls, generator.level_props);
 
 	std::vector<Renderable> renderables;
-	for (const auto &f : generator.floors)
+	for (const auto &f : generator.level_floors)
 	{
 		renderables.emplace_back(f.texture, f.x, f.y, f.w, f.h, 0.0f);
 	}
 
-	for (const auto &w : generator.walls)
+	for (const auto &w : generator.level_walls)
 	{
 		renderables.emplace_back(Texture::player, w.x, w.y, w.w, w.h, 0.0f);
 	}
 
-	for (const auto &p : generator.props)
+	for (const auto &p : generator.level_props)
 	{
 		const auto newprop = correct_prop_orientation(p);
 		renderables.emplace_back(p.texture, newprop.x, newprop.y, newprop.w, newprop.h, get_prop_rotation(newprop.side));

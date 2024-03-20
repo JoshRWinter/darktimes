@@ -37,16 +37,21 @@ void LevelGenerator::generate(int seed)
 	rand.reseed(seed);
 	log_seed(seed);
 
+	// reset the level state
+	level_floors.clear();
+	level_walls.clear();
+	level_props.clear();
+
 	const auto generated_floors = generate_impl();
 
 	for (const auto &f : generated_floors)
-		floors.push_back(f);
+		level_floors.push_back(f);
 
 	for (const auto &w : generate_walls(generated_floors))
-		walls.push_back(w);
+		level_walls.push_back(w);
 
 	for (const auto &p : generate_props(generated_floors))
-		props.push_back(p);
+		level_props.push_back(p);
 
 #ifndef NDEBUG
 	fputs("=============================\n", stderr);
@@ -62,11 +67,6 @@ void LevelGenerator::generate(int seed)
 // generates segments and mushes em together
 std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 {
-	// reset the level state
-	floors.clear();
-	walls.clear();
-	props.clear();
-
 	// reset the health object
 	health = decltype(health)();
 
