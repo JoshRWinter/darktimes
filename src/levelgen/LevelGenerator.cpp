@@ -78,7 +78,7 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 
 	/*
 	// ================ structure testing
-	for (const auto &f : generate_structure(floors, floors.at(0), LevelSide::top, 0))
+	for (const auto &f : generate_structure(floors, floors.at(0), LevelSide::right, 0))
 		floors.push_back(f);
 	if (!connect(floors.at(0), floors.at(1)) && false) win::bug("no connection");
 	return floors;
@@ -618,8 +618,8 @@ std::vector<LevelPropInternal> LevelGenerator::generate_props(const std::vector<
 		const std::vector<LevelPropExcluder> door_excluders = generate_door_excluders(floor);
 
 		// debugging
-		//for (const LevelProp &excluder : door_excluders)
-		//props.push_back(excluder);
+		//for (const auto &excluder : door_excluders)
+			//props.emplace_back(Texture::player, LevelSide::right, 0, 0, excluder.x, excluder.y, excluder.w, excluder.h, 0.0f, 0.0f);
 
 		std::vector<LevelPropInternal> spawned_props;
 		if (!floor.prop_spawns.empty())

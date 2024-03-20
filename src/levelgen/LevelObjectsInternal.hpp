@@ -53,10 +53,10 @@ struct LevelPropInternal : LevelProp
 
 	bool collide(const LevelPropExcluder &other) const
 	{
-		return x + w + excluder_padding_x > other.x &&
-			   x - excluder_padding_x < other.x + other.w &&
-			   y + h + excluder_padding_y > other.y &&
-			   y - excluder_padding_y < other.y + other.h;
+		return x + w > other.x &&
+			   x < other.x + other.w &&
+			   y + h > other.y &&
+			   y < other.y + other.h;
 	}
 
 	bool matches_collision_class(int other_collision_class) const

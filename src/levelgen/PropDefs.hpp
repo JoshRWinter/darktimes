@@ -72,17 +72,17 @@ struct PropDefinitions
 
 	std::vector<LevelPropDefinition> side_tables =
 	{
-		LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_furniture, LevelPropDefinition::collision_class_excluder | LevelPropDefinition::collision_class_furniture, 0.36f, 0.7f)
+		LevelPropDefinition(Texture::large_table, LevelPropDefinition::collision_class_furniture, LevelPropDefinition::collision_class_excluder | LevelPropDefinition::collision_class_furniture, 0.36f, 0.7f)
 	};
 
 	std::vector<LevelPropDefinition> center_tables =
 	{
-		LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_furniture, LevelPropDefinition::collision_class_excluder | LevelPropDefinition::collision_class_furniture, 0.5f, 0.5f, 0.1f, 0.1f)
+		LevelPropDefinition(Texture::large_table, LevelPropDefinition::collision_class_furniture, LevelPropDefinition::collision_class_excluder | LevelPropDefinition::collision_class_furniture, 0.5f, 0.5f, 0.1f, 0.1f)
 	};
 
 	std::vector<LevelPropDefinition> rugs =
 	{
-		LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_rug, LevelPropDefinition::collision_class_rug, 1.0f, 2.0f, 0.0f, 0.0f)
+		LevelPropDefinition(Texture::large_table, LevelPropDefinition::collision_class_rug, LevelPropDefinition::collision_class_rug, 1.0f, 2.0f, 0.0f, 0.0f)
 	};
 
 	LevelPropDefinition floor_transition_strip = LevelPropDefinition(Texture::player, LevelPropDefinition::collision_class_debris, 0.0f, 0.025f, 1.0f, 0.0f, 0.0f);

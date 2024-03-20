@@ -59,11 +59,12 @@ std::vector<std::uint16_t> GLStaticAtlasRenderer::load(const std::vector<Rendera
 
 		const auto translate = glm::translate(ident, glm::vec3(renderable.x + (renderable.w / 2.0f), renderable.y + (renderable.h / 2.0f), 0.0f));
 		const auto scale = glm::scale(ident, glm::vec3(renderable.w, renderable.h, 0.0f));
+		const auto rotate = glm::rotate(ident, renderable.rot, glm::vec3(0.0f, 0.0f, 1.0f));
 
 		for (int i = 0; i < 4; ++i)
 		{
 			const glm::vec4 raw(verts[(i * 2) + 0], verts[(i * 2) + 1], 0.0f, 1.0f);
-			const auto transformed = translate * scale * raw;
+			const auto transformed = translate * rotate * scale * raw;
 
 			position_data.push_back(transformed.x);
 			position_data.push_back(transformed.y);

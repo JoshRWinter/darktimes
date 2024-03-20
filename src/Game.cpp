@@ -1,5 +1,4 @@
 #include "Game.hpp"
-#include "render/Renderer.hpp"
 #include "levelgen/LevelGenerator.hpp"
 
 Game::Game(win::Display &display, win::AssetRoll &roll)
@@ -13,23 +12,7 @@ Game::Game(win::Display &display, win::AssetRoll &roll)
 void Game::play()
 {
 	Renderer renderer(win::Dimensions<int>(display.width(), display.height()), win::Area<float>(-8.0f, 8.0f, -4.5f, 4.5f), roll);
-
-	LevelGenerator generator;
-	generator.generate(69);
-
-	sim.reset(generator.floors, generator.walls, generator.props);
-
-	std::vector<Renderable> renderables;
-	for (const auto &f : generator.floors)
-		renderables.emplace_back(f.texture, f.x, f.y, f.w, f.h, 0.0f);
-	for (const auto &w : generator.walls)
-		renderables.emplace_back(Texture::player, w.x, w.y, w.w, w.h, 0.0f);
-	for (const auto &p : generator.props)
-		renderables.emplace_back(Texture::large_table, p.x, p.y, p.w, p.h, 0.0f);
-
-	renderer.set_statics(renderables);
-	renderer.set_view(0.0f, 0.0f, 0.5);
-	renderer.set_view(0.0f, 0.0f, 0.0);
+	generate_level(renderer);
 
 	RenderableWorldState *state = NULL;
 	while (!quit)
@@ -92,4 +75,77 @@ void Game::mouse_event(int x, int y)
 void Game::stop()
 {
 	quit = true;
+}
+
+void Game::generate_level(Renderer &renderer)
+{
+	LevelGenerator generator;
+	generator.generate(69);
+
+	sim.reset(generator.floors, generator.walls, generator.props);
+
+	std::vector<Renderable> renderables;
+	for (const auto &f : generator.floors)
+	{
+		renderables.emplace_back(f.texture, f.x, f.y, f.w, f.h, 0.0f);
+	}
+
+	for (const auto &w : generator.walls)
+	{
+		renderables.emplace_back(Texture::player, w.x, w.y, w.w, w.h, 0.0f);
+	}
+
+	for (const auto &p : generator.props)
+	{
+		const auto newprop = correct_prop_orientation(p);
+		renderables.emplace_back(p.texture, newprop.x, newprop.y, newprop.w, newprop.h, get_prop_rotation(newprop.side));
+	}
+
+	renderer.set_statics(renderables);
+	renderer.set_view(0.0f, 0.0f, 0.0f);
+}
+
+LevelProp Game::correct_prop_orientation(const LevelProp &prop)
+{
+	LevelProp copy = prop;
+
+	switch (prop.side)
+	{
+		case LevelSide::left:
+		case LevelSide::right:
+			break;
+		case LevelSide::bottom:
+		case LevelSide::top:
+			copy.w = prop.h;
+			copy.h = prop.w;
+			break;
+	}
+
+	const float center_x = prop.x + (prop.w / 2.0f);
+	const float center_y = prop.y + (prop.h / 2.0f);
+
+	const float new_x = center_x - (copy.w / 2.0f);
+	const float new_y = center_y - (copy.h / 2.0f);
+
+	copy.x = new_x;
+	copy.y = new_y;
+
+	return copy;
+}
+
+float Game::get_prop_rotation(const LevelSide side)
+{
+	switch (side)
+	{
+		case LevelSide::left:
+			return M_PI;
+		case LevelSide::right:
+			return 0.0f;
+		case LevelSide::bottom:
+			return (M_PI * 3.0f) / 2;
+		case LevelSide::top:
+			return M_PI / 2.0f;
+	}
+
+	win::bug("lolnope");
 }
