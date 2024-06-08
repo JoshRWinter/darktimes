@@ -47,11 +47,11 @@ GLFloorTextureCollection::GLFloorTextureCollection(win::AssetRoll &roll, const T
 			win::bug("All floor textures must be same dimensions!");
 
 		if (tga.bpp() == 32)
-			win::bug("Floor textures must not contain an alpha channel");
+			data = convert_32_to_24(tga.data(), width, height);
 		else if (tga.bpp() == 8)
 			data = convert_8_to_24(tga.data(), width, height);
 		else if (tga.bpp() != 24)
-			win::bug("Floor textures must be either 8 or 24 bit color depth");
+			win::bug("Floor textures must be either 8, 24, or 32 bit color depth");
 
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, item.layer_index, width, height, 1, GL_BGR, GL_UNSIGNED_BYTE, data ? data.get() : tga.data());
 	}
@@ -76,6 +76,20 @@ std::unique_ptr<unsigned char[]> GLFloorTextureCollection::convert_8_to_24(const
 		allocated[(i * 3) + 0] = data[i];
 		allocated[(i * 3) + 1] = data[i];
 		allocated[(i * 3) + 2] = data[i];
+	}
+
+	return allocated;
+}
+
+std::unique_ptr<unsigned char[]> GLFloorTextureCollection::convert_32_to_24(const unsigned char *data, int width, int height)
+{
+	std::unique_ptr<unsigned char[]> allocated(new unsigned char[width * height * 3]);
+
+	for (int i = 0, j = 0; i < width * height * 4; i += 4, j += 3)
+	{
+		allocated[j + 0] = data[i + 0];
+		allocated[j + 1] = data[i + 1];
+		allocated[j + 2] = data[i + 2];
 	}
 
 	return allocated;
