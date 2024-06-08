@@ -1,2 +1,10 @@
-$padding 5
-player.tga:5:5:50:50
+$padding 4
+player.tga:244:184:50:50
+large_table.tga:344:0:96:180
+large_table2.tga:244:0:96:180
+rug1.tga:0:163:240:120
+tstrip.tga:444:124:3:120
+rug2.tga:0:0:240:159
+chair1.tga:298:184:48:72
+side_table1.tga:444:0:52:120
+chair2.tga:350:184:48:72

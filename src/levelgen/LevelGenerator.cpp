@@ -73,7 +73,7 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_impl()
 	std::vector<LevelFloorInternal> floors;
 
 	// starting room
-	LevelFloorInternal spawn(Texture::floor2, -1.0f, -1.0f, 2.0f, 2.0f);
+	LevelFloorInternal spawn(random_floor(), -1.0f, -1.0f, 2.0f, 2.0f);
 	floors.push_back(spawn);
 
 	/*
@@ -221,7 +221,7 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_grid(const std::vector<
 			const bool long_horizontal = rand.uniform_int(0, 6) == 0;
 			const bool long_vertical = rand.uniform_int(0, 6) == 0;
 
-			LevelFloorInternal floor(Texture::floor1, start_x, start_y, long_horizontal ? floor_width * 2.0f : floor_width, long_vertical ? floor_height * 2.0f : floor_height);
+			LevelFloorInternal floor(random_floor(), start_x, start_y, long_horizontal ? floor_width * 2.0f : floor_width, long_vertical ? floor_height * 2.0f : floor_height);
 
 			bool collision = false;
 			if (floor.collide(existing_floors))
@@ -325,7 +325,7 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_linear(const std::vecto
 					break;
 			}
 
-			LevelFloorInternal floor(Texture::floor1, x, y, width, height);
+			LevelFloorInternal floor(random_floor(), x, y, width, height);
 
 			if (floor.collide(existing_floors))
 				continue;
@@ -722,7 +722,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 		}
 	}
 
-	// generate some side tables
+	// generate some side furniture
 	const int side_tables = rand.uniform_int(0, 4);
 	for (int i = 0; i < side_tables; ++i)
 	{
@@ -730,7 +730,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 
 		for (int j = 0; j < attempts; ++j)
 		{
-			const LevelPropDefinition &propdef = PropDefinitions::get().side_tables.at(rand.uniform_int(0, PropDefinitions::get().side_tables.size() - 1));
+			const LevelPropDefinition &propdef = PropDefinitions::get().side_furniture.at(rand.uniform_int(0, PropDefinitions::get().side_furniture.size() - 1));
 			const LevelSide side = random_side();
 			const float table_margin = 0.075f;
 
@@ -756,7 +756,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 					break;
 			}
 
-			const auto prop = propdef.spawn(side, x, y);
+			const auto prop = propdef.spawn(flip(side), x, y);
 
 			if (!prop.collide(props) && !prop.collide(excluders))
 			{
@@ -841,6 +841,11 @@ std::vector<LevelPropInternal> LevelGenerator::generate_transition_strips(const 
 ///////////////////////////////////////////
 /// random helper functions
 ///////////////////////////////////////////
+
+Texture LevelGenerator::random_floor()
+{
+	return (Texture)rand.uniform_int((int)Texture::floor1, (int)Texture::floor5);
+}
 
 LevelSide LevelGenerator::flip(LevelSide side)
 {

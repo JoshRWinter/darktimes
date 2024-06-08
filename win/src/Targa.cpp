@@ -54,8 +54,8 @@ void Targa::load_image_bytes(Stream &raw)
 	raw.seek(16);
 	raw.read(&bits, sizeof(bits));
 
-	if (bits != 24 && bits != 32)
-		win::bug("TARGAs must be 24 or 32 bit color depth");
+	if (bits != 8 && bits != 24 && bits != 32)
+		win::bug("TARGAs must be 8, 24, or 32 bit color depth");
 
 	// components per pixel
 	const int cpp = bits / 8;

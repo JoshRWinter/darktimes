@@ -12,10 +12,9 @@ struct LevelPropExcluder
 
 struct LevelPropInternal : LevelProp
 {
-	LevelPropInternal(Texture texture, LevelSide side, int collision_class, int collides_with_class, float x, float y, float w, float h, float excluder_padding_y, float excluder_padding_x)
+	LevelPropInternal(Texture texture, LevelSide side, bool solid, float x, float y, float w, float h, float excluder_padding_y, float excluder_padding_x)
 		: LevelProp(texture, side, x, y, w, h)
-		, collision_class(collision_class)
-		, collides_with_class(collides_with_class)
+		, solid(solid)
 		, excluder_padding_x(excluder_padding_x)
 		, excluder_padding_y(excluder_padding_y)
 	{}
@@ -33,7 +32,7 @@ struct LevelPropInternal : LevelProp
 
 	bool collide(const LevelPropInternal &other) const
 	{
-		return matches_collision_class(other.collision_class) &&
+		return solid && other.solid &&
 			x + w + excluder_padding_x > other.x - other.excluder_padding_x &&
 			x - excluder_padding_x < other.x + other.w + other.excluder_padding_x &&
 			y + h + excluder_padding_y > other.y - other.excluder_padding_y &&
@@ -59,23 +58,7 @@ struct LevelPropInternal : LevelProp
 			   y < other.y + other.h;
 	}
 
-	bool matches_collision_class(int other_collision_class) const
-	{
-		// loop over all the bits
-		for (int position = 0; position < sizeof(collides_with_class) * 8; ++position)
-		{
-			bool left_bit = ((collides_with_class >> position) & 1) == 1;
-			bool right_bit = ((other_collision_class >> position) & 1) == 1;
-
-			if (left_bit && right_bit)
-				return true;
-		}
-
-		return false;
-	}
-
-	int collision_class;
-	int collides_with_class;
+	bool solid;
 	float excluder_padding_x, excluder_padding_y;
 };
 

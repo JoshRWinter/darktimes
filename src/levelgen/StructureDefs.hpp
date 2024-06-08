@@ -201,7 +201,7 @@ struct StructureDefinitions
 
 		std::vector<StructureProp>
 		{
-			StructureProp(1, LevelSide::top, 0.0f, 0.0f, PropDefinitions::get().side_tables.at(0))
+			StructureProp(1, LevelSide::top, 0.0f, 0.0f, PropDefinitions::get().side_furniture.at(0))
 		}
 	};
 

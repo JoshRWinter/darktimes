@@ -11,6 +11,22 @@ shader/dynamic_atlas.frag z
 svg2tga {
 	texture/floor1.svg 120 120
 	texture/floor2.svg 120 120
+	texture/floor3.svg 120 120
+	texture/floor4.svg 120 120
+	texture/floor5.svg 120 120
+
+	texture/tstrip.svg 3 120 exclude
+
+	texture/chair1.svg 48 72 exclude
+	texture/chair2.svg 48 72 exclude
+
+	texture/side_table1.svg 52 120 exclude
+
+	texture/large_table.svg 96 180 exclude
+	texture/large_table2.svg 96 180 exclude
+
+	texture/rug1.svg 240 120 exclude
+	texture/rug2.svg 240 159 exclude
 
 	texture/player.svg 50 50 exclude
 }

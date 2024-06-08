@@ -43,6 +43,7 @@ private:
 	std::vector<LevelPropInternal> generate_new_props(const LevelFloorInternal &floor, const std::vector<LevelPropExcluder> &excluders);
 	std::vector<LevelPropInternal> generate_props_from_spawns(const LevelFloorInternal &floor, const std::vector<LevelPropExcluder> &excluders);
 	static std::vector<LevelPropInternal> generate_transition_strips(const LevelFloorInternal &floor);
+	Texture random_floor();
 	static LevelSide flip(LevelSide side);
 	LevelSide random_side();
 	static std::array<LevelSide, 4> enumerate_connector_sides();

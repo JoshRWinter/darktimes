@@ -16,6 +16,8 @@ public:
 	const int &get_layer(Texture texture) const;
 
 private:
+	static std::unique_ptr<unsigned char[]> convert_8_to_24(const unsigned char *data, int width, int height);
+
 	win::GLTexture tex;
 	std::vector<int> map;
 };
