@@ -78,7 +78,8 @@ struct PropDefinitions
 	{
 		LevelPropDefinition(Texture::rug1, false, 2.0f, 1.0f, 0.0f, 0.0f),
 		LevelPropDefinition(Texture::rug2, false, 2.0f, 1.325f, 0.0f, 0.0f),
-		LevelPropDefinition(Texture::rug3, false, 2.5f, 0.7f, 0.0f, 0.0f)
+		LevelPropDefinition(Texture::rug3, false, 2.5f, 0.7f, 0.0f, 0.0f),
+		LevelPropDefinition(Texture::rug4, false, 1.8f, 1.1666f, 0.0f, 0.0f)
 	};
 
 	LevelPropDefinition floor_transition_strip = LevelPropDefinition(Texture::transition_strip, false, 0.025f, 1.0f, 0.0f, 0.0f);

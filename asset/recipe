@@ -28,6 +28,7 @@ svg2tga {
 	texture/rug1.svg 240 120 exclude
 	texture/rug2.svg 240 159 exclude
 	texture/rug3.svg 300 84 exclude
+	texture/rug4.svg 216 140 exclude
 
 	texture/player.svg 50 50 exclude
 }
