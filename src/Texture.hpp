@@ -20,6 +20,7 @@ enum class Texture
 
 	rug1,
 	rug2,
+	rug3,
 
 	player,
 

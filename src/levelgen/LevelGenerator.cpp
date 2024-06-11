@@ -717,7 +717,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 
 		if (!rug.collide(props))
 		{
-			if (width_pct < 0.8f && height_pct < 0.8f)
+			if (width_pct < 0.95f && height_pct < 0.95f)
 				props.push_back(rug);
 		}
 	}
