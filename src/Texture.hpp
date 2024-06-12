@@ -18,6 +18,9 @@ enum class Texture
 	large_table,
 	large_table2,
 
+	huge_table,
+	long_table,
+
 	rug1,
 	rug2,
 	rug3,

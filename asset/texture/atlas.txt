@@ -1,12 +1,14 @@
 $padding 4
-player.tga:356:308:50:50
+player.tga:444:248:50:50
 large_table.tga:244:124:96:180
 large_table2.tga:344:124:96:180
+huge_table.tga:500:0:276:276
+long_table.tga:0:308:384:174
 side_table1.tga:444:124:52:120
 rug1.tga:244:0:240:120
 rug2.tga:0:0:240:159
-rug3.tga:0:308:300:84
+rug3.tga:388:366:300:84
 rug4.tga:0:163:216:140
-chair1.tga:304:308:48:72
-chair2.tga:410:308:48:72
+chair1.tga:498:280:48:72
+chair2.tga:692:280:48:72
 tstrip.tga:220:163:3:120

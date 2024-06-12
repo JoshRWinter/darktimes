@@ -769,17 +769,29 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 	// generate some center tables
 	if (rand.one_in(3))
 	{
-		const LevelPropDefinition &propdef = PropDefinitions::get().center_tables.at(rand.uniform_int(0, PropDefinitions::get().center_tables.size() - 1));
+		const LevelPropDefinition *propdef;
 
-		LevelSide sides[4] { LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top };
+		// if the room is yuge, put in some yuge tables
+		if (floor.w * floor.h > 30.0f)// && !rand.one_in(3))
+			propdef = &PropDefinitions::get().huge_center_tables.at(rand.uniform_int(0, PropDefinitions::get().huge_center_tables.size() - 1));
+		else
+			propdef = &PropDefinitions::get().center_tables.at(rand.uniform_int(0, PropDefinitions::get().center_tables.size() - 1));
+
+		LevelSide sides[4]{LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top};
 		const LevelSide orientation = sides[rand.uniform_int(0, 3)];
 
-		const float x = (floor.x + (floor.w / 2.0f)) - (propdef.get_width(orientation) / 2.0f);
-		const float y = (floor.y + (floor.h / 2.0f)) - (propdef.get_height(orientation) / 2.0f);
+		const float x = (floor.x + (floor.w / 2.0f)) - (propdef->get_width(orientation) / 2.0f);
+		const float y = (floor.y + (floor.h / 2.0f)) - (propdef->get_height(orientation) / 2.0f);
 
-		const auto table = propdef.spawn(orientation, x, y);
+		const auto table = propdef->spawn(orientation, x, y);
 
-		if (!table.collide(props) && !table.collide(excluders))
+		// make sure the table doesn't cover too much of the room
+		float min = table.x - floor.x;
+		min = std::min(min, (floor.x + floor.w) - (table.x + table.w));
+		min = std::min(min, table.y - floor.y);
+		min = std::min(min, (floor.y + floor.h) - (table.y + table.h));
+
+		if (min > 1.5f && !table.collide(props) && !table.collide(excluders))
 			props.push_back(table);
 	}
 
