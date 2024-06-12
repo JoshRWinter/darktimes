@@ -13,7 +13,9 @@ ATLAS_TEXTURE(rug4, atlas, 9, STATIC);
 ATLAS_TEXTURE(chair1, atlas, 10, STATIC);
 ATLAS_TEXTURE(chair2, atlas, 11, STATIC);
 ATLAS_TEXTURE(couch1, atlas, 12, STATIC);
-ATLAS_TEXTURE(transition_strip, atlas, 13, STATIC);
+ATLAS_TEXTURE(clutter_brokenglass, atlas, 13, STATIC);
+ATLAS_TEXTURE(clutter_boot, atlas, 14, STATIC);
+ATLAS_TEXTURE(transition_strip, atlas, 15, STATIC);
 
 FLOOR_TEXTURE(floor1, "texture/floor1.tga", 0, STATIC);
 FLOOR_TEXTURE(floor2, "texture/floor2.tga", 1, STATIC);

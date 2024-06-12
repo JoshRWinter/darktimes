@@ -12,4 +12,6 @@ rug4.tga:0:163:216:140
 chair1.tga:498:280:48:72
 chair2.tga:550:280:48:72
 couch1.tga:692:280:48:126
+clutter_brokenglass.tga:423:308:36:32
+clutter_boot.tga:463:302:30:24
 tstrip.tga:220:163:3:120

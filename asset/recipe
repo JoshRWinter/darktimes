@@ -34,6 +34,9 @@ svg2tga {
 	texture/rug3.svg 300 84 exclude
 	texture/rug4.svg 216 140 exclude
 
+	texture/clutter_brokenglass.svg 36 32 exclude
+	texture/clutter_boot.svg 30 24 exclude
+
 	texture/player.svg 50 50 exclude
 }
 

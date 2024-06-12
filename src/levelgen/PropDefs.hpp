@@ -89,6 +89,12 @@ struct PropDefinitions
 		LevelPropDefinition(Texture::rug4, false, 1.8f, 1.1666f, 0.0f, 0.0f)
 	};
 
+	std::vector<LevelPropDefinition> clutter =
+	{
+		LevelPropDefinition(Texture::clutter_brokenglass, false, 0.3f, 0.2666f, 0.0f, 0.0f),
+		LevelPropDefinition(Texture::clutter_boot, false, 0.25f, 0.2f, 0.0f, 0.0f)
+	};
+
 	LevelPropDefinition floor_transition_strip = LevelPropDefinition(Texture::transition_strip, false, 0.025f, 1.0f, 0.0f, 0.0f);
 
 private:

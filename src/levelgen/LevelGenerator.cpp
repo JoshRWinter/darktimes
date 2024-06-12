@@ -702,9 +702,9 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 	// generate some rugs
 	if (rand.one_in(2))
 	{
-		const LevelPropDefinition propdef = PropDefinitions::get().rugs.at(rand.uniform_int(0, PropDefinitions::get().rugs.size() - 1));
+		const auto &propdef = PropDefinitions::get().rugs.at(rand.uniform_int(0, PropDefinitions::get().rugs.size() - 1));
 
-		LevelSide sides[4] { LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top };
+		LevelSide sides[] { LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top };
 		const LevelSide orientation = sides[rand.uniform_int(0, 3)];
 
 		const float x = (floor.x + (floor.w / 2.0f)) - (propdef.get_width(orientation) / 2.0f);
@@ -720,6 +720,23 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 			if (width_pct < 0.95f && height_pct < 0.95f)
 				props.push_back(rug);
 		}
+	}
+
+	// generate some clutter
+	const int clutter_count = rand.uniform_int(0, 1);
+	for (int i = 0; i < clutter_count; ++i)
+	{
+		const auto &propdef = PropDefinitions::get().clutter.at(rand.uniform_int(0, PropDefinitions::get().clutter.size() - 1));
+
+		LevelSide sides[] { LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top };
+		const LevelSide orientation = sides[rand.uniform_int(0, 3)];
+
+		const float x = rand.uniform_real(floor.x, (floor.x + floor.w) - propdef.get_width(orientation));
+		const float y = rand.uniform_real(floor.y, (floor.y + floor.h) - propdef.get_height(orientation));
+
+		const auto clutter = propdef.spawn(orientation, x, y);
+
+		props.push_back(clutter);
 	}
 
 	// generate some side furniture

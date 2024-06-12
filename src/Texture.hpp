@@ -27,6 +27,9 @@ enum class Texture
 	rug3,
 	rug4,
 
+	clutter_brokenglass,
+	clutter_boot,
+
 	player,
 
 	max_texture
