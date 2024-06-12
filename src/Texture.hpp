@@ -12,6 +12,7 @@ enum class Texture
 
 	chair1,
 	chair2,
+	couch1,
 
 	side_table1,
 

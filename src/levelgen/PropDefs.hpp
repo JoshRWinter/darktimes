@@ -65,6 +65,7 @@ struct PropDefinitions
 	{
 		LevelPropDefinition(Texture::chair1, true, 0.4f, 0.6f),
 		LevelPropDefinition(Texture::chair2, true, 0.4f, 0.6f),
+		LevelPropDefinition(Texture::couch1, true, 0.4f, 1.05f),
 		LevelPropDefinition(Texture::side_table1, true, 0.4333f, 1.0f)
 	};
 
