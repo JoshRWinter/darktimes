@@ -63,10 +63,11 @@ struct PropDefinitions
 
 	std::vector<LevelPropDefinition> side_furniture =
 	{
-		LevelPropDefinition(Texture::chair1, true, 0.4f, 0.6f),
-		LevelPropDefinition(Texture::chair2, true, 0.4f, 0.6f),
-		LevelPropDefinition(Texture::couch1, true, 0.4f, 1.05f),
-		LevelPropDefinition(Texture::side_table1, true, 0.4333f, 1.0f)
+		LevelPropDefinition(Texture::chair1, true, 0.4f, 0.6f, 0.4f, 0.4f),
+		LevelPropDefinition(Texture::chair2, true, 0.4f, 0.6f, 0.4f, 0.4f),
+		LevelPropDefinition(Texture::couch1, true, 0.4f, 1.05f, 0.4f, 0.4f),
+		LevelPropDefinition(Texture::side_table1, true, 0.4333f, 1.0f, 0.4f, 0.4f),
+		LevelPropDefinition(Texture::side_table2, true, 0.2917f, 0.45f, 0.4f, 0.4f)
 	};
 
 	std::vector<LevelPropDefinition> center_tables =

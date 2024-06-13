@@ -22,6 +22,7 @@ svg2tga {
 	texture/couch1.svg 48 126 exclude
 
 	texture/side_table1.svg 52 120 exclude
+	texture/side_table2.svg 31 48 exclude
 
 	texture/large_table.svg 96 180 exclude
 	texture/large_table2.svg 96 180 exclude

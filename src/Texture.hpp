@@ -15,6 +15,7 @@ enum class Texture
 	couch1,
 
 	side_table1,
+	side_table2,
 
 	large_table,
 	large_table2,
