@@ -84,7 +84,7 @@ struct PropDefinitions
 	std::vector<LevelPropDefinition> huge_center_tables =
 	{
 		LevelPropDefinition(Texture::huge_table, true, 2.3f, 2.3f, 0.25f, 0.25f),
-		LevelPropDefinition(Texture::long_table, true, 3.2f, 1.45f, 0.25f, 0.25f)
+		LevelPropDefinition(Texture::long_table, true, 1.45f, 3.2f, 0.25f, 0.25f),
 	};
 
 	std::vector<LevelPropDefinition> rugs =

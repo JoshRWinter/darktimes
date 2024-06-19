@@ -30,7 +30,7 @@ svg2tga {
 	texture/large_table2.svg 96 180 exclude
 
 	texture/huge_table.svg 276 276 exclude
-	texture/long_table.svg 384 174 exclude
+	texture/long_table.svg 174 384 exclude
 
 	texture/rug1.svg 240 120 exclude
 	texture/rug2.svg 240 159 exclude

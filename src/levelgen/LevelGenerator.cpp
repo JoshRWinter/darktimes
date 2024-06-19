@@ -54,11 +54,12 @@ void LevelGenerator::generate(int seed)
 	for (const auto &p : props)
 		level_props.push_back(p);
 
+	/*
 	// show prop excluders
 	for (const auto &p : props)
 		if (p.excluder_padding_x != 0.0f || p.excluder_padding_y != 0.0f)
 			level_props.emplace_back(Texture::debug, LevelSide::right, p.x - p.excluder_padding_x, p.y - p.excluder_padding_y, p.w + (p.excluder_padding_x * 2.0f), p.h + (p.excluder_padding_y * 2.0f));
-
+	*/
 
 #ifndef NDEBUG
 	fputs("=============================\n", stderr);
@@ -747,8 +748,8 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 	}
 
 	// generate some side furniture
-	const int side_tables = rand.uniform_int(0, 4);
-	for (int i = 0; i < side_tables; ++i)
+	const int side_furniture = rand.uniform_int(0, 4);
+	for (int i = 0; i < side_furniture; ++i)
 	{
 		const int attempts = 3;
 
@@ -756,27 +757,27 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 		{
 			const LevelPropDefinition &propdef = PropDefinitions::get().side_furniture.at(rand.uniform_int(0, PropDefinitions::get().side_furniture.size() - 1));
 			const LevelSide side = random_side();
-			const float table_margin = 0.075f;
+			const float furniture_margin = 0.055f;
 
 			float x, y;
 
 			switch (side)
 			{
 				case LevelSide::left:
-					x = floor.x + table_margin;
+					x = floor.x + furniture_margin;
 					y = rand.uniform_real(floor.y, (floor.y + floor.h) - propdef.get_height(side));
 					break;
 				case LevelSide::right:
-					x = ((floor.x + floor.w) - propdef.get_width(side)) - table_margin;
+					x = ((floor.x + floor.w) - propdef.get_width(side)) - furniture_margin;
 					y = rand.uniform_real(floor.y, (floor.y + floor.h) - propdef.get_height(side));
 					break;
 				case LevelSide::bottom:
 					x = rand.uniform_real(floor.x, (floor.x + floor.w) - propdef.get_width(side));
-					y = floor.y + table_margin;
+					y = floor.y + furniture_margin;
 					break;
 				case LevelSide::top:
 					x = rand.uniform_real(floor.x, (floor.x + floor.w) - propdef.get_width(side));
-					y = ((floor.y + floor.h) - propdef.get_height(side)) - table_margin;
+					y = ((floor.y + floor.h) - propdef.get_height(side)) - furniture_margin;
 					break;
 			}
 
@@ -791,32 +792,42 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 	}
 
 	// generate some center tables
-	if (rand.one_in(3))
 	{
 		const LevelPropDefinition *propdef;
+		int odds; // out of hundred
+		LevelSide orientation;
 
 		// if the room is yuge, put in some yuge tables
-		if (floor.w * floor.h > 30.0f)// && !rand.one_in(3))
+		if (floor.w * floor.h > 25.0f)// && !rand.one_in(3))
+		{
 			propdef = &PropDefinitions::get().huge_center_tables.at(rand.uniform_int(0, PropDefinitions::get().huge_center_tables.size() - 1));
+			odds = 80;
+			orientation = floor.w > floor.h ? (rand.one_in(2) ? LevelSide::top : LevelSide::bottom) : (rand.one_in(2) ? LevelSide::right : LevelSide::left);
+		}
 		else
+		{
 			propdef = &PropDefinitions::get().center_tables.at(rand.uniform_int(0, PropDefinitions::get().center_tables.size() - 1));
+			odds = 60;
+			LevelSide sides[4]{LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top};
+			orientation = sides[rand.uniform_int(0, 3)];
+		}
 
-		LevelSide sides[4]{LevelSide::left, LevelSide::right, LevelSide::bottom, LevelSide::top};
-		const LevelSide orientation = sides[rand.uniform_int(0, 3)];
+		if (rand.uniform_int(1, 100) < odds)
+		{
+			const float x = (floor.x + (floor.w / 2.0f)) - (propdef->get_width(orientation) / 2.0f);
+			const float y = (floor.y + (floor.h / 2.0f)) - (propdef->get_height(orientation) / 2.0f);
 
-		const float x = (floor.x + (floor.w / 2.0f)) - (propdef->get_width(orientation) / 2.0f);
-		const float y = (floor.y + (floor.h / 2.0f)) - (propdef->get_height(orientation) / 2.0f);
+			const auto table = propdef->spawn(orientation, x, y);
 
-		const auto table = propdef->spawn(orientation, x, y);
+			// make sure the table doesn't cover too much of the room
+			float min = table.x - floor.x;
+			min = std::min(min, (floor.x + floor.w) - (table.x + table.w));
+			min = std::min(min, table.y - floor.y);
+			min = std::min(min, (floor.y + floor.h) - (table.y + table.h));
 
-		// make sure the table doesn't cover too much of the room
-		float min = table.x - floor.x;
-		min = std::min(min, (floor.x + floor.w) - (table.x + table.w));
-		min = std::min(min, table.y - floor.y);
-		min = std::min(min, (floor.y + floor.h) - (table.y + table.h));
-
-		if (min > 1.5f && !table.collide(props) && !table.collide(excluders))
-			props.push_back(table);
+			if (min > 0.5f && !table.collide(props) && !table.collide(excluders))
+				props.push_back(table);
+		}
 	}
 
 	return props;
