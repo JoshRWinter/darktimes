@@ -21,21 +21,26 @@ struct LevelPropDefinition
 	LevelPropInternal spawn(LevelSide side, float x, float y) const
 	{
 		float w, h;
+		float xpad, ypad;
 		switch (side)
 		{
 			case LevelSide::left:
 			case LevelSide::right:
 				w = width;
 				h = height;
+				xpad = excluder_padding_x;
+				ypad = excluder_padding_y;
 				break;
 			case LevelSide::bottom:
 			case LevelSide::top:
 				w = height;
 				h = width;
+				xpad = excluder_padding_y;
+				ypad = excluder_padding_x;
 				break;
 		}
 
-		return LevelPropInternal(texture, side, solid, x, y, w, h, excluder_padding_x, excluder_padding_y);
+		return LevelPropInternal(texture, side, solid, x, y, w, h, xpad, ypad);
 	}
 
 	float get_width(LevelSide side) const
@@ -63,23 +68,23 @@ struct PropDefinitions
 
 	std::vector<LevelPropDefinition> side_furniture =
 	{
-		LevelPropDefinition(Texture::chair1, true, 0.4f, 0.6f, 0.4f, 0.4f),
-		LevelPropDefinition(Texture::chair2, true, 0.4f, 0.6f, 0.4f, 0.4f),
-		LevelPropDefinition(Texture::couch1, true, 0.4f, 1.05f, 0.4f, 0.4f),
-		LevelPropDefinition(Texture::side_table1, true, 0.4333f, 1.0f, 0.4f, 0.4f),
-		LevelPropDefinition(Texture::side_table2, true, 0.2917f, 0.45f, 0.4f, 0.4f)
+		LevelPropDefinition(Texture::chair1, true, 0.4f, 0.6f, 0.18f, 0.0f),
+		LevelPropDefinition(Texture::chair2, true, 0.4f, 0.6f, 0.18f, 0.0f),
+		LevelPropDefinition(Texture::couch1, true, 0.4f, 1.05f, 0.18f, 0.0f),
+		LevelPropDefinition(Texture::side_table1, true, 0.4333f, 1.0f, 0.18f, 0.0f),
+		LevelPropDefinition(Texture::side_table2, true, 0.2917f, 0.45f, 0.18f, 0.0f)
 	};
 
 	std::vector<LevelPropDefinition> center_tables =
 	{
-		LevelPropDefinition(Texture::large_table, true, 0.8f, 1.5f, 0.1f, 0.1f),
-		LevelPropDefinition(Texture::large_table2, true, 0.8f, 1.25f, 0.1f, 0.1f)
+		LevelPropDefinition(Texture::large_table, true, 0.8f, 1.5f, 0.18f, 0.25f),
+		LevelPropDefinition(Texture::large_table2, true, 0.8f, 1.25f, 0.18f, 0.25f)
 	};
 
 	std::vector<LevelPropDefinition> huge_center_tables =
 	{
-		LevelPropDefinition(Texture::huge_table, true, 2.3f, 2.3f, 0.4f, 0.4f),
-		LevelPropDefinition(Texture::long_table, true, 3.2f, 1.45f, 0.4f, 0.4f)
+		LevelPropDefinition(Texture::huge_table, true, 2.3f, 2.3f, 0.25f, 0.25f),
+		LevelPropDefinition(Texture::long_table, true, 3.2f, 1.45f, 0.25f, 0.25f)
 	};
 
 	std::vector<LevelPropDefinition> rugs =

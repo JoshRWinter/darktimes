@@ -43,6 +43,7 @@ void LevelGenerator::generate(int seed)
 	level_props.clear();
 
 	const auto generated_floors = generate_impl();
+	const auto props = generate_props(generated_floors);
 
 	for (const auto &f : generated_floors)
 		level_floors.push_back(f);
@@ -50,8 +51,14 @@ void LevelGenerator::generate(int seed)
 	for (const auto &w : generate_walls(generated_floors))
 		level_walls.push_back(w);
 
-	for (const auto &p : generate_props(generated_floors))
+	for (const auto &p : props)
 		level_props.push_back(p);
+
+	// show prop excluders
+	for (const auto &p : props)
+		if (p.excluder_padding_x != 0.0f || p.excluder_padding_y != 0.0f)
+			level_props.emplace_back(Texture::debug, LevelSide::right, p.x - p.excluder_padding_x, p.y - p.excluder_padding_y, p.w + (p.excluder_padding_x * 2.0f), p.h + (p.excluder_padding_y * 2.0f));
+
 
 #ifndef NDEBUG
 	fputs("=============================\n", stderr);

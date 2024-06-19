@@ -2,6 +2,8 @@
 
 enum class Texture
 {
+	debug,
+
 	floor1,
 	floor2,
 	floor3,

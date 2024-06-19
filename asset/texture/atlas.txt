@@ -1,4 +1,5 @@
 $padding 4
+debug.tga:602:280:50:50
 player.tga:444:248:50:50
 large_table.tga:244:124:96:180
 large_table2.tga:344:124:96:180
