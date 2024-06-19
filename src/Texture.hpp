@@ -18,6 +18,7 @@ enum class Texture
 
 	side_table1,
 	side_table2,
+	side_shelf,
 
 	large_table,
 	large_table2,
