@@ -6,8 +6,9 @@ large_table2.tga:0:388:96:180
 huge_table.tga:422:0:276:276
 long_table.tga:0:0:174:384
 side_table1.tga:420:375:52:120
-side_table2.tga:595:334:31:48
+side_table2.tga:649:362:31:48
 side_shelf.tga:482:356:34:78
+piano.tga:588:334:40:102
 rug1.tga:178:0:240:120
 rug2.tga:178:124:240:159
 rug3.tga:178:287:300:84
@@ -15,6 +16,6 @@ rug4.tga:200:375:216:140
 chair1.tga:534:280:48:72
 chair2.tga:482:280:48:72
 couch1.tga:536:356:48:126
-clutter_brokenglass.tga:595:386:36:32
-clutter_boot.tga:630:334:30:24
-tstrip.tga:588:334:3:120
+clutter_brokenglass.tga:649:414:36:32
+clutter_boot.tga:649:334:30:24
+tstrip.tga:642:334:3:120

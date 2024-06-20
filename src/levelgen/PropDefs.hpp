@@ -73,7 +73,8 @@ struct PropDefinitions
 		LevelPropDefinition(Texture::couch1, true, 0.4f, 1.05f, 0.18f, 0.0f),
 		LevelPropDefinition(Texture::side_table1, true, 0.4333f, 1.0f, 0.18f, 0.0f),
 		LevelPropDefinition(Texture::side_table2, true, 0.2917f, 0.45f, 0.18f, 0.0f),
-		LevelPropDefinition(Texture::side_shelf, true, 0.2833f, 0.65f, 0.18f, 0.0f)
+		LevelPropDefinition(Texture::side_shelf, true, 0.2833f, 0.65f, 0.18f, 0.0f),
+		LevelPropDefinition(Texture::piano, true, 0.3333f, 0.85f, 0.18f, 0.0f)
 	};
 
 	std::vector<LevelPropDefinition> center_tables =
