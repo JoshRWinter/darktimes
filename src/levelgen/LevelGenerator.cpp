@@ -6,6 +6,7 @@
 #include <cmath>
 #include <array>
 #include <functional>
+#include <unordered_map>
 
 #include "../Texture.hpp"
 
@@ -432,7 +433,7 @@ std::vector<int> LevelGenerator::find_start_candidates(const std::vector<LevelFl
 }
 
 // given an existing floor, find all those (among all other existing floors) that neighbor it in a manner appropriate to join them together in holy matrimony
-std::vector<int> LevelGenerator::find_neighbors(const std::vector<LevelFloorInternal> &floors, const LevelFloorInternal& floor/*, LevelSide side*/)
+std::vector<int> LevelGenerator::find_neighbors(const std::vector<LevelFloorInternal> &floors, const LevelFloorInternal& floor)
 {
 	std::vector<int> matches;
 
@@ -449,7 +450,6 @@ std::vector<int> LevelGenerator::find_neighbors(const std::vector<LevelFloorInte
 
 		if (can_connect(floor, f, c1, c2))
 		{
-			//if (c1.side == side)
 			matches.push_back(index);
 		}
 	}
@@ -529,8 +529,8 @@ bool LevelGenerator::can_connect(const LevelFloorInternal &floor1, const LevelFl
 			break;
 	}
 
-	LevelFloorConnector floor1_connector(side, start, stop);
-	LevelFloorConnector floor2_connector(flipside, start, stop);
+	LevelFloorConnector floor1_connector(floor2.id, side, start, stop);
+	LevelFloorConnector floor2_connector(floor1.id, flipside, start, stop);
 
 	if (floor1_connector.collide(floor1.connectors, 0.5f))
 		return false;
@@ -619,6 +619,10 @@ std::vector<LevelWallInternal> LevelGenerator::generate_walls(const std::vector<
 // look at all floors and generate props for them (if appropriate)
 std::vector<LevelPropInternal> LevelGenerator::generate_props(const std::vector<LevelFloorInternal> &floors)
 {
+	std::unordered_map<int, const LevelFloor*> floor_map;
+	for (const auto &floor : floors)
+		floor_map[floor.id] = &floor;
+
 	std::vector<LevelPropInternal> props;
 
 	for (const auto &floor : floors)
@@ -647,7 +651,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_props(const std::vector<
 		}
 
 		// generate them lil transition strips between the floor textures
-		const std::vector<LevelPropInternal> strips = generate_transition_strips(floor);
+		const std::vector<LevelPropInternal> strips = generate_transition_strips(floor, floor_map);
 		for (const auto &strip : strips)
 			props.push_back(strip);
 	}
@@ -848,7 +852,7 @@ std::vector<LevelPropInternal> LevelGenerator::generate_props_from_spawns(const 
 }
 
 // generate those lil dooly-bobs between floors
-std::vector<LevelPropInternal> LevelGenerator::generate_transition_strips(const LevelFloorInternal &floor)
+std::vector<LevelPropInternal> LevelGenerator::generate_transition_strips(const LevelFloorInternal &floor, const std::unordered_map<int, const LevelFloor*> &floor_map)
 {
 	std::vector<LevelPropInternal> props;
 
@@ -856,6 +860,9 @@ std::vector<LevelPropInternal> LevelGenerator::generate_transition_strips(const 
 
 	for (const LevelFloorConnector &con : floor.connectors)
 	{
+		if (floor_map.at(con.floor_id)->texture == floor.texture)
+			continue;
+
 		LevelSide o;
 
 		float x = 0.0f, y = 0.0f;

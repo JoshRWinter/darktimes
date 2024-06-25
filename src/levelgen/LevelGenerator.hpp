@@ -42,7 +42,7 @@ private:
 	static std::vector<LevelPropExcluder> generate_door_excluders(const LevelFloorInternal &floor);
 	std::vector<LevelPropInternal> generate_new_props(const LevelFloorInternal &floor, const std::vector<LevelPropExcluder> &excluders);
 	std::vector<LevelPropInternal> generate_props_from_spawns(const LevelFloorInternal &floor, const std::vector<LevelPropExcluder> &excluders);
-	static std::vector<LevelPropInternal> generate_transition_strips(const LevelFloorInternal &floor);
+	static std::vector<LevelPropInternal> generate_transition_strips(const LevelFloorInternal &floor, const std::unordered_map<int, const LevelFloor*> &floor_map);
 	Texture random_floor();
 	static LevelSide flip(LevelSide side);
 	LevelSide random_side();

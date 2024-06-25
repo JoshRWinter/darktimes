@@ -66,8 +66,9 @@ struct LevelFloorConnector
 {
 	LevelFloorConnector() = default;
 
-	LevelFloorConnector(LevelSide side, float start, float stop)
-		: side(side)
+	LevelFloorConnector(int floor_id, LevelSide side, float start, float stop)
+		: floor_id(floor_id)
+		, side(side)
 		, start(start)
 		, stop(stop)
 	{}
@@ -95,6 +96,7 @@ struct LevelFloorConnector
 		return false;
 	}
 
+	int floor_id;
 	LevelSide side;
 	float start, stop;
 };
@@ -113,6 +115,7 @@ struct LevelFloorInternal : LevelFloor
 {
 	LevelFloorInternal(Texture texture, float x, float y, float w, float h, bool skip_prop_generation = false)
 		: LevelFloor(texture, x, y, w, h)
+		, id(next_id++)
 		, skip_prop_generation(skip_prop_generation)
 	{}
 
@@ -126,7 +129,10 @@ struct LevelFloorInternal : LevelFloor
 		return false;
 	}
 
+	int id;
 	bool skip_prop_generation;
 	std::vector<LevelFloorConnector> connectors;
 	std::vector<LevelPropInternal> prop_spawns;
+
+	inline static int next_id = 0;
 };
