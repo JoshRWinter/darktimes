@@ -798,10 +798,10 @@ std::vector<LevelPropInternal> LevelGenerator::generate_new_props(const LevelFlo
 		LevelSide orientation;
 
 		// if the room is yuge, put in some yuge tables
-		if (floor.w * floor.h > 25.0f)// && !rand.one_in(3))
+		if (floor.w * floor.h > 30.0f)
 		{
 			propdef = &PropDefinitions::get().huge_center_tables.at(rand.uniform_int(0, PropDefinitions::get().huge_center_tables.size() - 1));
-			odds = 80;
+			odds = 85;
 			orientation = floor.w > floor.h ? (rand.one_in(2) ? LevelSide::top : LevelSide::bottom) : (rand.one_in(2) ? LevelSide::right : LevelSide::left);
 		}
 		else
