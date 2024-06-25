@@ -65,8 +65,8 @@ std::vector<std::uint16_t> GLStaticFloorRenderer::load(const std::vector<Rendera
 
 			position_texcoord_data.push_back(transformed.x);
 			position_texcoord_data.push_back(transformed.y);
-			position_texcoord_data.push_back(tc.s * renderable.w);
-			position_texcoord_data.push_back(tc.t * renderable.h);
+			position_texcoord_data.push_back((tc.s * renderable.w) + renderable.x);
+			position_texcoord_data.push_back((tc.t * renderable.h) + renderable.y);
 		}
 
 		const int layer_index = floor_textures.get_layer(renderable.texture);
