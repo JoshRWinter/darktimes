@@ -17,6 +17,7 @@ public:
 	void set_view(float x, float y, float zoom);
 	void set_statics(const std::vector<Renderable> &statics);
 	void set_dynamics(const std::vector<Renderable> &dynamics);
+	void set_light_occluders(const std::vector<win::Box<float>> &occluders);
 	void render();
 
 private:

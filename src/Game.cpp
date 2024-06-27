@@ -103,6 +103,11 @@ void Game::generate_level(Renderer &renderer)
 
 	renderer.set_statics(renderables);
 	renderer.set_view(0.0f, 0.0f, 0.0f);
+
+	std::vector<win::Box<float>> occluders;
+	for (const auto &wall : generator.level_walls)
+		occluders.emplace_back(wall.x, wall.y, wall.w, wall.h);
+	renderer.set_light_occluders(occluders);
 }
 
 LevelProp Game::correct_prop_orientation(const LevelProp &prop)

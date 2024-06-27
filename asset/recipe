@@ -7,6 +7,8 @@ shader/static_atlas.vert z
 shader/static_atlas.frag z
 shader/dynamic_atlas.vert z
 shader/dynamic_atlas.frag z
+shader/dynamic_light.vert z
+shader/dynamic_light.frag z
 
 svg2tga {
     texture/debug.svg 50 50

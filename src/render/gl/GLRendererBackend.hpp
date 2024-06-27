@@ -11,9 +11,11 @@
 #include "GLFloorTextureCollection.hpp"
 #include "GLAtlasTextureCollection.hpp"
 
+#include "../LightMeshGenerator.hpp"
 #include "GLStaticFloorRenderer.hpp"
 #include "GLStaticAtlasRenderer.hpp"
 #include "GLDynamicAtlasRenderer.hpp"
+#include "GLDynamicLightRenderer.hpp"
 #include "../RendererBackend.hpp"
 
 enum class GLLoadedObjectType : std::uint16_t
@@ -47,6 +49,7 @@ public:
 	const win::Font &create_font(win::Stream data, float size) override;
 	void draw_text(const win::Font &font, const char *text, float x, float y, bool centered) override;
 	void set_view(float x, float y, float zoom) override;
+	void set_light_occluders(const std::vector<win::Box<float>> &occluders) override;
 	std::vector<const void*> load_statics(const std::vector<Renderable> &statics) override;
 	void load_dynamics() override;
 	void render_start() override;
@@ -62,9 +65,12 @@ private:
 	GLFloorTextureCollection floor_textures;
 	GLAtlasTextureCollection atlases;
 
+	LightMeshGenerator light_mesh_generator;
+
 	GLStaticFloorRenderer static_floor_renderer;
 	GLStaticAtlasRenderer static_atlas_renderer;
 	GLDynamicAtlasRenderer dynamic_atlas_renderer;
+	GLDynamicLightRenderer dynamic_light_renderer;
 	std::vector<GLLoadedObject> loaded_statics;
 
 	glm::mat4 projection;

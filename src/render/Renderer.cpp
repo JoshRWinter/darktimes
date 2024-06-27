@@ -26,6 +26,11 @@ void Renderer::set_dynamics(const std::vector<Renderable> &dynamics)
 	this->dynamics = dynamics;
 }
 
+void Renderer::set_light_occluders(const std::vector<win::Box<float>> &occluders)
+{
+	backend->set_light_occluders(occluders);
+}
+
 void Renderer::render()
 {
 	backend->render_start();

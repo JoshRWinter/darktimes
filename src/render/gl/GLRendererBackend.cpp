@@ -14,6 +14,7 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
 	, static_floor_renderer(roll)
 	, static_atlas_renderer(roll)
 	, dynamic_atlas_renderer(roll)
+	, dynamic_light_renderer(roll)
 	, text_renderer(screen_dims, projection, GL_TEXTURE1, true)
 {
 	fprintf(stderr, "%s\n%s\n%s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
@@ -48,6 +49,12 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
 	static_floor_renderer.set_view_projection(vp);
 	static_atlas_renderer.set_view_projection(vp);
 	dynamic_atlas_renderer.set_view_projection(vp);
+	dynamic_light_renderer.set_view_projection(vp);
+}
+
+void GLRendererBackend::set_light_occluders(const std::vector<win::Box<float>> &occluders)
+{
+	light_mesh_generator.set_occluders(occluders);
 }
 
 std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Renderable> &statics)
@@ -139,6 +146,16 @@ void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
 
 	current_renderer->flush();
 	current_renderer = &dynamic_atlas_renderer;
+
+	current_renderer->flush();
+	current_renderer = &dynamic_light_renderer;
+
+	if (dynamics.size() > 0)
+	{
+		const auto &player = dynamics.at(0);
+		const auto &mesh = light_mesh_generator.generate(player.x + (player.w / 2.0f), player.y + (player.h / 2.0f), 5.0f);
+		dynamic_light_renderer.render(mesh.data(), mesh.size());
+	}
 
 #ifndef NDEBUG
 	win::gl_check_error();

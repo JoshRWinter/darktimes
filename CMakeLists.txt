@@ -25,6 +25,8 @@ set(sources
 	src/render/Renderer.hpp
 	src/render/Renderer.cpp
 	src/render/RendererBackend.hpp
+	src/render/LightMeshGenerator.hpp
+	src/render/LightMeshGenerator.cpp
 	src/render/TextureAssetMap.hpp
 	src/render/TextureAssetMap.txt
 
@@ -40,6 +42,8 @@ set(sources
 	src/render/gl/GLStaticFloorRenderer.cpp
 	src/render/gl/GLStaticAtlasRenderer.hpp
 	src/render/gl/GLStaticAtlasRenderer.cpp
+	src/render/gl/GLDynamicLightRenderer.hpp
+	src/render/gl/GLDynamicLightRenderer.cpp
 	src/render/gl/GLDynamicAtlasRenderer.hpp
 	src/render/gl/GLDynamicAtlasRenderer.cpp
 
