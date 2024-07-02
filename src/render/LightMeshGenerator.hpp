@@ -37,6 +37,7 @@ public:
 
 private:
 	static bool intersects(float centerx, float centery, float angle, const Line &line, Intersection &intersection);
+	static bool near(const win::Box<float> &box, float centerx, float centery, float radius);
 	static float get_angle(float centerx, float centery, float x, float y);
 
 	win::BlockMap<win::Box<float>> index;

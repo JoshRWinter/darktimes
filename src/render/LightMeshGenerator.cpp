@@ -61,6 +61,9 @@ std::vector<float> LightMeshGenerator::generate(float centerx, float centery, fl
 	// decompose occluders into points
 	for (const auto &occluder : index.iterate(win::BlockMapLocation(centerx - radius, centery - radius, radius * 2.0f, radius * 2.0f)))
 	{
+		if (!near(occluder, centerx, centery, radius))
+			continue;
+
 		for (int i = 0; i < 3; ++i)
 		{
 			const float x1 = std::max(occluder.x, centerx - radius);
@@ -171,6 +174,11 @@ bool LightMeshGenerator::intersects(float centerx, float centery, float angle, c
 	intersection.dist = t1;
 
 	return true;
+}
+
+bool LightMeshGenerator::near(const win::Box<float> &box, float centerx, float centery, float radius)
+{
+	return box.x + box.width >= centerx - radius && box.x <= centerx + radius && box.y + box.height >= centery - radius && box.y <= centery + radius;
 }
 
 float LightMeshGenerator::get_angle(float centerx, float centery, float x, float y)
