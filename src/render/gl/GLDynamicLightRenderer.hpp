@@ -20,9 +20,18 @@ public:
 	void flush() override;
 
 private:
-	win::GLProgram program;
+	win::GLProgram light_program;
 	int uniform_view_projection;
 
-	win::GLVertexArray vao;
-	win::GLBuffer vbo;
+	win::GLProgram overlay_program;
+	int uniform_overlay_sampler;
+
+	win::GLVertexArray light_vao;
+	win::GLBuffer light_vbo;
+
+	win::GLVertexArray overlay_vao;
+	win::GLBuffer overlay_vbo;
+
+	win::GLFramebuffer fbo;
+	win::GLTexture light_texture;
 };
