@@ -134,9 +134,7 @@ void GLRendererBackend::render_statics(const std::vector<const void*> &statics)
 		}
 	}
 
-#ifndef NDEBUG
-	win::gl_check_error();
-#endif
+	check_error();
 }
 
 void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
@@ -150,13 +148,20 @@ void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
 	current_renderer->flush();
 	current_renderer = &dynamic_light_renderer;
 
-	if (dynamics.size() > 0)
+	check_error();
+}
+
+void GLRendererBackend::render_dynamic_lights(const std::vector<LightRenderable> &lights)
+{
+	for (const auto &light : lights)
 	{
-		const auto &player = dynamics.at(0);
-		const auto &mesh = light_mesh_generator.generate(player.x + (player.w / 2.0f), player.y + (player.h / 2.0f), 5.0f);
+		const auto &mesh = light_mesh_generator.generate(light.x, light.y, light.radius);
 		dynamic_light_renderer.render(mesh.data(), mesh.size());
 	}
+}
 
+void GLRendererBackend::check_error()
+{
 #ifndef NDEBUG
 	win::gl_check_error();
 #endif

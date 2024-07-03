@@ -56,8 +56,11 @@ public:
 	void render_end() override;
 	void render_statics(const std::vector<const void*> &statics) override;
 	void render_dynamics(const std::vector<Renderable> &dynamics) override;
+	void render_dynamic_lights(const std::vector<LightRenderable> &lights) override;
 
 private:
+	static void check_error();
+
 	GLDummyRenderer dummy_renderer;
 	GLSubRenderer *current_renderer;
 

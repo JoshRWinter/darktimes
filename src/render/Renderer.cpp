@@ -26,6 +26,11 @@ void Renderer::set_dynamics(const std::vector<Renderable> &dynamics)
 	this->dynamics = dynamics;
 }
 
+void Renderer::set_dynamic_lights(const std::vector<LightRenderable> &lights)
+{
+	this->dynamic_lights = lights;
+}
+
 void Renderer::set_light_occluders(const std::vector<win::Box<float>> &occluders)
 {
 	backend->set_light_occluders(occluders);
@@ -36,6 +41,7 @@ void Renderer::render()
 	backend->render_start();
 	backend->render_statics(static_objects);
 	backend->render_dynamics(dynamics);
+	backend->render_dynamic_lights(dynamic_lights);
 
 	backend->draw_text(font_title, "DARK TIMES", 0.0f, 3.5f, true);
 

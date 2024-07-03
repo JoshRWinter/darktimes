@@ -4,6 +4,7 @@
 
 #include <win/Font.hpp>
 
+#include "../LightRenderable.hpp"
 #include "../Renderable.hpp"
 
 class RendererBackend
@@ -21,4 +22,5 @@ public:
 	virtual void render_end() = 0;
 	virtual void render_statics(const std::vector<const void*> &statics) = 0;
 	virtual void render_dynamics(const std::vector<Renderable> &dynamics) = 0;
+	virtual void render_dynamic_lights(const std::vector<LightRenderable> &lights) = 0;
 };

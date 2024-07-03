@@ -55,10 +55,13 @@ void World::tick(const GameInput &input, RenderableWorldState &state)
 	for (const auto &r : renderables)
 	{
 		const auto &phys = r.entity.get<PhysicalComponent>();
-		state.renderables.emplace_back(r.texture, phys.x, phys.y, phys.w, phys.h, phys.rot);
+		state.dynamics.emplace_back(r.texture, phys.x, phys.y, phys.w, phys.h, phys.rot);
 	}
 
 	const auto &player_physical = (*players.begin()).entity.get<PhysicalComponent>();
 	state.centerx = player_physical.x + (PlayerEntity::width / 2.0f);
 	state.centery = player_physical.y + (PlayerEntity::height / 2.0f);
+
+	const float flashlight_offset = 0.4f;
+	state.dynamic_lights.emplace_back((player_physical.x + (PlayerEntity::width / 2.0f)) + std::cosf(player_physical.rot) * flashlight_offset, (player_physical.y + (PlayerEntity::height / 2.0f)) + std::sinf(player_physical.rot) * flashlight_offset, 4.0f, win::Color<float>(0.0f, 1.0f, 0.0f, 1.0f));
 }

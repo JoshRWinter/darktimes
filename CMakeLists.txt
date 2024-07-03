@@ -11,6 +11,7 @@ set(sources
 	src/Darktimes.hpp
 
 	# top level nonsense
+	src/LightRenderable.hpp
 	src/Renderable.hpp
 	src/Texture.hpp
 	src/SyncObjectManager.hpp

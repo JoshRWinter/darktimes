@@ -29,7 +29,8 @@ void Game::play()
 		if (state != NULL)
 		{
 			renderer.set_view(state->centerx, state->centery, 1.0f);
-			renderer.set_dynamics(state->renderables);
+			renderer.set_dynamics(state->dynamics);
+			renderer.set_dynamic_lights(state->dynamic_lights);
 		}
 
 		renderer.render();

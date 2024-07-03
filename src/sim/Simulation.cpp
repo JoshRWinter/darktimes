@@ -78,7 +78,9 @@ void Simulation::simulation(Simulation &sim)
 		// prepare a sync object for writing world state into
 		while ((state = sim.som_state.writer_acquire()) == NULL);
 
-		state->renderables.clear();
+		// reset it
+		state->dynamics.clear();
+		state->dynamic_lights.clear();
 
 		// run the world simulation
 		world.tick(input, *state);
