@@ -9,6 +9,7 @@ Renderer::Renderer(const win::Dimensions<int> &screen_dims, const win::Area<floa
 	, font_debug(backend->create_font(roll["font/NotoSansMono-Regular.ttf"], 0.1f))
 {
 	backend->load_dynamics();
+	backend->set_viewport(screen_dims);
 }
 
 void Renderer::set_view(float x, float y, float zoom)
@@ -43,7 +44,7 @@ void Renderer::render()
 	backend->render_dynamics(dynamics);
 	backend->render_dynamic_lights(dynamic_lights);
 
-	backend->draw_text(font_title, "DARK TIMES", 0.0f, 3.5f, true);
+	//backend->draw_text(font_title, "DARK TIMES", 0.0f, 3.5f, true);
 
 	static char fpsbuf[30] = "FPS: 69";
 	static int total_fps = 0;

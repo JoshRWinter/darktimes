@@ -49,6 +49,7 @@ public:
 	const win::Font &create_font(win::Stream data, float size) override;
 	void draw_text(const win::Font &font, const char *text, float x, float y, bool centered) override;
 	void set_view(float x, float y, float zoom) override;
+	void set_viewport(const win::Dimensions<int> &viewport) override;
 	void set_light_occluders(const std::vector<win::Box<float>> &occluders) override;
 	std::vector<const void*> load_statics(const std::vector<Renderable> &statics) override;
 	void load_dynamics() override;

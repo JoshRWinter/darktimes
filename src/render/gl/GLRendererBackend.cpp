@@ -53,6 +53,11 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
 	dynamic_light_renderer.set_view_projection(vp);
 }
 
+void GLRendererBackend::set_viewport(const win::Dimensions<int> &viewport)
+{
+	dynamic_light_renderer.set_viewport(viewport);
+}
+
 void GLRendererBackend::set_light_occluders(const std::vector<win::Box<float>> &occluders)
 {
 	light_mesh_generator.set_occluders(occluders);

@@ -13,8 +13,8 @@ int main()
 #ifndef NDEBUG
 	display_options.caption = "debug_window";
 	display_options.fullscreen = false;
-	display_options.width = 1600;
-	display_options.height = 900;
+	display_options.width = 1920;
+	display_options.height = 1080;
 #else
 	display_options.caption = "Darktimes";
 	display_options.fullscreen = true;

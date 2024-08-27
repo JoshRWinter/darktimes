@@ -5,6 +5,7 @@
 #include <win/Win.hpp>
 #include <win/AssetRoll.hpp>
 #include <win/gl/GL.hpp>
+#include <win/Utility.hpp>
 
 #include "GLSubRenderer.hpp"
 
@@ -16,22 +17,30 @@ public:
 	explicit GLDynamicLightRenderer(win::AssetRoll &roll);
 
 	void set_view_projection(const glm::mat4 &vp);
+	void set_viewport(const win::Dimensions<int> &viewport);
 	void render(const float *vertices, int count);
 	void flush() override;
 
 private:
-	win::GLProgram light_program;
-	int uniform_view_projection;
+	win::Dimensions<int> viewport;
 
-	win::GLProgram overlay_program;
-	int uniform_overlay_sampler;
+	struct
+	{
+		win::GLProgram program;
+		win::GLFramebuffer fbo;
+		win::GLTexture fbo_tex;
+		win::GLVertexArray vao;
+		win::GLBuffer vbo;
+		int uniform_view_projection;
+	} light;
 
-	win::GLVertexArray light_vao;
-	win::GLBuffer light_vbo;
-
-	win::GLVertexArray overlay_vao;
-	win::GLBuffer overlay_vbo;
-
-	win::GLFramebuffer fbo;
-	win::GLTexture light_texture;
+	struct
+	{
+		win::GLProgram program;
+		win::GLFramebuffer fbo;
+		win::GLTexture fbo_tex;
+		win::GLVertexArray vao;
+		win::GLBuffer vbo;
+		int uniform_horizontal;
+	} blur;
 };

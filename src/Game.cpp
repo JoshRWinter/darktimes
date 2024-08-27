@@ -91,10 +91,12 @@ void Game::generate_level(Renderer &renderer)
 		renderables.emplace_back(f.texture, f.x, f.y, f.w, f.h, 0.0f);
 	}
 
+	/*
 	for (const auto &w : generator.level_walls)
 	{
 		renderables.emplace_back(Texture::debug, w.x, w.y, w.w, w.h, 0.0f);
 	}
+	 */
 
 	for (const auto &p : generator.level_props)
 	{
