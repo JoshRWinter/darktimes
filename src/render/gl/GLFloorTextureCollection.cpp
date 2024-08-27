@@ -38,7 +38,7 @@ GLFloorTextureCollection::GLFloorTextureCollection(win::AssetRoll &roll, const T
 		{
 			width = tga.width();
 			height = tga.height();
-			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, width, height, floor_texture_count, 0, GL_BGR, GL_UNSIGNED_BYTE, NULL);
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_SRGB, width, height, floor_texture_count, 0, GL_BGR, GL_UNSIGNED_BYTE, NULL);
 		}
 
 		std::unique_ptr<unsigned char[]> data;

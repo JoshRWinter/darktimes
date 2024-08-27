@@ -21,9 +21,10 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
 
 	this->projection = glm::ortho(projection.left, projection.right, projection.bottom, projection.top);
 
-	glClearColor(0.4f, 0.0f, 0.1f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_FRAMEBUFFER_SRGB);
 }
 
 const win::Font &GLRendererBackend::create_font(win::Stream data, float size)
