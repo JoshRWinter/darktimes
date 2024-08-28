@@ -62,6 +62,16 @@ public:
 private:
 	static void check_error();
 
+	win::GLFramebuffer fbo;
+	win::GLTexture fbo_tex;
+
+	struct
+	{
+		win::GLProgram program;
+		win::GLVertexArray vao;
+		win::GLBuffer vbo;
+	} overlay;
+
 	GLDummyRenderer dummy_renderer;
 	GLSubRenderer *current_renderer;
 

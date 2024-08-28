@@ -18,7 +18,7 @@ public:
 
 	void set_view_projection(const glm::mat4 &vp);
 	void set_viewport(const win::Dimensions<int> &viewport);
-	void render(const float *vertices, int count);
+	void render(const float *vertices, int count, GLuint fbo);
 	void flush() override;
 
 private:

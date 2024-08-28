@@ -25,6 +25,56 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_FRAMEBUFFER_SRGB);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo.get());
+	glActiveTexture(GL_TEXTURE0 + 69);
+	glBindTexture(GL_TEXTURE_2D, fbo_tex.get());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_tex.get(), 0);
+
+	const char *vert =
+		"#version 330 core\n"
+		"layout (location = 0) in vec2 pos;\n"
+		"layout (location = 1) in vec2 texcoord;\n"
+		"out vec2 ftexcoord;\n"
+		"void main(){\n"
+		"ftexcoord = texcoord;\n"
+		"gl_Position = vec4(pos.xy, 0.0, 1.0);\n"
+		"}\n",
+	*frag =
+		"#version 330 core\n"
+		"in vec2 ftexcoord;\n"
+		"out vec4 frag;\n"
+		"uniform sampler2D tex;\n"
+		"void main(){\n"
+		"frag = texture(tex, ftexcoord);\n"
+		"}\n";
+
+	const float verts[] =
+		{
+			-1.0f, 1.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f,
+			1.0f, -1.0f, 1.0f, 0.0f,
+			-1.0f, 1.0f, 0.0f, 1.0f,
+			1.0f, -1.0f, 1.0f, 0.0f,
+			1.0f, 1.0f, 1.0f, 1.0f
+		};
+
+	overlay.program = win::GLProgram(win::load_gl_shaders(vert, frag));
+	glUseProgram(overlay.program.get());
+	glUniform1i(glGetUniformLocation(overlay.program.get(), "tex"), 69);
+
+	glBindVertexArray(overlay.vao.get());
+	glBindBuffer(GL_ARRAY_BUFFER, overlay.vbo.get());
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, NULL);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+
+	check_error();
 }
 
 const win::Font &GLRendererBackend::create_font(win::Stream data, float size)
@@ -105,12 +155,23 @@ void GLRendererBackend::load_dynamics()
 
 void GLRendererBackend::render_start()
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo.get());
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void GLRendererBackend::render_end()
 {
 	current_renderer->flush();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(overlay.program.get());
+	//glActiveTexture(GL_TEXTURE0 + 69);
+	//glBindTexture(GL_TEXTURE_2D, fbo_tex.get());
+	glBindVertexArray(overlay.vao.get());
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	check_error();
 }
 
 void GLRendererBackend::render_statics(const std::vector<const void*> &statics)
@@ -162,7 +223,7 @@ void GLRendererBackend::render_dynamic_lights(const std::vector<LightRenderable>
 	for (const auto &light : lights)
 	{
 		const auto &mesh = light_mesh_generator.generate(light.x, light.y, light.radius);
-		dynamic_light_renderer.render(mesh.data(), mesh.size());
+		dynamic_light_renderer.render(mesh.data(), mesh.size(), fbo.get());
 	}
 }
 

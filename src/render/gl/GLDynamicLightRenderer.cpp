@@ -87,7 +87,7 @@ void GLDynamicLightRenderer::set_viewport(const win::Dimensions<int> &viewport)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, viewport.width, viewport.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 }
 
-void GLDynamicLightRenderer::render(const float *vertices, int count)
+void GLDynamicLightRenderer::render(const float *vertices, int count, GLuint fbo)
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -120,7 +120,7 @@ void GLDynamicLightRenderer::render(const float *vertices, int count)
 
 	glBlendFunc(GL_DST_COLOR, GL_ZERO);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glBindTexture(GL_TEXTURE_2D, blur.fbo_tex.get());
 	glUniform1i(blur.uniform_horizontal, 0);
 
