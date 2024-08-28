@@ -81,10 +81,10 @@ void GLDynamicLightRenderer::set_viewport(const win::Dimensions<int> &viewport)
 	glActiveTexture(GL_TEXTURE2);
 
 	glBindTexture(GL_TEXTURE_2D, light.fbo_tex.get());
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, viewport.width, viewport.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, viewport.width, viewport.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, blur.fbo_tex.get());
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, viewport.width, viewport.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, viewport.width, viewport.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 }
 
 void GLDynamicLightRenderer::render(const float *vertices, int count)
