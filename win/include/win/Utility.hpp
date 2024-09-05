@@ -68,13 +68,13 @@ template <typename T> struct Dimensions
 	T width, height;
 };
 
-template <typename Ta, typename Tb = Ta> struct Pair
+template <typename T> struct Pair
 {
 	Pair() : x(0), y(0) {}
-	Pair(Ta x, const Tb y) : x(x), y(y) {}
+	Pair(const typename std::enable_if<std::is_fundamental<T>::value, T>::type x, const T y) : x(x), y(y) {}
 
-	Ta x;
-	Tb y;
+	T x;
+	T y;
 };
 
 const char *key_name(Button);

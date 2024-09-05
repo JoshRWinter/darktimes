@@ -1,12 +1,12 @@
 #include <cmath>
 
-#include <win/BlockMap.hpp>
+#include <win/SpatialIndex.hpp>
 
 #include "PlayerSystem.hpp"
 #include "../entity/PlayerEntity.hpp"
 
 void player_system(
-	win::BlockMap<PhysicalComponent> &blockmap,
+	win::SpatialIndex<PhysicalComponent> &index,
 	win::Pool<Entity> &entities,
 	win::Pool<PhysicalComponent> &physicals,
 	win::Pool<RenderableComponent> &renderables,
@@ -41,7 +41,7 @@ void player_system(
 	phys.rot = aim;
 
 	// collision
-	for (const auto &p : blockmap.iterate(win::BlockMapLocation(phys.x, phys.y, phys.w, phys.h)))
+	for (const auto &p : index.query(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h)))
 	{
 		phys.correct(p);
 	}

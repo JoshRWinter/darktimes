@@ -24,7 +24,7 @@ void LightMeshGenerator::set_occluders(const std::vector<win::Box<float>> &occlu
 	this->occluders = occluders;
 
 	for (auto &occluder : this->occluders)
-		index.add(win::BlockMapLocation(occluder.x, occluder.y, occluder.width, occluder.height), occluder);
+		index.add(win::SpatialIndexLocation(occluder.x, occluder.y, occluder.width, occluder.height), occluder);
 }
 
 std::vector<float> LightMeshGenerator::generate(float centerx, float centery, float radius)
@@ -50,7 +50,7 @@ std::vector<float> LightMeshGenerator::generate(float centerx, float centery, fl
 	angles.push_back(get_angle(centerx, centery, centerx - radius, centery + radius));
 
 	// decompose occluders into lines
-	for (const auto &occluder : index.iterate(win::BlockMapLocation(centerx - radius, centery - radius, radius * 2.0f, radius * 2.0f)))
+	for (const auto &occluder : index.query(win::SpatialIndexLocation(centerx - radius, centery - radius, radius * 2.0f, radius * 2.0f)))
 	{
 		lines.emplace_back(occluder.x, occluder.y, occluder.x, occluder.y + occluder.height); // left
 		lines.emplace_back(occluder.x + occluder.width, occluder.y, occluder.x + occluder.width, occluder.y + occluder.height); // right
@@ -59,7 +59,7 @@ std::vector<float> LightMeshGenerator::generate(float centerx, float centery, fl
 	}
 
 	// decompose occluders into points
-	for (const auto &occluder : index.iterate(win::BlockMapLocation(centerx - radius, centery - radius, radius * 2.0f, radius * 2.0f)))
+	for (const auto &occluder : index.query(win::SpatialIndexLocation(centerx - radius, centery - radius, radius * 2.0f, radius * 2.0f)))
 	{
 		if (!near(occluder, centerx, centery, radius))
 			continue;

@@ -38,10 +38,10 @@ void World::reset(const std::vector<LevelFloor> &floors, const std::vector<Level
 	if (leftmost == INFINITY || rightmost == INFINITY || bottommost == INFINITY || topmost == INFINITY)
 		win::bug("Block map initialization woes");
 
-	blockmap.reset(1.0f, leftmost, rightmost, bottommost, topmost);
+	index.reset(1.0f, leftmost, rightmost, bottommost, topmost);
 
 	for (auto &phys : physicals)
-		blockmap.add(win::BlockMapLocation(phys.x, phys.y, phys.w, phys.h), phys);
+		index.add(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h), phys);
 }
 
 void World::tick(const GameInput &input, RenderableWorldState &state)
@@ -49,7 +49,7 @@ void World::tick(const GameInput &input, RenderableWorldState &state)
 	if (physicals.size() == 0)
 		return; // world not initialized yet
 
-	player_system(blockmap, entities, physicals, renderables, players, input);
+	player_system(index, entities, physicals, renderables, players, input);
 
 	// map renderables
 	for (const auto &r : renderables)

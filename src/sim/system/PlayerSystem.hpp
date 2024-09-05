@@ -1,7 +1,7 @@
 #pragma once
 
 #include <win/Pool.hpp>
-#include <win/BlockMap.hpp>
+#include <win/SpatialIndex.hpp>
 
 #include "../../GameInput.hpp"
 #include "../entity/Entity.hpp"
@@ -10,7 +10,7 @@
 #include "../component/PlayerComponent.hpp"
 
 void player_system(
-	win::BlockMap<PhysicalComponent> &blockmap,
+	win::SpatialIndex<PhysicalComponent> &index,
 	win::Pool<Entity> &entities,
 	win::Pool<PhysicalComponent> &physicals,
 	win::Pool<RenderableComponent> &renderables,

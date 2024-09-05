@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <win/BlockMap.hpp>
+#include <win/SpatialIndex.hpp>
 #include <win/Win.hpp>
 #include <win/Utility.hpp>
 
@@ -40,6 +40,6 @@ private:
 	static bool near(const win::Box<float> &box, float centerx, float centery, float radius);
 	static float get_angle(float centerx, float centery, float x, float y);
 
-	win::BlockMap<win::Box<float>> index;
+	win::SpatialIndex<win::Box<float>> index;
 	std::vector<win::Box<float>> occluders;
 };

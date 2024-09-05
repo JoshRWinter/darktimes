@@ -1,7 +1,7 @@
 #pragma once
 
 #include <win/Pool.hpp>
-#include <win/BlockMap.hpp>
+#include <win/SpatialIndex.hpp>
 
 #include "../Darktimes.hpp"
 #include "../GameInput.hpp"
@@ -26,7 +26,7 @@ public:
 	void tick(const GameInput &input, RenderableWorldState &state);
 
 private:
-	win::BlockMap<PhysicalComponent> blockmap;
+	win::SpatialIndex<PhysicalComponent> index;
 	win::Pool<Entity> entities;
 	win::Pool<PhysicalComponent> physicals;
 	win::Pool<RenderableComponent> renderables;
