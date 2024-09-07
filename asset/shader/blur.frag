@@ -6,7 +6,6 @@ in vec2 ftexcoord;
 out vec4 frag;
 
 const float weight[] = float[] (0.2, 0.0666, 0.0666, 0.0666, 0.0666, 0.0666, 0.0666);
-//const float weight[] = float[] (0.2, 0.1, 0.1, 0.1, 0.1);
 const int samples = weight.length();
 
 void main()

@@ -60,6 +60,17 @@ void GLRendererBackend::set_viewport(const win::Dimensions<int> &viewport)
 
 void GLRendererBackend::set_light_occluders(const std::vector<win::Box<float>> &occluders)
 {
+	std::vector<GLDynamicLightRenderer::Line> lines;
+	//lines.emplace_back(-2.0f, 2.0f, 2.0f, 2.0f);
+	for (const auto &box : occluders)
+	{
+		lines.emplace_back(box.x, box.y, box.x, box.y + box.height); // left
+		lines.emplace_back(box.x + box.width, box.y, box.x + box.width, box.y + box.height); // right
+		lines.emplace_back(box.x, box.y, box.x + box.width, box.y); // bottom
+		lines.emplace_back(box.x, box.y + box.height, box.x + box.width, box.y + box.height); // top
+	}
+
+	dynamic_light_renderer.set_geometry(lines);
 	light_mesh_generator.set_occluders(occluders);
 }
 
@@ -161,8 +172,8 @@ void GLRendererBackend::render_dynamic_lights(const std::vector<LightRenderable>
 {
 	for (const auto &light : lights)
 	{
-		const auto &mesh = light_mesh_generator.generate(light.x, light.y, light.radius);
-		dynamic_light_renderer.render(mesh.data(), mesh.size());
+		//const auto &mesh = light_mesh_generator.generate(light.x, light.y, light.radius);
+		dynamic_light_renderer.render(light.x, light.y, light.radius, win::Color<float>(0.7f, 0.2f, 0.2f));
 	}
 }
 
