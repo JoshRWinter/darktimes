@@ -133,84 +133,47 @@ void GLDynamicLightRenderer::render(float x, float y, float radius, const win::C
 	const auto screen_space_view_shift = world_to_screen(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), projection * view);
 	const glm::ivec2 screen_space_line_shift(screen_space_view_shift.x - screen_space_reference.x, screen_space_view_shift.y - screen_space_reference.y);
 
-	const win::Box<int> screen_upperleft(screen_lightpos.x - screen_radius, screen_lightpos.y, screen_radius, screen_radius);
-	const win::Box<int> screen_upperright(screen_lightpos.x, screen_lightpos.y, screen_radius, screen_radius);
-	const win::Box<int> screen_lowerleft(screen_lightpos.x - screen_radius, screen_lightpos.y - screen_radius, screen_radius, screen_radius);
-	const win::Box<int> screen_lowerright(screen_lightpos.x, screen_lightpos.y - screen_radius, screen_radius, screen_radius);
+	const win::Box<int> screen_quadrants[]
+	{
+	win::Box<int>(screen_lightpos.x - screen_radius, screen_lightpos.y, screen_radius, screen_radius),
+	win::Box<int>(screen_lightpos.x, screen_lightpos.y, screen_radius, screen_radius),
+	win::Box<int>(screen_lightpos.x - screen_radius, screen_lightpos.y - screen_radius, screen_radius, screen_radius),
+	win::Box<int>(screen_lightpos.x, screen_lightpos.y - screen_radius, screen_radius, screen_radius)
+	};
 
-	const glm::vec2 world_upperleft(x - radius, y);
-	const glm::vec2 world_upperright(x, y);
-	const glm::vec2 world_lowerleft(x - radius, y - radius);
-	const glm::vec2 world_lowerright(x, y - radius);
+	const glm::vec2 geometries[] =
+	{
+	glm::vec2(x - radius, y),
+	glm::vec2(x, y),
+	glm::vec2(x - radius, y - radius),
+	glm::vec2(x, y - radius)
+	};
+
+	int offsets[4];
+	int lengths[4];
 
 	std::vector<int> data;
 
-	struct OffsetLength { OffsetLength(int offset, int length) : offset(offset), length(length) {} int offset, length; };
-	std::vector<OffsetLength> offsets;
-
-	for (const auto &line : lines)
+	for (int i = 0; i < 4; ++i)
 	{
-		const InternalLine translated(line.x1 + screen_space_line_shift.x, line.y1 + screen_space_line_shift.y, line.x2 + screen_space_line_shift.x, line.y2 + screen_space_line_shift.y);
-		const auto box = boundingbox(translated);
+		offsets[i] = data.size();
 
-		if (overlaps(box, screen_upperleft))
+		for (const auto &line : lines)
 		{
-			data.push_back(line.x1 + screen_space_line_shift.x);
-			data.push_back(line.y1 + screen_space_line_shift.y);
-			data.push_back(line.x2 + screen_space_line_shift.x);
-			data.push_back(line.y2 + screen_space_line_shift.y);
+			const InternalLine translated(line.x1 + screen_space_line_shift.x, line.y1 + screen_space_line_shift.y, line.x2 + screen_space_line_shift.x, line.y2 + screen_space_line_shift.y);
+			const auto minbox = boundingbox(translated);
+
+			if (overlaps(minbox, screen_quadrants[i]))
+			{
+				data.push_back(line.x1 + screen_space_line_shift.x);
+				data.push_back(line.y1 + screen_space_line_shift.y);
+				data.push_back(line.x2 + screen_space_line_shift.x);
+				data.push_back(line.y2 + screen_space_line_shift.y);
+			}
 		}
+
+		lengths[i] = data.size() - offsets[i];
 	}
-	const int upperleft_offset = 0;
-	const int upperleft_length = data.size();
-
-	for (const auto &line : lines)
-	{
-		const InternalLine translated(line.x1 + screen_space_line_shift.x, line.y1 + screen_space_line_shift.y, line.x2 + screen_space_line_shift.x, line.y2 + screen_space_line_shift.y);
-		const auto box = boundingbox(translated);
-
-		if (overlaps(box, screen_upperright))
-		{
-			data.push_back(line.x1 + screen_space_line_shift.x);
-			data.push_back(line.y1 + screen_space_line_shift.y);
-			data.push_back(line.x2 + screen_space_line_shift.x);
-			data.push_back(line.y2 + screen_space_line_shift.y);
-		}
-	}
-	const int upperright_offset = upperleft_length;
-	const int upperright_length = data.size() - upperright_offset;
-
-	for (const auto &line : lines)
-	{
-		const InternalLine translated(line.x1 + screen_space_line_shift.x, line.y1 + screen_space_line_shift.y, line.x2 + screen_space_line_shift.x, line.y2 + screen_space_line_shift.y);
-		const auto box = boundingbox(translated);
-
-		if (overlaps(box, screen_lowerleft))
-		{
-			data.push_back(line.x1 + screen_space_line_shift.x);
-			data.push_back(line.y1 + screen_space_line_shift.y);
-			data.push_back(line.x2 + screen_space_line_shift.x);
-			data.push_back(line.y2 + screen_space_line_shift.y);
-		}
-	}
-	const int lowerleft_offset = upperright_offset + upperright_length;
-	const int lowerleft_length = data.size() - lowerleft_offset;
-
-	for (const auto &line : lines)
-	{
-		const InternalLine translated(line.x1 + screen_space_line_shift.x, line.y1 + screen_space_line_shift.y, line.x2 + screen_space_line_shift.x, line.y2 + screen_space_line_shift.y);
-		const auto box = boundingbox(translated);
-
-		if (overlaps(box, screen_lowerright))
-		{
-			data.push_back(line.x1 + screen_space_line_shift.x);
-			data.push_back(line.y1 + screen_space_line_shift.y);
-			data.push_back(line.x2 + screen_space_line_shift.x);
-			data.push_back(line.y2 + screen_space_line_shift.y);
-		}
-	}
-	const int lowerright_offset = lowerleft_offset + lowerleft_length;
-	const int lowerright_length = data.size() - lowerright_offset;
 
 	fprintf(stderr, "linecount: %lu\n", data.size() / 4);
 
@@ -219,54 +182,13 @@ void GLDynamicLightRenderer::render(float x, float y, float radius, const win::C
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(int) * data.size(), data.data(), GL_DYNAMIC_DRAW);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 3, light.linedata.get());
 
+	for (int i = 0; i < 4; ++i)
 	{
-		glUniform2i(light.uniform.range, 0, upperleft_length / 4);
+		glUniform2i(light.uniform.range, offsets[i] / 4, lengths[i] / 4);
 
 		// position the light geometry
 		const auto ident = glm::identity<glm::mat4>();
-		const auto translate = glm::translate(ident, glm::vec3(world_upperleft.x + (radius / 2.0f), world_upperleft.y + (radius / 2.0f), 0.0f));
-		const auto scale = glm::scale(ident, glm::vec3(radius, radius, 1.0f));
-		const auto trans = projection * view * translate * scale;
-		glUniformMatrix4fv(light.uniform.mvp, 1, GL_FALSE, glm::value_ptr(trans));
-
-		// draw the light mesh
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-
-	{
-		glUniform2i(light.uniform.range, upperright_offset / 4, upperright_length / 4);
-
-		// position the light geometry
-		const auto ident = glm::identity<glm::mat4>();
-		const auto translate = glm::translate(ident, glm::vec3(world_upperright.x + (radius / 2.0f), world_upperright.y + (radius / 2.0f), 0.0f));
-		const auto scale = glm::scale(ident, glm::vec3(radius, radius, 1.0f));
-		const auto trans = projection * view * translate * scale;
-		glUniformMatrix4fv(light.uniform.mvp, 1, GL_FALSE, glm::value_ptr(trans));
-
-		// draw the light mesh
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-
-	{
-		glUniform2i(light.uniform.range, lowerleft_offset / 4, lowerleft_length / 4);
-
-		// position the light geometry
-		const auto ident = glm::identity<glm::mat4>();
-		const auto translate = glm::translate(ident, glm::vec3(world_lowerleft.x + (radius / 2.0f), world_lowerleft.y + (radius / 2.0f), 0.0f));
-		const auto scale = glm::scale(ident, glm::vec3(radius, radius, 1.0f));
-		const auto trans = projection * view * translate * scale;
-		glUniformMatrix4fv(light.uniform.mvp, 1, GL_FALSE, glm::value_ptr(trans));
-
-		// draw the light mesh
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-
-	{
-		glUniform2i(light.uniform.range, lowerright_offset / 4, lowerright_length / 4);
-
-		// position the light geometry
-		const auto ident = glm::identity<glm::mat4>();
-		const auto translate = glm::translate(ident, glm::vec3(world_lowerright.x + (radius / 2.0f), world_lowerright.y + (radius / 2.0f), 0.0f));
+		const auto translate = glm::translate(ident, glm::vec3(geometries[i].x + (radius / 2.0f), geometries[i].y + (radius / 2.0f), 0.0f));
 		const auto scale = glm::scale(ident, glm::vec3(radius, radius, 1.0f));
 		const auto trans = projection * view * translate * scale;
 		glUniformMatrix4fv(light.uniform.mvp, 1, GL_FALSE, glm::value_ptr(trans));

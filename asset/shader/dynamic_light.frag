@@ -10,7 +10,6 @@ uniform LineData
     Line lines[4096];
 };
 
-uniform ivec2 dims;
 uniform ivec2 light;
 uniform vec3 lightcolor;
 uniform int radius;
