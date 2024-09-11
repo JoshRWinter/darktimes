@@ -50,7 +50,7 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
 	static_floor_renderer.set_view_projection(vp);
 	static_atlas_renderer.set_view_projection(vp);
 	dynamic_atlas_renderer.set_view_projection(vp);
-	dynamic_light_renderer.set_view_projection(vp);
+	dynamic_light_renderer.set_view_projection(view, projection);
 }
 
 void GLRendererBackend::set_viewport(const win::Dimensions<int> &viewport)
