@@ -7,7 +7,7 @@ struct Line
 
 uniform LineData
 {
-    Line lines[4096];
+    Line lines[300];
 };
 
 uniform ivec2 light;
@@ -20,10 +20,16 @@ out vec4 color;
 
 bool intersects(ivec2 a1, ivec2 a2, ivec2 b1, ivec2 b2)
 {
-    bool side1 = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x) > 0;
-    bool side2 = (b2.x - b1.x) * (a2.y - b1.y) - (b2.y - b1.y) * (a2.x - b1.x) > 0;
-    bool side3 = (a2.x - a1.x) * (b1.y - a1.y) - (a2.y - a1.y) * (b1.x - a1.x) > 0;
-    bool side4 = (a2.x - a1.x) * (b2.y - a1.y) - (a2.y - a1.y) * (b2.x - a1.x) > 0;
+    float poopoo = b2.x - b1.x;
+    float peepee = b2.y - b1.y;
+    float doodoo = a2.x - a1.x;
+    float weewee = a2.y - a1.y;
+
+    bool side1 = poopoo * (a1.y - b1.y) - peepee * (a1.x - b1.x) > 0;
+    bool side2 = poopoo * (a2.y - b1.y) - peepee * (a2.x - b1.x) > 0;
+    bool side3 = doodoo * (b1.y - a1.y) - weewee * (b1.x - a1.x) > 0;
+    bool side4 = doodoo * (b2.y - a1.y) - weewee * (b2.x - a1.x) > 0;
+
     return side1 != side2 && side3 != side4;
 }
 
