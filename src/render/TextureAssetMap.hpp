@@ -40,7 +40,7 @@ public:
 
 		return t;
 #else
-		return static_textures[(int)texture];
+		return map[(int)texture];
 #endif
 	}
 

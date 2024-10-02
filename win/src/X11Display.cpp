@@ -220,7 +220,7 @@ namespace win
 
 X11Display::X11Display(const DisplayOptions &options)
 {
-	if (options.width < 1 || options.height < 1)
+	if (options.width < 0 || options.height < 0)
 		win::bug("Invalid window dimensions");
 	if (options.gl_major == 0)
 		win::bug("Unsupported GL version");
@@ -255,7 +255,7 @@ X11Display::X11Display(const DisplayOptions &options)
 	xswa.event_mask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask;
 
 	// create da window
-	window = XCreateWindow(xdisplay, RootWindow(xdisplay, xvi->screen), 0, 0, options.width, options.height, 0, xvi->depth, InputOutput, xvi->visual, CWColormap | CWEventMask, &xswa);
+	window = XCreateWindow(xdisplay, RootWindow(xdisplay, xvi->screen), 0, 0, options.fullscreen ? WidthOfScreen(ScreenOfDisplay(xdisplay, 0)) : options.width, options.fullscreen ? HeightOfScreen(ScreenOfDisplay(xdisplay, 0)) : options.height, 0, xvi->depth, InputOutput, xvi->visual, CWColormap | CWEventMask, &xswa);
 	XMapWindow(xdisplay, window);
 	XStoreName(xdisplay, window, options.caption.c_str());
 
