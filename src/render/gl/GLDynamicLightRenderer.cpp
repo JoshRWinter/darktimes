@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "glm/gtc/type_ptr.hpp"
 
 #include "GLDynamicLightRenderer.hpp"
@@ -21,7 +23,8 @@ GLDynamicLightRenderer::GLDynamicLightRenderer(win::AssetRoll &roll)
 	glUseProgram(light.program.get());
 	light.uniform.mvp = get_uniform(light.program, "mvp");
 	light.uniform.light = get_uniform(light.program, "light");
-	//light.uniform.radius = get_uniform(light.program, "radius");
+	//light.uniform.viewport_width = get_uniform(light.program, "viewport_width");
+	light.uniform.power = get_uniform(light.program, "power");
 	light.uniform.lightcolor = get_uniform(light.program, "lightcolor");
 	light.uniform.range = get_uniform(light.program, "range");
 
@@ -92,25 +95,18 @@ void GLDynamicLightRenderer::set_viewport(const win::Dimensions<int> &viewport)
 	glActiveTexture(GL_TEXTURE2);
 
 	glBindTexture(GL_TEXTURE_2D, light.fbo_tex.get());
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, viewport.width, viewport.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, viewport.width, viewport.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, blur.fbo_tex.get());
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R11F_G11F_B10F, viewport.width, viewport.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, viewport.width, viewport.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 }
 
 void GLDynamicLightRenderer::set_geometry(const std::vector<Line> &lines)
 {
-	this->lines.clear();
-	for (const auto &line : lines)
-	{
-		const auto a = world_to_screen(glm::vec2(line.x1, line.y1), projection);
-		const auto b = world_to_screen(glm::vec2(line.x2, line.y2), projection);
-
-		this->lines.emplace_back(a.x, a.y, b.x, b.y);
-	}
+	this->lines = lines;
 }
 
-void GLDynamicLightRenderer::render(float x, float y, float radius, const win::Color<float> &rgb)
+void GLDynamicLightRenderer::render(float x, float y, float power, const win::Color<float> &rgb)
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -120,33 +116,35 @@ void GLDynamicLightRenderer::render(float x, float y, float radius, const win::C
 	glUseProgram(light.program.get());
 	glBindVertexArray(light.vao.get());
 
-	// screen-space representations of the light position and radius
-	const auto screen_lightpos = world_to_screen(glm::vec2(x, y), projection * view);
-	const auto screen_radius = world_to_screen_size(glm::vec2(radius, 0.0f), projection).x;
+	const float cutoff_threshold = 0.2f;
+	const auto radius = std::sqrtf((power - cutoff_threshold) / cutoff_threshold);
 
-	glUniform2i(light.uniform.light, screen_lightpos.x, screen_lightpos.y);
+	const auto screen_xy = world_to_screen(glm::vec2(x, y), projection * view);
+	glUniform2i(light.uniform.light, screen_xy.x, screen_xy.y);
 	glUniform3f(light.uniform.lightcolor, 1.0f, 1.0f, 1.0f);
-	//glUniform1i(light.uniform.radius, 500);
+	//glUniform1i(light.uniform.viewport_width,
+	glUniform1f(light.uniform.power, power);
 
-	// build the line data for the shader
-	const auto screen_space_reference = world_to_screen(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), projection);
-	const auto screen_space_view_shift = world_to_screen(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), projection * view);
-	const glm::ivec2 screen_space_line_shift(screen_space_view_shift.x - screen_space_reference.x, screen_space_view_shift.y - screen_space_reference.y);
+	const glm::vec4 world_topright = glm::inverse(view) * glm::inverse(projection) * glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+	const glm::vec4 world_bottomleft = glm::inverse(view) * glm::inverse(projection) * glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f);
 
-	const win::Box<int> screen_quadrants[]
+	struct Box
 	{
-	win::Box<int>(screen_lightpos.x - screen_radius, screen_lightpos.y, screen_radius, screen_radius),
-	win::Box<int>(screen_lightpos.x, screen_lightpos.y, screen_radius, screen_radius),
-	win::Box<int>(screen_lightpos.x - screen_radius, screen_lightpos.y - screen_radius, screen_radius, screen_radius),
-	win::Box<int>(screen_lightpos.x, screen_lightpos.y - screen_radius, screen_radius, screen_radius)
+		Box(float x1, float y1, float x2, float y2) : x1(x1), y1(y1), x2(x2), y2(y2) {}
+		float x1, y1, x2, y2;
 	};
 
-	const glm::vec2 geometries[] =
+	const Box light_geometry(x - radius, y - radius, x + radius,  y + radius);
+	const Box screen_geometry(world_bottomleft.x, world_bottomleft.y, world_topright.x, world_topright.y);
+	const Box overlap(std::max(light_geometry.x1, screen_geometry.x1), std::max(light_geometry.y1, screen_geometry.y1), std::min(light_geometry.x2, screen_geometry.x2), std::min(light_geometry.y2, screen_geometry.y2));
+
+	// build the line data for the shader
+	const win::Box<float> quadrants[]
 	{
-	glm::vec2(x - radius, y),
-	glm::vec2(x, y),
-	glm::vec2(x - radius, y - radius),
-	glm::vec2(x, y - radius)
+		win::Box<float>(overlap.x1, overlap.y1, x - overlap.x1, y - overlap.y1), // lower left
+		win::Box<float>(x, overlap.y1, overlap.x2 - x, y - overlap.y1), // lower right
+		win::Box<float>(overlap.x1, y, x - overlap.x1, overlap.y2 - y), // upper left
+		win::Box<float>(x, y, overlap.x2 - x, overlap.y2 - y) // upper right
 	};
 
 	int offsets[4];
@@ -154,28 +152,32 @@ void GLDynamicLightRenderer::render(float x, float y, float radius, const win::C
 
 	std::vector<int> data;
 
+	const auto start = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < 4; ++i)
 	{
 		offsets[i] = data.size();
 
 		for (const auto &line : lines)
 		{
-			const InternalLine translated(line.x1 + screen_space_line_shift.x, line.y1 + screen_space_line_shift.y, line.x2 + screen_space_line_shift.x, line.y2 + screen_space_line_shift.y);
-			const auto minbox = boundingbox(translated);
+			const auto minbox = boundingbox(line);
 
-			if (overlaps(minbox, screen_quadrants[i]))
+			if (overlaps(minbox, quadrants[i]))
 			{
-				data.push_back(line.x1 + screen_space_line_shift.x);
-				data.push_back(line.y1 + screen_space_line_shift.y);
-				data.push_back(line.x2 + screen_space_line_shift.x);
-				data.push_back(line.y2 + screen_space_line_shift.y);
+				const auto a = world_to_screen(glm::vec4(line.x1, line.y1, 0.0f, 1.0f), projection * view);
+				const auto b = world_to_screen(glm::vec4(line.x2, line.y2, 0.0f, 1.0f), projection * view);
+
+				data.push_back(a.x);
+				data.push_back(a.y);
+				data.push_back(b.x);
+				data.push_back(b.y);
 			}
 		}
 
 		lengths[i] = data.size() - offsets[i];
 	}
-
-	fprintf(stderr, "linecount: %lu\n", data.size() / 4);
+	const auto stop = std::chrono::high_resolution_clock::now();
+	const auto millis = std::chrono::duration<float, std::milli>(stop - start).count();
+	fprintf(stderr, "Built %lu lines in %.1f milliseconds\n", data.size() / 4, millis);
 
 	// upload line data
 	glBindBuffer(GL_UNIFORM_BUFFER, light.linedata.get());
@@ -188,8 +190,8 @@ void GLDynamicLightRenderer::render(float x, float y, float radius, const win::C
 
 		// position the light geometry
 		const auto ident = glm::identity<glm::mat4>();
-		const auto translate = glm::translate(ident, glm::vec3(geometries[i].x + (radius / 2.0f), geometries[i].y + (radius / 2.0f), 0.0f));
-		const auto scale = glm::scale(ident, glm::vec3(radius, radius, 1.0f));
+		const auto translate = glm::translate(ident, glm::vec3(quadrants[i].x + (quadrants[i].width / 2.0f), quadrants[i].y + (quadrants[i].height / 2.0f), 0.0f));
+		const auto scale = glm::scale(ident, glm::vec3(quadrants[i].width, quadrants[i].height, 1.0f));
 		const auto trans = projection * view * translate * scale;
 		glUniformMatrix4fv(light.uniform.mvp, 1, GL_FALSE, glm::value_ptr(trans));
 
@@ -229,28 +231,20 @@ glm::ivec2 GLDynamicLightRenderer::world_to_screen(const glm::vec2 &vert, const 
 {
 	const glm::vec4 world(vert.x, vert.y, 0.0f, 1.0f);
 	const auto clip = transform * world;
-	return glm::ivec2(((clip.x + 1.0f) / 2.0f) * viewport.width, ((clip.y + 1.0f) / 2.0f) * viewport.height);
+	return glm::ivec2(std::roundf(((clip.x + 1.0f) / 2.0f) * viewport.width), std::roundf(((clip.y + 1.0f) / 2.0f) * viewport.height));
 }
 
-glm::ivec2 GLDynamicLightRenderer::world_to_screen_size(const glm::vec2 &size, const glm::mat4 &projection) const
+win::Box<float> GLDynamicLightRenderer::boundingbox(const Line &line)
 {
-	const auto reference = world_to_screen(glm::vec2(0.0f, 0.0f), projection);
-	const auto point = world_to_screen(size, projection);
+	const float left = std::min(line.x1, line.x2);
+	const float right = std::max(line.x1, line.x2);
+	const float bottom = std::min(line.y1, line.y2);
+	const float top = std::max(line.y1, line.y2);
 
-	return glm::ivec2(point.x - reference.x, point.y - reference.y);
+	return win::Box<float>(left, bottom, right - left, top - bottom);
 }
 
-win::Box<int> GLDynamicLightRenderer::boundingbox(const InternalLine &line)
-{
-	const int left = std::min(line.x1, line.x2);
-	const int right = std::max(line.x1, line.x2);
-	const int bottom = std::min(line.y1, line.y2);
-	const int top = std::max(line.y1, line.y2);
-
-	return win::Box<int>(left, bottom, right - left, top - bottom);
-}
-
-bool GLDynamicLightRenderer::overlaps(const win::Box<int> &a, const win::Box<int> &b)
+bool GLDynamicLightRenderer::overlaps(const win::Box<float> &a, const win::Box<float> &b)
 {
 	return a.x + a.width > b.x && a.x < b.x + b.width && a.y + a.height > b.y && a.y < b.y + b.height;
 }

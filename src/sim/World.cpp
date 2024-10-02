@@ -63,5 +63,5 @@ void World::tick(const GameInput &input, RenderableWorldState &state)
 	state.centery = player_physical.y + (PlayerEntity::height / 2.0f);
 
 	const float flashlight_offset = 0.2f;
-	state.dynamic_lights.emplace_back((player_physical.x + (PlayerEntity::width / 2.0f)) + std::cosf(player_physical.rot) * flashlight_offset, (player_physical.y + (PlayerEntity::height / 2.0f)) + std::sinf(player_physical.rot) * flashlight_offset, 4.0f, win::Color<float>(0.0f, 1.0f, 0.0f, 1.0f));
+	state.dynamic_lights.emplace_back((player_physical.x + (PlayerEntity::width / 2.0f)) + std::cosf(player_physical.rot) * flashlight_offset, (player_physical.y + (PlayerEntity::height / 2.0f)) + std::sinf(player_physical.rot) * flashlight_offset, 2000.0f, win::Color<float>(0.0f, 1.0f, 0.0f, 1.0f));
 }

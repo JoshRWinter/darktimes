@@ -12,7 +12,8 @@ uniform LineData
 
 uniform ivec2 light;
 uniform vec3 lightcolor;
-uniform int radius;
+//uniform int viewport_width;
+uniform float power;
 uniform ivec2 range;
 
 out vec4 color;
@@ -34,5 +35,8 @@ void main()
             discard;
     }
 
-    color = vec4(lightcolor, 1.0);
+    float distance = distance(gl_FragCoord.xy, light);
+    float intensity = power / (1.0 + (distance * distance));
+
+    color = vec4(intensity * lightcolor.r, intensity * lightcolor.g, intensity * lightcolor.b, 1.0);
 }

@@ -13,12 +13,6 @@ class GLDynamicLightRenderer : public GLSubRenderer
 {
 	WIN_NO_COPY_MOVE(GLDynamicLightRenderer);
 
-	struct InternalLine
-	{
-		int x1, y1, x2, y2;
-		InternalLine(int x1, int y1, int x2, int y2) : x1(x1), y1(y1), x2(x2), y2(y2) {}
-	};
-
 public:
 	struct Line
 	{
@@ -36,14 +30,13 @@ public:
 
 private:
 	glm::ivec2 world_to_screen(const glm::vec2 &vert, const glm::mat4 &transform) const;
-	glm::ivec2 world_to_screen_size(const glm::vec2 &size, const glm::mat4 &projection) const;
-	static win::Box<int> boundingbox(const InternalLine &line);
-	static bool overlaps(const win::Box<int> &a, const win::Box<int> &b);
+	static win::Box<float> boundingbox(const Line &line);
+	static bool overlaps(const win::Box<float> &a, const win::Box<float> &b);
 
 	win::Dimensions<int> viewport;
 	glm::mat4 view;
 	glm::mat4 projection;
-	std::vector<InternalLine> lines;
+	std::vector<Line> lines;
 
 	struct
 	{
@@ -57,7 +50,8 @@ private:
 		{
 			GLint mvp;
 			GLint light;
-			//GLint radius;
+			GLint power;
+			GLint viewport_width;
 			GLint lightcolor;
 			GLint range;
 		} uniform;

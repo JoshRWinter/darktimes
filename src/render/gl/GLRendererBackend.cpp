@@ -43,7 +43,7 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
 {
 	const auto ident = glm::identity<glm::mat4>();
 	const auto translate = glm::translate(ident, glm::vec3(-x, -y, 0.0f));
-	const auto scale = glm::scale(ident, glm::vec3(zoom, zoom, 0.0f));
+	const auto scale = glm::scale(ident, glm::vec3(zoom, zoom, 1.0f));
 	const auto view = scale * translate;
 	const auto vp = projection * view;
 
