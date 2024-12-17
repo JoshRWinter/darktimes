@@ -49,7 +49,7 @@ void LevelGenerator::generate(int seed)
 	for (const auto &f : generated_floors)
 		level_floors.push_back(f);
 
-	for (const auto &w : generate_walls(generated_floors))
+	for (const auto &w : optimize_walls(generate_walls(generated_floors)))
 		level_walls.push_back(w);
 
 	for (const auto &p : props)
@@ -610,6 +610,38 @@ std::vector<LevelWallInternal> LevelGenerator::generate_walls(const std::vector<
 	}
 
 	return walls;
+}
+
+std::vector<LevelWallInternal> LevelGenerator::optimize_walls(const std::vector<LevelWallInternal> &walls)
+{
+	std::vector<LevelWallInternal> optimized = walls;
+
+	for (auto it = optimized.begin(); it != optimized.end();)
+	{
+		const auto &wall = *it;
+
+		bool prune = false;
+		for (const auto &wall2 : optimized)
+		{
+			if (&wall == &wall2)
+				continue;
+
+			// if wall is contained within wall2
+			const float thresh = 0.01f;
+			if (wall.x - wall2.x > -thresh && (wall.x + wall.w) - (wall2.x + wall2.w) < thresh && wall.y - wall2.y > -thresh && (wall.y + wall.h) - (wall2.y + wall2.h) < thresh)
+			{
+				prune = true;
+				break;
+			}
+		}
+
+		if (prune)
+			it = optimized.erase(it);
+		else
+			++it;
+	}
+
+	return optimized;
 }
 
 ///////////////////////////////////////////

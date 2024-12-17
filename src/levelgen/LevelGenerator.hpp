@@ -38,6 +38,7 @@ private:
 	static bool can_connect(const LevelFloorInternal &floor1, const LevelFloorInternal &floor2, LevelFloorConnector &c1, LevelFloorConnector &c2);
 	static std::vector<LevelFloorInternal> prune(const std::vector<LevelFloorInternal> &floors);
 	static std::vector<LevelWallInternal> generate_walls(const std::vector<LevelFloorInternal> &floors);
+	static std::vector<LevelWallInternal> optimize_walls(const std::vector<LevelWallInternal> &walls);
 	std::vector<LevelPropInternal> generate_props(const std::vector<LevelFloorInternal> &floors);
 	static std::vector<LevelPropExcluder> generate_door_excluders(const LevelFloorInternal &floor);
 	std::vector<LevelPropInternal> generate_new_props(const LevelFloorInternal &floor, const std::vector<LevelPropExcluder> &excluders);
