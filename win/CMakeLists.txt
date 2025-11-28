@@ -15,6 +15,10 @@ add_library(win STATIC
 	# utility
 	#
 
+	include/win/ObjectExchanger.hpp
+
+	include/win/SimStateExchanger.hpp
+
 	include/win/Utility.hpp
 	src/Utility.cpp
 
@@ -33,6 +37,15 @@ add_library(win STATIC
 	src/Targa.cpp
 
 	include/win/Math.hpp
+
+	include/win/UdpServer.hpp
+	src/UdpServer.cpp
+
+	include/win/UdpClient.hpp
+	src/UdpClient.cpp
+
+	include/win/WsaSingleton.hpp
+	src/WsaSingleton.cpp
 
 	#
 	# gl utility
@@ -63,14 +76,11 @@ add_library(win STATIC
 	include/win/AssetRoll.hpp
 	src/AssetRoll.cpp
 
-	include/win/FileReadStream.hpp
-	src/FileReadStream.cpp
+	include/win/MemoryStream.hpp
+	src/MemoryStream.cpp
 
-	include/win/AssetRollStreamRaw.hpp
-	src/AssetRollStreamRaw.cpp
-
-	include/win/AssetRollStreamCompressed.hpp
-	src/AssetRollStreamCompressed.cpp
+	include/win/FileStream.hpp
+	src/FileStream.cpp
 
 	include/win/DisplayBase.hpp
 	src/DisplayBase.cpp
@@ -150,11 +160,13 @@ if(WIN32)
 		PRIVATE
 		${OPENGL_LIBRARIES}
 		${DSOUND_LIBRARIES}
+		dxgi.lib
 		dxguid.lib
 		${CMAKE_CURRENT_LIST_DIR}/lib/zlib.lib
 		${CMAKE_CURRENT_LIST_DIR}/lib/freetype.lib
 		${CMAKE_CURRENT_LIST_DIR}/lib/ogg.lib
 		${CMAKE_CURRENT_LIST_DIR}/lib/vorbis.lib
+		ws2_32
 		)
 
 	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -190,6 +202,7 @@ else()
 		${CMAKE_THREAD_LIBS_INIT}
 		${ZLIB_LIBRARIES}
 		${OGGVORBIS_LIBRARIES}
+		Xrandr
 		)
 
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

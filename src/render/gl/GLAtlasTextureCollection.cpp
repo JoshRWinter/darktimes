@@ -14,7 +14,7 @@ GLAtlasTextureCollection::GLAtlasTextureCollection(win::AssetRoll &roll, const T
 		{
 			auto atlas = find(item.asset_path, texture_map);
 			if (atlas == NULL)
-				atlas = &atlases.emplace_back(roll[item.asset_path], win::GLAtlas::Mode::linear);
+				atlas = &atlases.emplace_back(roll[item.asset_path], win::GLAtlas::Mode::linear, GL_TEXTURE0);
 
 			map.push_back(atlas);
 		}

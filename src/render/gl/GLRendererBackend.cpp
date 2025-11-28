@@ -15,7 +15,7 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
 	, static_atlas_renderer(roll)
 	, dynamic_atlas_renderer(roll)
 	, dynamic_light_renderer(roll)
-	, text_renderer(screen_dims, projection, GL_TEXTURE1, true)
+	, text_renderer(screen_dims, projection, GL_TEXTURE1, true, 0, true)
 {
 	fprintf(stderr, "%s\n%s\n%s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
 

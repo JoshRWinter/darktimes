@@ -91,9 +91,14 @@ void load_gl_functions()
 	glUseProgram = (decltype(glUseProgram)) get_proc("glUseProgram");
 	glDeleteProgram = (decltype(glDeleteProgram)) get_proc("glDeleteProgram");
 
+	glGenerateMipmap = (decltype(glGenerateMipmap)) get_proc("glGenerateMipmap");
+
 	glGenFramebuffers = (decltype(glGenFramebuffers)) get_proc("glGenFramebuffers");
 	glBindFramebuffer = (decltype(glBindFramebuffer)) get_proc("glBindFramebuffer");
 	glFramebufferTexture2D = (decltype(glFramebufferTexture2D)) get_proc("glFramebufferTexture2D");
+	glDrawBuffers = (decltype(glDrawBuffers)) get_proc("glDrawBuffers");
+	glColorMaski = (decltype(glColorMaski)) get_proc("glColorMaski");
+	glClearBufferfv = (decltype(glClearBufferfv)) get_proc("glClearBufferfv");
 	glDeleteFramebuffers = (decltype(glDeleteFramebuffers)) get_proc("glDeleteFramebuffers");
 
 	glGenVertexArrays = (decltype(glGenVertexArrays)) get_proc("glGenVertexArrays");
@@ -115,6 +120,8 @@ void load_gl_functions()
 	glVertexAttribIPointer = (decltype(glVertexAttribIPointer)) get_proc("glVertexAttribIPointer");
 	glEnableVertexAttribArray = (decltype(glEnableVertexAttribArray)) get_proc("glEnableVertexAttribArray");
 
+	glShaderStorageBlockBinding = (decltype(glShaderStorageBlockBinding)) get_proc("glShaderStorageBlockBinding");
+	glGetProgramResourceIndex = (decltype(glGetProgramResourceIndex)) get_proc("glGetProgramResourceIndex");
 	glGetUniformBlockIndex = (decltype(glGetUniformBlockIndex)) get_proc("glGetUniformBlockIndex");
 	glUniformBlockBinding = (decltype(glUniformBlockBinding)) get_proc("glUniformBlockBinding");
 	glGetUniformLocation = (decltype(glGetUniformLocation)) get_proc("glGetUniformLocation");
