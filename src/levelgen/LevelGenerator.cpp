@@ -183,8 +183,8 @@ std::vector<LevelFloorInternal> LevelGenerator::generate_grid(const std::vector<
 
 	const int horizontal_tiles = rand.uniform_int(3, 6);
 	const int vertical_tiles = rand.uniform_int(3, 6);
-	const float floor_width = rand.uniform_real(MIN_WALL_LENGTH * 2.0f, 3.5f);
-	const float floor_height = rand.uniform_real(MIN_WALL_LENGTH * 2.0f, 3.5f);
+	const float floor_width = rand.uniform_real(MIN_WALL_LENGTH * 2.0f, 3.8f);
+	const float floor_height = rand.uniform_real(MIN_WALL_LENGTH * 2.0f, 3.8f);
 
 	// determine where the first floor should start
 	float start_x, start_y;
