@@ -37,5 +37,6 @@ enum class Texture
 
 	player,
 
+	// leave this last
 	max_texture
 };

@@ -8,7 +8,7 @@
 #include <functional>
 #include <unordered_map>
 
-#include "../Texture.hpp"
+#include "../../Texture.hpp"
 
 #include "LevelGenerator.hpp"
 #include "PropDefs.hpp"

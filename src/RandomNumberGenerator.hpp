@@ -2,11 +2,11 @@
 
 #include <random>
 
-#include "Darktimes.hpp"
+#include <win/Win.hpp>
 
 class RandomNumberGenerator
 {
-	NO_COPY_MOVE(RandomNumberGenerator);
+	WIN_NO_COPY_MOVE(RandomNumberGenerator);
 
 public:
 	explicit RandomNumberGenerator(int seed);

@@ -8,60 +8,45 @@ set(executable Darktimes)
 set(sources
 	src/main.cpp
 
-	src/Darktimes.hpp
-
 	# top level nonsense
-	src/LightRenderable.hpp
 	src/Renderable.hpp
 	src/Texture.hpp
-	src/SyncObjectManager.hpp
 	src/RandomNumberGenerator.hpp
 	src/RandomNumberGenerator.cpp
-	src/Game.hpp
-	src/Game.cpp
 	src/GameInput.hpp
-	src/RenderableWorldState.hpp
 
 	# render
 	src/render/Renderer.hpp
 	src/render/Renderer.cpp
 	src/render/RendererBackend.hpp
-	src/render/LightMeshGenerator.hpp
-	src/render/LightMeshGenerator.cpp
 	src/render/TextureAssetMap.hpp
 	src/render/TextureAssetMap.txt
 
 	# gl renderer
 	src/render/gl/GLRendererBackend.hpp
 	src/render/gl/GLRendererBackend.cpp
-	src/render/gl/GLFloorTextureCollection.hpp
-	src/render/gl/GLFloorTextureCollection.cpp
-	src/render/gl/GLAtlasTextureCollection.hpp
-	src/render/gl/GLAtlasTextureCollection.cpp
-	src/render/gl/GLSubRenderer.hpp
-	src/render/gl/GLStaticFloorRenderer.hpp
-	src/render/gl/GLStaticFloorRenderer.cpp
-	src/render/gl/GLStaticAtlasRenderer.hpp
-	src/render/gl/GLStaticAtlasRenderer.cpp
-	src/render/gl/GLDynamicLightRenderer.hpp
-	src/render/gl/GLDynamicLightRenderer.cpp
-	src/render/gl/GLDynamicAtlasRenderer.hpp
-	src/render/gl/GLDynamicAtlasRenderer.cpp
-
-	# level gen nonsense
-	src/levelgen/LevelObjects.hpp
-	src/levelgen/LevelObjectsInternal.hpp
-	src/levelgen/PropDefs.hpp
-	src/levelgen/StructureDefs.hpp
-	src/levelgen/Structure.hpp
-	src/levelgen/LevelGenerator.hpp
-	src/levelgen/LevelGenerator.cpp
+	src/render/gl/GLRendererBase.hpp
+	src/render/gl/GLConstants.hpp
+	src/render/gl/GLFloorRenderer.hpp
+	src/render/gl/GLFloorRenderer.cpp
+	src/render/gl/GLAtlasRenderer.hpp
+	src/render/gl/GLAtlasRenderer.cpp
 
 	# sim
-	src/sim/World.hpp
-	src/sim/World.cpp
 	src/sim/Simulation.hpp
 	src/sim/Simulation.cpp
+	src/sim/Game.hpp
+	src/sim/Game.cpp
+	src/sim/World.hpp
+
+	# level gen nonsense
+	src/sim/levelgen/LevelObjects.hpp
+	src/sim/levelgen/LevelObjectsInternal.hpp
+	src/sim/levelgen/PropDefs.hpp
+	src/sim/levelgen/StructureDefs.hpp
+	src/sim/levelgen/Structure.hpp
+	src/sim/levelgen/LevelGenerator.hpp
+	src/sim/levelgen/LevelGenerator.cpp
 
 	# entities
 	src/sim/entity/Entity.hpp

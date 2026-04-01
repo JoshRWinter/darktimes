@@ -8,35 +8,18 @@
 using namespace win::gl;
 
 GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
-	: current_renderer(&dummy_renderer)
-	, floor_textures(roll, texture_map)
-	, atlases(roll, texture_map)
-	, static_floor_renderer(roll)
-	, static_atlas_renderer(roll)
-	, dynamic_atlas_renderer(roll)
-	, dynamic_light_renderer(roll)
+	: projection(glm::ortho(projection.left, projection.right, projection.bottom, projection.top))
+	, floor_renderer(roll, texture_map)
+	, atlas_renderer(roll, texture_map)
 	, text_renderer(screen_dims, projection, GL_TEXTURE1, true, 0, true)
 {
-	fprintf(stderr, "%s\n%s\n%s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER), glGetString(GL_VERSION));
+	fprintf(stderr, "%s\n%s\n%s\n\n", (const char*)glGetString(GL_VENDOR), (const char*)glGetString(GL_RENDERER), (const char*)glGetString(GL_VERSION));
 
-	this->projection = glm::ortho(projection.left, projection.right, projection.bottom, projection.top);
-
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_FRAMEBUFFER_SRGB);
-}
-
-const win::Font &GLRendererBackend::create_font(win::Stream data, float size)
-{
-	glActiveTexture(GL_TEXTURE15);
-	return fonts.add(std::move(text_renderer.create_font(size, std::move(data))));
-}
-
-void GLRendererBackend::draw_text(const win::Font &font, const char *text, float x, float y, bool centered)
-{
-	text_renderer.draw((win::GLFont&)font, text, x, y, centered);
-	text_renderer.flush();
 }
 
 void GLRendererBackend::set_view(float x, float y, float zoom)
@@ -47,34 +30,11 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
 	const auto view = scale * translate;
 	const auto vp = projection * view;
 
-	static_floor_renderer.set_view_projection(vp);
-	static_atlas_renderer.set_view_projection(vp);
-	dynamic_atlas_renderer.set_view_projection(vp);
-	dynamic_light_renderer.set_view_projection(view, projection);
+	floor_renderer.set_view_projection(vp);
+	atlas_renderer.set_view_projection(vp);
 }
 
-void GLRendererBackend::set_viewport(const win::Dimensions<int> &viewport)
-{
-	dynamic_light_renderer.set_viewport(viewport);
-}
-
-void GLRendererBackend::set_light_occluders(const std::vector<win::Box<float>> &occluders)
-{
-	std::vector<GLDynamicLightRenderer::Line> lines;
-	//lines.emplace_back(-2.0f, 2.0f, 2.0f, 2.0f);
-	for (const auto &box : occluders)
-	{
-		lines.emplace_back(box.x, box.y, box.x, box.y + box.height); // left
-		lines.emplace_back(box.x + box.width, box.y, box.x + box.width, box.y + box.height); // right
-		lines.emplace_back(box.x, box.y, box.x + box.width, box.y); // bottom
-		lines.emplace_back(box.x, box.y + box.height, box.x + box.width, box.y + box.height); // top
-	}
-
-	dynamic_light_renderer.set_geometry(lines);
-	light_mesh_generator.set_occluders(occluders);
-}
-
-std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Renderable> &statics)
+void GLRendererBackend::load_statics(const std::vector<Renderable> &statics)
 {
 	loaded_statics.clear();
 
@@ -88,93 +48,62 @@ std::vector<const void*> GLRendererBackend::load_statics(const std::vector<Rende
 			atlas_renderables.push_back(s);
 	}
 
-	const auto floor_statics = static_floor_renderer.load(floor_renderables, floor_textures);
-	const auto atlas_statics = static_atlas_renderer.load(atlas_renderables, atlases, texture_map);
+	const auto floor_statics = floor_renderer.load(floor_renderables);
+	const auto atlas_statics = atlas_renderer.load(atlas_renderables, texture_map);
 
 	int floor_index = 0;
 	int atlas_index = 0;
 	for (const auto &s : statics)
 	{
 		if (texture_map[s.texture].atlas_index == -1)
-			loaded_statics.emplace_back(GLLoadedObjectType::floor, floor_statics.at(floor_index++));
+			loaded_statics.emplace_back(StaticObject::Type::floor, floor_statics.at(floor_index++));
 		else
-			loaded_statics.emplace_back(GLLoadedObjectType::atlas, atlas_statics.at(atlas_index++));
+			loaded_statics.emplace_back(StaticObject::Type::atlas, atlas_statics.at(atlas_index++));
 	}
-
-	std::vector<const void*> results;
-
-	for (const auto &s : loaded_statics)
-		results.push_back(&s);
-
-	return results;
 }
 
-void GLRendererBackend::load_dynamics()
+void GLRendererBackend::render_statics(const std::vector<int> &statics)
 {
-	dynamic_atlas_renderer.load_all(atlases, texture_map);
-}
+	if (statics.empty())
+		return;
 
-void GLRendererBackend::render_start()
-{
-	glClear(GL_COLOR_BUFFER_BIT);
-}
+	renderable_ids.clear();
+	renderable_ids.reserve(statics.size());
 
-void GLRendererBackend::render_end()
-{
-	current_renderer->flush();
-}
+	auto type = loaded_statics[statics[0]].type;
 
-void GLRendererBackend::render_statics(const std::vector<const void*> &statics)
-{
-	for (const auto s : statics)
+	const auto flush = [this, &type]()
 	{
-		const auto object = *(const GLLoadedObject*)s;
-		if (object.type == GLLoadedObjectType::floor)
-		{
-			if (current_renderer != &static_floor_renderer)
-			{
-				current_renderer->flush();
-				current_renderer = &static_floor_renderer;
-			}
-
-			static_floor_renderer.add(object.base_vertex);
-		}
+		if (type == StaticObject::Type::floor)
+			floor_renderer.render(renderable_ids);
 		else
-		{
-			if (current_renderer != &static_atlas_renderer)
-			{
-				current_renderer->flush();
-				current_renderer = &static_atlas_renderer;
-			}
+			atlas_renderer.render(renderable_ids);
 
-			static_atlas_renderer.add(object.base_vertex);
+		renderable_ids.clear();
+	};
+
+	for (const auto i : statics)
+	{
+		const auto &object = loaded_statics.at(i);
+
+		if (type != object.type)
+		{
+			flush();
+			type = object.type;
 		}
+
+		renderable_ids.push_back(object.base_vertex);
 	}
+
+	if (!renderable_ids.empty())
+		flush();
 
 	check_error();
 }
 
 void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
 {
-	for (const auto &d : dynamics)
-		dynamic_atlas_renderer.add(d);
 
-	current_renderer->flush();
-	current_renderer = &dynamic_atlas_renderer;
-
-	current_renderer->flush();
-	current_renderer = &dynamic_light_renderer;
-
-	check_error();
-}
-
-void GLRendererBackend::render_dynamic_lights(const std::vector<LightRenderable> &lights)
-{
-	for (const auto &light : lights)
-	{
-		//const auto &mesh = light_mesh_generator.generate(light.x, light.y, light.radius);
-		dynamic_light_renderer.render(light.x, light.y, light.radius, win::Color<float>(0.7f, 0.2f, 0.2f));
-	}
 }
 
 void GLRendererBackend::check_error()

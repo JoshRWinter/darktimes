@@ -1,41 +1,30 @@
 #pragma once
 
+#include <vector>
+
 #include <glm/glm.hpp>
 
 #include <win/gl/GL.hpp>
-#include <win/gl/GLAtlas.hpp>
 #include <win/gl/GLTextRenderer.hpp>
 #include <win/AssetRoll.hpp>
-#include <win/Pool.hpp>
 
-#include "GLFloorTextureCollection.hpp"
-#include "GLAtlasTextureCollection.hpp"
-
-#include "../LightMeshGenerator.hpp"
-#include "GLStaticFloorRenderer.hpp"
-#include "GLStaticAtlasRenderer.hpp"
-#include "GLDynamicAtlasRenderer.hpp"
-#include "GLDynamicLightRenderer.hpp"
+#include "GLFloorRenderer.hpp"
+#include "GLAtlasRenderer.hpp"
 #include "../RendererBackend.hpp"
+#include "../TextureAssetMap.hpp"
 
-enum class GLLoadedObjectType : std::uint16_t
+struct StaticObject
 {
-	floor,
-	atlas
-};
+	enum class Type
+	{
+		floor,
+		atlas
+	};
 
-struct GLLoadedObject
-{
-	GLLoadedObject(GLLoadedObjectType type, std::uint16_t base_vertex) : type(type), base_vertex(base_vertex) {}
+	StaticObject(Type type, std::uint16_t base_vertex) : type(type), base_vertex(base_vertex) {}
 
-	GLLoadedObjectType type;
+	Type type;
 	std::uint16_t base_vertex;
-};
-
-class GLDummyRenderer : public GLSubRenderer
-{
-public:
-	void flush() override {};
 };
 
 class GLRendererBackend : public RendererBackend
@@ -46,39 +35,23 @@ public:
 	GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll);
 	~GLRendererBackend() override = default;
 
-	const win::Font &create_font(win::Stream data, float size) override;
-	void draw_text(const win::Font &font, const char *text, float x, float y, bool centered) override;
 	void set_view(float x, float y, float zoom) override;
-	void set_viewport(const win::Dimensions<int> &viewport) override;
-	void set_light_occluders(const std::vector<win::Box<float>> &occluders) override;
-	std::vector<const void*> load_statics(const std::vector<Renderable> &statics) override;
-	void load_dynamics() override;
-	void render_start() override;
-	void render_end() override;
-	void render_statics(const std::vector<const void*> &statics) override;
+	void load_statics(const std::vector<Renderable> &statics) override;
+	void render_statics(const std::vector<int> &statics) override;
 	void render_dynamics(const std::vector<Renderable> &dynamics) override;
-	void render_dynamic_lights(const std::vector<LightRenderable> &lights) override;
 
 private:
 	static void check_error();
 
-	GLDummyRenderer dummy_renderer;
-	GLSubRenderer *current_renderer;
-
-	TextureAssetMap texture_map;
-	GLFloorTextureCollection floor_textures;
-	GLAtlasTextureCollection atlases;
-
-	LightMeshGenerator light_mesh_generator;
-
-	GLStaticFloorRenderer static_floor_renderer;
-	GLStaticAtlasRenderer static_atlas_renderer;
-	GLDynamicAtlasRenderer dynamic_atlas_renderer;
-	GLDynamicLightRenderer dynamic_light_renderer;
-	std::vector<GLLoadedObject> loaded_statics;
-
 	glm::mat4 projection;
 
+	TextureAssetMap texture_map;
+
+	GLFloorRenderer floor_renderer;
+	GLAtlasRenderer atlas_renderer;
+	std::vector<StaticObject> loaded_statics;
+
 	win::GLTextRenderer text_renderer;
-	win::Pool<win::GLFont> fonts;
+
+	std::vector<std::uint16_t> renderable_ids;
 };

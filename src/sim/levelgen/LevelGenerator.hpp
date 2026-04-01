@@ -1,9 +1,10 @@
 #pragma once
 
-#include "../Darktimes.hpp"
+#include <win/Win.hpp>
 
 #include "LevelObjectsInternal.hpp"
-#include "../RandomNumberGenerator.hpp"
+#include "../../RandomNumberGenerator.hpp"
+#include "../../Texture.hpp"
 
 void level_generate(
 	int seed,
@@ -14,7 +15,7 @@ void level_generate(
 
 class LevelGenerator
 {
-	NO_COPY_MOVE(LevelGenerator);
+	WIN_NO_COPY_MOVE(LevelGenerator);
 
 	typedef std::function<std::vector<LevelFloorInternal>(const LevelFloorInternal&, LevelSide)> GeneratorFunction;
 

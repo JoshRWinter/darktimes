@@ -1,31 +1,27 @@
 #pragma once
 
+#include <vector>
+
 #include <win/Pool.hpp>
 #include <win/SpatialIndex.hpp>
 
-#include "../Darktimes.hpp"
-#include "../GameInput.hpp"
-#include "../RenderableWorldState.hpp"
-#include "../levelgen/LevelObjects.hpp"
-
+#include "levelgen/LevelObjects.hpp"
 #include "entity/Entity.hpp"
 #include "component/Component.hpp"
 #include "component/PhysicalComponent.hpp"
 #include "component/RenderableComponent.hpp"
 #include "component/PlayerComponent.hpp"
 
-class World
+struct World
 {
-	NO_COPY_MOVE(World);
-
-public:
 	World() = default;
-	~World();
 
-	void reset(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props);
-	void tick(const GameInput &input, RenderableWorldState &state);
+	// Level gen data
+	std::vector<LevelFloor> level_floors;
+	std::vector<LevelProp> level_props;
+	std::vector<LevelWall> level_walls;
 
-private:
+	// gameplay state
 	win::SpatialIndex<PhysicalComponent> index;
 	win::Pool<Entity> entities;
 	win::Pool<PhysicalComponent> physicals;

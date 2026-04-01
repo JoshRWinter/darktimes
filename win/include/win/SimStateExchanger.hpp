@@ -186,7 +186,7 @@ private:
 	const float sim_frequency;
 	const std::chrono::time_point<std::chrono::high_resolution_clock> beginning = std::chrono::high_resolution_clock::now();
 
-	win::ObjectExchanger<impl::SimStateContainer<SimState>, 10> exchanger;
+	win::ObjectExchanger<impl::SimStateContainer<SimState>, 4> exchanger;
 
 	impl::SimStateContainer<SimState> *prev_simstate = NULL;
 	impl::SimStateContainer<SimState> *current_simstate = NULL;
