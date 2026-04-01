@@ -4,21 +4,23 @@
 
 enum class ComponentType
 {
-	physical,
-	renderable,
-	player
+    physical,
+    renderable,
+    player
 };
 
 class Entity;
+
 struct Component
 {
-	WIN_NO_COPY_MOVE(Component);
+    WIN_NO_COPY_MOVE(Component);
 
-	Component(ComponentType type, Entity &entity)
-		: type(type)
-		, entity(entity)
-	{}
+    Component(ComponentType type, Entity &entity)
+        : type(type)
+        , entity(entity)
+    {
+    }
 
-	ComponentType type;
-	Entity &entity;
+    ComponentType type;
+    Entity &entity;
 };

@@ -4,7 +4,7 @@
 
 #include "../Texture.hpp"
 
-#if defined (STATIC) || defined (DYNAMIC) || defined STATIC_DYNAMIC
+#if defined(STATIC) || defined(DYNAMIC) || defined STATIC_DYNAMIC
 #error "macro confusion"
 #endif
 
@@ -17,53 +17,50 @@
 
 struct TextureMapItem
 {
-	const char *asset_path = NULL;
-	int atlas_index = -1;
-	bool dynamic = false;
+    const char *asset_path = NULL;
+    int atlas_index = -1;
+    bool dynamic = false;
 };
 
 class TextureAssetMap
 {
-	WIN_NO_COPY_MOVE(TextureAssetMap);
+    WIN_NO_COPY_MOVE(TextureAssetMap);
 
 public:
-	TextureAssetMap() = default;
+    TextureAssetMap() = default;
 
-	static constexpr int size()
-	{
-		return static_cast<int>(Texture::max_texture);
-	}
+    static constexpr int size() { return static_cast<int>(Texture::max_texture); }
 
-	const TextureMapItem &operator[](Texture texture) const
-	{
+    const TextureMapItem &operator[](Texture texture) const
+    {
 #ifndef NDEBUG
-		if (texture < (Texture)0 || texture >= Texture::max_texture)
-			win::bug("out of range");
+        if (texture < (Texture)0 || texture >= Texture::max_texture)
+            win::bug("out of range");
 
-		const auto &t = map[(int)texture];
-		if (t.asset_path == NULL)
-			win::bug("Texture " + std::to_string((int)texture) + " is not initialized in the texture map.");
+        const auto &t = map[(int)texture];
+        if (t.asset_path == NULL)
+            win::bug("Texture " + std::to_string((int)texture) + " is not initialized in the texture map.");
 
-		return t;
+        return t;
 #else
-		return map[(int)texture];
+        return map[(int)texture];
 #endif
-	}
+    }
 
 private:
-	TextureMapItem map[(int)Texture::max_texture];
+    TextureMapItem map[(int)Texture::max_texture];
 
-	bool add(Texture textureid, const char *asset_path, int atlas_index, bool dynamic)
-	{
-		TextureMapItem tmi;
-		tmi.asset_path = asset_path;
-		tmi.atlas_index = atlas_index;
-		tmi.dynamic = dynamic;
+    bool add(Texture textureid, const char *asset_path, int atlas_index, bool dynamic)
+    {
+        TextureMapItem tmi;
+        tmi.asset_path = asset_path;
+        tmi.atlas_index = atlas_index;
+        tmi.dynamic = dynamic;
 
-		map[(int)textureid] = tmi;
+        map[(int)textureid] = tmi;
 
-		return false;
-	}
+        return false;
+    }
 
 #include "TextureAssetMap.txt"
 };

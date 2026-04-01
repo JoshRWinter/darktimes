@@ -6,76 +6,84 @@
 
 class Entity
 {
-	WIN_NO_COPY_MOVE(Entity);
+    WIN_NO_COPY_MOVE(Entity);
 
 public:
-	constexpr static int max_components = 4;
+    constexpr static int max_components = 4;
 
-	// name MUST BE STATIC!!!
-	explicit Entity(const char *name)
-		: name(name) {}
+    // name MUST BE STATIC!!!
+    explicit Entity(const char *name)
+        : name(name)
+    {
+    }
 
-	~Entity()
-	{
-		for (auto &component : components)
-			if (component.occupied)
-				win::bug("Live component on entity " + std::string(name));
-	}
+    ~Entity()
+    {
+        for (auto &component : components)
+            if (component.occupied)
+                win::bug("Live component on entity " + std::string(name));
+    }
 
-	Component &add(Component &c) { return *add(&c); }
-	Component *add(Component *c)
-	{
-		for (auto &component : components)
-		{
-			if (!component.occupied)
-			{
-				component.occupied = true;
-				component.component = c;
+    Component &add(Component &c) { return *add(&c); }
 
-				return c;
-			}
-		}
+    Component *add(Component *c)
+    {
+        for (auto &component : components)
+        {
+            if (!component.occupied)
+            {
+                component.occupied = true;
+                component.component = c;
 
-		win::bug("Component slots full on entity " + std::string(name));
-	}
+                return c;
+            }
+        }
 
-	void remove(ComponentType type)
-	{
-		for (auto &component : components)
-		{
-			if (component.occupied && component.component->type == type)
-			{
-				component.occupied = false;
-				component.component = NULL;
-			}
-		}
-	}
+        win::bug("Component slots full on entity " + std::string(name));
+    }
 
-	template <typename T> T &get()
-	{
-		for (auto &component : components)
-			if (component.occupied && component.component->type == T::ctype)
-				return *(T*)component.component;
+    void remove(ComponentType type)
+    {
+        for (auto &component : components)
+        {
+            if (component.occupied && component.component->type == type)
+            {
+                component.occupied = false;
+                component.component = NULL;
+            }
+        }
+    }
 
-		win::bug("No component with type " + std::to_string((int)T::ctype) + " on entity " + name);
-	}
+    template<typename T> T &get()
+    {
+        for (auto &component : components)
+            if (component.occupied && component.component->type == T::ctype)
+                return *(T *)component.component;
 
-	template <typename T> T *get_optional()
-	{
-		for (auto &component : components)
-			if (component.occupied && component.component->type == T::ctype)
-				return (T*)component.component;
+        win::bug("No component with type " + std::to_string((int)T::ctype) + " on entity " + name);
+    }
 
-		return NULL;
-	}
+    template<typename T> T *get_optional()
+    {
+        for (auto &component : components)
+            if (component.occupied && component.component->type == T::ctype)
+                return (T *)component.component;
 
-	void clear()
-	{
-		for (auto &component : components)
-			component.occupied = false;
-	}
+        return NULL;
+    }
+
+    void clear()
+    {
+        for (auto &component : components)
+            component.occupied = false;
+    }
 
 private:
-	const char *name;
-	struct { Component *component = NULL; bool occupied = false; } components[max_components];
+    const char *name;
+
+    struct
+    {
+        Component *component = NULL;
+        bool occupied = false;
+    } components[max_components];
 };

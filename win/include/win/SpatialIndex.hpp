@@ -107,7 +107,7 @@ template<typename T> class SpatialIndex;
 
 template<typename T> class SpatialIndexIterator
 {
-	friend class SpatialIndex<T>;
+    friend class SpatialIndex<T>;
 
 public:
     SpatialIndexIterator(const SpatialIndex<T> &map,
