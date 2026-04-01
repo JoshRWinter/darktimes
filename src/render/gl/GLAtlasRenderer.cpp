@@ -16,7 +16,7 @@ GLAtlasRenderer::GLAtlasRenderer(win::AssetRoll &roll, const TextureAssetMap &te
 {
 	init_atlases(roll, texture_map);
 
-	program = win::GLProgram(win::load_gl_shaders(roll["shader/static_atlas.vert"], roll["shader/static_atlas.frag"]));
+	program = win::GLProgram(win::gl_load_shaders(roll["shader/static_atlas.vert"], roll["shader/static_atlas.frag"]));
 	glUseProgram(program.get());
 	uniform_view_projection = get_uniform(program, "view_projection");
 	const auto uniform_tex = get_uniform(program, "tex");

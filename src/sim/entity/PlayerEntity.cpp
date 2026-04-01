@@ -2,10 +2,10 @@
 #include "PlayerEntity.hpp"
 
 void PlayerEntity::create(
-	win::Pool<Entity> &entities,
-	win::Pool<PhysicalComponent> &physicals,
-	win::Pool<RenderableComponent> &renderables,
-	win::Pool<PlayerComponent> &players
+	Pool<Entity> &entities,
+	Pool<PhysicalComponent> &physicals,
+	Pool<RenderableComponent> &renderables,
+	Pool<PlayerComponent> &players
 )
 {
 	auto &ent = entities.add("player");

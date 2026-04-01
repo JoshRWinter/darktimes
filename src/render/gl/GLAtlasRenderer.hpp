@@ -27,7 +27,7 @@ private:
 	int uniform_view_projection;
 
 	std::vector<win::GLAtlas*> atlas_map;
-	win::Pool<win::GLAtlas> atlases;
+	win::Pool<win::GLAtlas, 5, true> atlases;
 
 	win::GLVertexArray vao;
 	win::GLBuffer position, texcoord;

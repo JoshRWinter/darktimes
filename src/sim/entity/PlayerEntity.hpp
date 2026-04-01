@@ -1,7 +1,6 @@
 #pragma once
 
-#include <win/Pool.hpp>
-
+#include "../PoolTypes.hpp"
 #include "Entity.hpp"
 #include "../component/PhysicalComponent.hpp"
 #include "../component/RenderableComponent.hpp"
@@ -15,9 +14,9 @@ struct PlayerEntity
 	static constexpr float height = 0.4f;
 
 	static void create(
-		win::Pool<Entity>&,
-		win::Pool<PhysicalComponent>&,
-		win::Pool<RenderableComponent>&,
-		win::Pool<PlayerComponent>&
+		Pool<Entity>&,
+		Pool<PhysicalComponent>&,
+		Pool<RenderableComponent>&,
+		Pool<PlayerComponent>&
 	);
 };

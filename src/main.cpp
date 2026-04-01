@@ -29,7 +29,7 @@ int main()
 	win::Display display(display_options);
 	display.vsync(true);
 
-	win::load_gl_functions();
+	win::gl_load_functions();
 
 	display.register_mouse_handler([](int x, int y)
 	{

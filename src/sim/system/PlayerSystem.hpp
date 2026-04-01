@@ -1,8 +1,8 @@
 #pragma once
 
-#include <win/Pool.hpp>
 #include <win/SpatialIndex.hpp>
 
+#include "../PoolTypes.hpp"
 #include "../../GameInput.hpp"
 #include "../entity/Entity.hpp"
 #include "../component/PhysicalComponent.hpp"
@@ -11,9 +11,9 @@
 
 void player_system(
 	win::SpatialIndex<PhysicalComponent> &index,
-	win::Pool<Entity> &entities,
-	win::Pool<PhysicalComponent> &physicals,
-	win::Pool<RenderableComponent> &renderables,
-	win::Pool<PlayerComponent> &players,
+	Pool<Entity> &entities,
+	Pool<PhysicalComponent> &physicals,
+	Pool<RenderableComponent> &renderables,
+	Pool<PlayerComponent> &players,
 	const GameInput &input
 );

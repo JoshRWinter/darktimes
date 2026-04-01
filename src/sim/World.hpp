@@ -5,6 +5,7 @@
 #include <win/Pool.hpp>
 #include <win/SpatialIndex.hpp>
 
+#include "PoolTypes.hpp"
 #include "levelgen/LevelObjects.hpp"
 #include "entity/Entity.hpp"
 #include "component/Component.hpp"
@@ -23,8 +24,8 @@ struct World
 
 	// gameplay state
 	win::SpatialIndex<PhysicalComponent> index;
-	win::Pool<Entity> entities;
-	win::Pool<PhysicalComponent> physicals;
-	win::Pool<RenderableComponent> renderables;
-	win::Pool<PlayerComponent> players;
+	Pool<Entity> entities;
+	Pool<PhysicalComponent> physicals;
+	Pool<RenderableComponent> renderables;
+	Pool<PlayerComponent> players;
 };

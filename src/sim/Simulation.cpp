@@ -70,7 +70,7 @@ void Simulation::simulation(Simulation &sim)
 
 	win::Pair<float> mouse;
 	std::vector<win::Button> buttons;
-	buttons.reserve(decltype(sim.inputs)::length);
+	buttons.reserve(decltype(sim.inputs)::length());
 
 	while (!sim.stop_flag.load())
 	{
@@ -81,7 +81,7 @@ void Simulation::simulation(Simulation &sim)
 			sim.mouseinput.reader_release(i);
 		}
 
-		buttons.resize(sim.inputs.length);
+		buttons.resize(decltype(sim.inputs)::length());
 		buttons.clear();
 		const auto read = sim.inputs.read(buttons.data(), buttons.size());
 		buttons.resize(read);

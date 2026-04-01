@@ -38,6 +38,7 @@ set(sources
 	src/sim/Game.hpp
 	src/sim/Game.cpp
 	src/sim/World.hpp
+	src/sim/PoolTypes.hpp
 
 	# level gen nonsense
 	src/sim/levelgen/LevelObjects.hpp

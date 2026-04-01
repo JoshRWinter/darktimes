@@ -22,6 +22,8 @@ add_library(win STATIC
 	include/win/Utility.hpp
 	src/Utility.cpp
 
+	include/win/Bag.hpp
+
 	include/win/Pool.hpp
 
 	include/win/ConcurrentRingBuffer.hpp
@@ -82,6 +84,15 @@ add_library(win STATIC
 	include/win/FileStream.hpp
 	src/FileStream.cpp
 
+	include/win/X11MonitorEnumerator.hpp
+	src/X11MonitorEnumerator.cpp
+
+	include/win/Win32MonitorEnumerator.hpp
+	src/Win32MonitorEnumerator.cpp
+
+	include/win/MonitorEnumerator.hpp
+	src/MonitorEnumerator.cpp
+
 	include/win/DisplayBase.hpp
 	src/DisplayBase.cpp
 
@@ -139,7 +150,7 @@ add_library(win STATIC
 	src/sound/SoundEngineLinuxPipeWire.cpp
 )
 
-if(WIN32)
+if (WIN32)
 	find_package(OpenGL REQUIRED)
 	find_package(DSound REQUIRED)
 
@@ -154,7 +165,7 @@ if(WIN32)
 		include/ogg
 		include/vorbis
 		include/zlib
-		)
+	)
 
 	target_link_libraries(win
 		PRIVATE
@@ -167,12 +178,12 @@ if(WIN32)
 		${CMAKE_CURRENT_LIST_DIR}/lib/ogg.lib
 		${CMAKE_CURRENT_LIST_DIR}/lib/vorbis.lib
 		ws2_32
-		)
+	)
 
-	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+	if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
 		string(REGEX REPLACE "/W[0-4]" "/W1" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-	endif()
-else()
+	endif ()
+else ()
 	set(OpenGL_GL_PREFERENCE LEGACY)
 
 	find_package(Freetype REQUIRED)
@@ -192,7 +203,7 @@ else()
 		${PipeWire_INCLUDE_DIRS}
 		${Spa_INCLUDE_DIRS}
 		${PULSEAUDIO_INCLUDE_DIRS}
-		)
+	)
 
 	target_link_libraries(win
 		PRIVATE
@@ -203,12 +214,12 @@ else()
 		${ZLIB_LIBRARIES}
 		${OGGVORBIS_LIBRARIES}
 		Xrandr
-		)
+	)
 
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		target_compile_options(win PRIVATE -fno-exceptions)
-	endif()
-endif()
+	endif ()
+endif ()
 
 if (USE_ASAN)
 	message("Enabling ASAN")
@@ -219,5 +230,5 @@ if (USE_ASAN)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		target_compile_options(win PRIVATE -fsanitize=undefined)
 		target_link_options(win PRIVATE -fsanitize=undefined)
-	endif()
-endif()
+	endif ()
+endif ()
