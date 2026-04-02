@@ -1,21 +1,14 @@
 #include <cmath>
 
-#include <win/SpatialIndex.hpp>
+#include "../entity/Entities.hpp"
+#include "Systems.hpp"
 
-#include "../entity/PlayerEntity.hpp"
-#include "PlayerSystem.hpp"
-
-void player_system(win::SpatialIndex<PhysicalComponent> &index,
-                   Pool<Entity> &entities,
-                   Pool<PhysicalComponent> &physicals,
-                   Pool<RenderableComponent> &renderables,
-                   Pool<PlayerComponent> &players,
-                   const GameInput &input)
+void player_system(World &world, const GameInput &input)
 {
-    if (players.size() == 0)
-        PlayerEntity::create(entities, physicals, renderables, players);
+    if (world.players.size() == 0)
+        PlayerEntity::create(world);
 
-    auto &player = *players.begin();
+    auto &player = *world.players.begin();
     auto &phys = player.entity.get<PhysicalComponent>();
 
     // movement
@@ -34,7 +27,7 @@ void player_system(win::SpatialIndex<PhysicalComponent> &index,
     phys.rot = aim;
 
     // collision
-    for (const auto &p : index.query(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h)))
+    for (const auto &p : world.index.query(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h)))
     {
         phys.correct(p);
     }

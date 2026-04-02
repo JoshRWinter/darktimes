@@ -2,11 +2,49 @@
 
 #include <cmath>
 
-#include "Component.hpp"
+#include <win/Win.hpp>
+
+#include "../../Texture.hpp"
+
+enum class ComponentType
+{
+    physical,
+    renderable,
+    player
+};
+
+class Entity;
+
+struct Component
+{
+    WIN_NO_COPY_MOVE(Component);
+
+    Component(ComponentType type, Entity &entity)
+        : type(type)
+        , entity(entity)
+    {
+    }
+
+    ComponentType type;
+    Entity &entity;
+};
+
+struct RenderableComponent : Component
+{
+    static constexpr auto ctype = ComponentType::renderable;
+
+    RenderableComponent(Entity &entity, Texture texture)
+        : Component(ctype, entity)
+        , texture(texture)
+    {
+    }
+
+    Texture texture;
+};
 
 struct PhysicalComponent : Component
 {
-    static constexpr ComponentType ctype = ComponentType::physical;
+    static constexpr auto ctype = ComponentType::physical;
 
     PhysicalComponent(Entity &entity, float x, float y, float w, float h, float rot)
         : Component(ctype, entity)
@@ -47,4 +85,14 @@ struct PhysicalComponent : Component
     }
 
     float x, y, w, h, rot;
+};
+
+struct PlayerComponent : Component
+{
+    static constexpr auto ctype = ComponentType::player;
+
+    explicit PlayerComponent(Entity &entity)
+        : Component(ctype, entity)
+    {
+    }
 };

@@ -38,7 +38,6 @@ set(sources
 	src/sim/Game.hpp
 	src/sim/Game.cpp
 	src/sim/World.hpp
-	src/sim/PoolTypes.hpp
 
 	# level gen nonsense
 	src/sim/levelgen/LevelObjects.hpp
@@ -49,38 +48,31 @@ set(sources
 	src/sim/levelgen/LevelGenerator.hpp
 	src/sim/levelgen/LevelGenerator.cpp
 
-	# entities
-	src/sim/entity/Entity.hpp
-	src/sim/entity/PlayerEntity.hpp
+	src/sim/entity/Entities.hpp
+	src/sim/component/Components.hpp
+	src/sim/system/Systems.hpp
+
+	src/sim/entity/Entity.cpp
 	src/sim/entity/PlayerEntity.cpp
-
-	# components
-	src/sim/component/Component.hpp
-	src/sim/component/PhysicalComponent.hpp
-	src/sim/component/RenderableComponent.hpp
-	src/sim/component/PlayerComponent.hpp
-
-	# systems
-	src/sim/system/PlayerSystem.hpp
 	src/sim/system/PlayerSystem.cpp
 )
 
-if(WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
+if (WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
 	add_executable(${executable} WIN32 ${sources})
-else()
+else ()
 	add_executable(${executable} ${sources})
-endif()
+endif ()
 
 target_link_libraries(${executable} win)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(${executable} PRIVATE -fno-exceptions)
-elseif(WIN32)
+elseif (WIN32)
 	# /w3 is too aggressive
-	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+	if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
 		string(REGEX REPLACE "/W[0-4]" "/W1" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-	endif()
-endif()
+	endif ()
+endif ()
 
 if (USE_ASAN)
 	message("Enabling ASAN")
@@ -91,5 +83,5 @@ if (USE_ASAN)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		target_compile_options(${executable} PRIVATE -fsanitize=undefined)
 		target_link_options(${executable} PRIVATE -fsanitize=undefined)
-	endif()
-endif()
+	endif ()
+endif ()
