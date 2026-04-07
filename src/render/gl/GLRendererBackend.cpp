@@ -34,6 +34,13 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
     atlas_renderer.set_view_projection(vp);
 }
 
+void GLRendererBackend::begin()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void GLRendererBackend::end() {}
+
 void GLRendererBackend::load_statics(const std::vector<Renderable> &statics)
 {
     loaded_statics.clear();

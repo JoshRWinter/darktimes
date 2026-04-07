@@ -41,6 +41,8 @@ public:
 
     void set_view(float x, float y, float zoom) override;
     void load_statics(const std::vector<Renderable> &statics) override;
+    void begin() override;
+    void end() override;
     void render_statics(const std::vector<int> &statics) override;
     void render_dynamics(const std::vector<Renderable> &dynamics) override;
 

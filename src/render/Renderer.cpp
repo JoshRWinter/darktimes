@@ -3,6 +3,7 @@
 
 Renderer::Renderer(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
     : backend(new GLRendererBackend(screen_dims, projection, roll))
+    , staging(100)
 {
 }
 
@@ -15,11 +16,14 @@ void Renderer::set_statics(const std::vector<Renderable> &statics)
 void Renderer::render(Renderables &renderables)
 {
     backend->set_view(renderables.centerx, renderables.centery, 1.0);
+    backend->begin();
 
-    std::vector<int> ids;
+    staging.clear();
     for (const auto &r : statics)
-        ids.push_back(ids.size());
+        staging.push_back(staging.size());
 
-    backend->render_statics(ids);
+    backend->render_statics(staging);
+
+    backend->end();
 }
 

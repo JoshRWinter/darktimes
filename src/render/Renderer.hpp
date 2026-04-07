@@ -18,6 +18,7 @@ public:
     void render(Renderables &renderables);
 
 private:
+    std::vector<int> staging;
     std::vector<Renderable> statics;
     std::unique_ptr<RendererBackend> backend;
 };
