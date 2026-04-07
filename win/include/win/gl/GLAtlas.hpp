@@ -15,21 +15,22 @@ namespace win
 
 class GLAtlas : public Atlas
 {
-	WIN_NO_COPY(GLAtlas);
+    WIN_NO_COPY(GLAtlas);
 
 public:
-	enum class Mode { linear, nearest };
+    enum class Mode
+    {
+        linear,
+        nearest
+    };
 
-	GLAtlas(Stream, Mode);
-	GLAtlas(GLAtlas&&) = default;
+    GLAtlas(Stream, Mode, GLenum texture_unit);
+    GLAtlas(GLAtlas &&) = default;
 
-	GLuint texture() const;
+    GLuint texture() const;
 
 private:
-	GLTexture gltex;
-
-	int num;
-	std::unique_ptr<AtlasItem[]> items;
+    GLTexture gltex;
 };
 
 }

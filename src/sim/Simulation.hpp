@@ -1,41 +1,36 @@
 #pragma once
 
-#include <thread>
 #include <atomic>
+#include <thread>
+#include <vector>
 
-#include "../Darktimes.hpp"
-#include "../GameInput.hpp"
-#include "../RenderableWorldState.hpp"
-#include "../SyncObjectManager.hpp"
-#include "../levelgen/LevelObjects.hpp"
+#include <win/ConcurrentRingBuffer.hpp>
+#include <win/SimStateExchanger.hpp>
+#include <win/Win.hpp>
 
-struct SimulationResetCommand
-{
-	std::vector<LevelFloor> floors;
-	std::vector<LevelWall> walls;
-	std::vector<LevelProp> props;
-};
+#include "../KeyEvent.hpp"
+#include "../Renderable.hpp"
 
 class Simulation
 {
-	NO_COPY_MOVE(Simulation);
+    WIN_NO_COPY_MOVE(Simulation);
 
 public:
-	// all public methods are called by instantiating thread
-	Simulation();
-	~Simulation();
+    explicit Simulation(win::SimStateExchanger<Renderables> &simexchanger);
+    ~Simulation();
 
-	void reset(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props);
-	void set_input(const GameInput &input);
-	RenderableWorldState *get_state(RenderableWorldState *previous);
+    void queue_inputs(const std::vector<KeyEvent> &i);
+    void set_mouse_input(const win::Pair<float> &p);
+    std::vector<Renderable> *get_statics();
+    void release_statics(std::vector<Renderable> *renderables);
 
 private:
-	// all private methods called by "thread" thread
-	static void simulation(Simulation &sim);
+    static void simulation(Simulation &sim);
 
-	SyncObjectManager<SimulationResetCommand, 1> som_level_package;
-	SyncObjectManager<GameInput, 3> som_input;
-	SyncObjectManager<RenderableWorldState, 3> som_state;
-	std::atomic<bool> stop_flag;
-	std::thread thread;
+    std::atomic<bool> stop_flag;
+    win::ConcurrentRingBuffer<KeyEvent, 20> inputs;
+    win::ObjectExchanger<win::Pair<float>, 3> mouseinput;
+    win::ObjectExchanger<std::vector<Renderable>, 1> statics;
+    win::SimStateExchanger<Renderables> &simexchanger;
+    std::thread thread;
 };

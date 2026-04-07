@@ -1,48 +1,34 @@
 #include <cmath>
 
-#include <win/BlockMap.hpp>
+#include "../entity/Entities.hpp"
+#include "Systems.hpp"
 
-#include "PlayerSystem.hpp"
-#include "../entity/PlayerEntity.hpp"
-
-void player_system(
-	win::BlockMap<PhysicalComponent> &blockmap,
-	win::Pool<Entity> &entities,
-	win::Pool<PhysicalComponent> &physicals,
-	win::Pool<RenderableComponent> &renderables,
-	win::Pool<PlayerComponent> &players,
-	const GameInput &input
-)
+void player_system(World &world, const Controls &controls)
 {
-	if (players.size() == 0)
-		PlayerEntity::create(
-			entities,
-			physicals,
-			renderables,
-			players
-		);
+    if (world.players.size() == 0)
+        PlayerEntity::create(world);
 
-	auto &player = *players.begin();
-	auto &phys = player.entity.get<PhysicalComponent>();
+    auto &player = *world.players.begin();
+    auto &phys = player.entity.get<PhysicalComponent>();
 
-	// movement
-	const float scoot = 0.1f;
-	if (input.up)
-		phys.y += scoot;
-	if (input.down)
-		phys.y -= scoot;
-	if (input.left)
-		phys.x -= scoot;
-	if (input.right)
-		phys.x += scoot;
+    // movement
+    const float scoot = 0.1f;
+    if (controls.up)
+        phys.y += scoot;
+    if (controls.down)
+        phys.y -= scoot;
+    if (controls.left)
+        phys.x -= scoot;
+    if (controls.right)
+        phys.x += scoot;
 
-	// aim direction
-	const float aim = atan2f(input.y, input.x);
-	phys.rot = aim;
+    // aim direction
+    // const float aim = atan2f(input.y, input.x);
+    // phys.rot = aim;
 
-	// collision
-	for (const auto &p : blockmap.iterate(win::BlockMapLocation(phys.x, phys.y, phys.w, phys.h)))
-	{
-		phys.correct(p);
-	}
+    // collision
+    for (const auto &p : world.index.query(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h)))
+    {
+        phys.correct(p);
+    }
 }

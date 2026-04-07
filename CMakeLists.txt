@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 project(Darktimes)
 add_subdirectory(win)
 set(CMAKE_CXX_STANDARD 17)
@@ -8,93 +8,72 @@ set(executable Darktimes)
 set(sources
 	src/main.cpp
 
-	src/Darktimes.hpp
-
 	# top level nonsense
-	src/LightRenderable.hpp
+	src/KeyEvent.hpp
 	src/Renderable.hpp
 	src/Texture.hpp
-	src/SyncObjectManager.hpp
 	src/RandomNumberGenerator.hpp
 	src/RandomNumberGenerator.cpp
-	src/Game.hpp
-	src/Game.cpp
-	src/GameInput.hpp
-	src/RenderableWorldState.hpp
 
 	# render
 	src/render/Renderer.hpp
 	src/render/Renderer.cpp
 	src/render/RendererBackend.hpp
-	src/render/LightMeshGenerator.hpp
-	src/render/LightMeshGenerator.cpp
 	src/render/TextureAssetMap.hpp
 	src/render/TextureAssetMap.txt
 
 	# gl renderer
 	src/render/gl/GLRendererBackend.hpp
 	src/render/gl/GLRendererBackend.cpp
-	src/render/gl/GLFloorTextureCollection.hpp
-	src/render/gl/GLFloorTextureCollection.cpp
-	src/render/gl/GLAtlasTextureCollection.hpp
-	src/render/gl/GLAtlasTextureCollection.cpp
-	src/render/gl/GLSubRenderer.hpp
-	src/render/gl/GLStaticFloorRenderer.hpp
-	src/render/gl/GLStaticFloorRenderer.cpp
-	src/render/gl/GLStaticAtlasRenderer.hpp
-	src/render/gl/GLStaticAtlasRenderer.cpp
-	src/render/gl/GLDynamicLightRenderer.hpp
-	src/render/gl/GLDynamicLightRenderer.cpp
-	src/render/gl/GLDynamicAtlasRenderer.hpp
-	src/render/gl/GLDynamicAtlasRenderer.cpp
-
-	# level gen nonsense
-	src/levelgen/LevelObjects.hpp
-	src/levelgen/LevelObjectsInternal.hpp
-	src/levelgen/PropDefs.hpp
-	src/levelgen/StructureDefs.hpp
-	src/levelgen/Structure.hpp
-	src/levelgen/LevelGenerator.hpp
-	src/levelgen/LevelGenerator.cpp
+	src/render/gl/GLRendererBase.hpp
+	src/render/gl/GLConstants.hpp
+	src/render/gl/GLFloorRenderer.hpp
+	src/render/gl/GLFloorRenderer.cpp
+	src/render/gl/GLAtlasRenderer.hpp
+	src/render/gl/GLAtlasRenderer.cpp
 
 	# sim
-	src/sim/World.hpp
-	src/sim/World.cpp
 	src/sim/Simulation.hpp
 	src/sim/Simulation.cpp
+	src/sim/Controls.hpp
+	src/sim/Game.hpp
+	src/sim/Game.cpp
+	src/sim/World.hpp
 
-	# entities
-	src/sim/entity/Entity.hpp
-	src/sim/entity/PlayerEntity.hpp
+	# level gen nonsense
+	src/sim/levelgen/LevelObjects.hpp
+	src/sim/levelgen/LevelObjectsInternal.hpp
+	src/sim/levelgen/PropDefs.hpp
+	src/sim/levelgen/StructureDefs.hpp
+	src/sim/levelgen/Structure.hpp
+	src/sim/levelgen/LevelGenerator.hpp
+	src/sim/levelgen/LevelGenerator.cpp
+
+	src/sim/entity/Entities.hpp
+	src/sim/component/Components.hpp
+	src/sim/system/Systems.hpp
+
+	src/sim/entity/Entity.cpp
 	src/sim/entity/PlayerEntity.cpp
-
-	# components
-	src/sim/component/Component.hpp
-	src/sim/component/PhysicalComponent.hpp
-	src/sim/component/RenderableComponent.hpp
-	src/sim/component/PlayerComponent.hpp
-
-	# systems
-	src/sim/system/PlayerSystem.hpp
 	src/sim/system/PlayerSystem.cpp
 )
 
-if(WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
+if (WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
 	add_executable(${executable} WIN32 ${sources})
-else()
+else ()
 	add_executable(${executable} ${sources})
-endif()
+endif ()
 
 target_link_libraries(${executable} win)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_compile_options(${executable} PRIVATE -fno-exceptions)
-elseif(WIN32)
+elseif (WIN32)
 	# /w3 is too aggressive
-	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+	if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
 		string(REGEX REPLACE "/W[0-4]" "/W1" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-	endif()
-endif()
+	endif ()
+endif ()
 
 if (USE_ASAN)
 	message("Enabling ASAN")
@@ -105,5 +84,5 @@ if (USE_ASAN)
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		target_compile_options(${executable} PRIVATE -fsanitize=undefined)
 		target_link_options(${executable} PRIVATE -fsanitize=undefined)
-	endif()
-endif()
+	endif ()
+endif ()

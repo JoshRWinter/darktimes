@@ -1,0 +1,155 @@
+#pragma once
+
+#include "LevelObjects.hpp"
+
+struct LevelPropExcluder
+{
+    LevelPropExcluder(float x, float y, float w, float h)
+        : x(x)
+        , y(y)
+        , w(w)
+        , h(h)
+    {
+    }
+
+    float x, y, w, h;
+};
+
+struct LevelPropInternal : LevelProp
+{
+    LevelPropInternal(Texture texture, LevelSide side, bool solid, float x, float y, float w, float h, float excluder_padding_x, float excluder_padding_y)
+        : LevelProp(texture, side, x, y, w, h)
+        , solid(solid)
+        , excluder_padding_x(excluder_padding_x)
+        , excluder_padding_y(excluder_padding_y)
+    {
+    }
+
+    bool collide(const std::vector<LevelPropInternal> &others) const
+    {
+        for (const auto &other : others)
+        {
+            if (collide(other))
+                return true;
+        }
+
+        return false;
+    }
+
+    bool collide(const LevelPropInternal &other) const
+    {
+        // clang-format off
+		return solid && other.solid &&
+			x + w + excluder_padding_x > other.x - other.excluder_padding_x &&
+			x - excluder_padding_x < other.x + other.w + other.excluder_padding_x &&
+			y + h + excluder_padding_y > other.y - other.excluder_padding_y &&
+			y - excluder_padding_y < other.y + other.h + other.excluder_padding_y;
+        // clang-format on
+    }
+
+    bool collide(const std::vector<LevelPropExcluder> &others) const
+    {
+        for (const auto &other : others)
+        {
+            if (collide(other))
+                return true;
+        }
+
+        return false;
+    }
+
+    bool collide(const LevelPropExcluder &other) const
+    {
+        // clang-format off
+		return x + w > other.x &&
+			   x < other.x + other.w &&
+			   y + h > other.y &&
+			   y < other.y + other.h;
+        // clang-format on
+    }
+
+    bool solid;
+    float excluder_padding_x, excluder_padding_y;
+};
+
+struct LevelFloorConnector
+{
+    LevelFloorConnector() = default;
+
+    LevelFloorConnector(int floor_id, LevelSide side, float start, float stop)
+        : floor_id(floor_id)
+        , side(side)
+        , start(start)
+        , stop(stop)
+    {
+    }
+
+    bool collide(const LevelFloorConnector &rhs, float padding) const
+    {
+        if (side != rhs.side)
+            return false;
+
+        const bool above = rhs.start > stop + padding;
+        const bool below = rhs.stop < start - padding;
+
+        if (above || below)
+            return false;
+
+        return true;
+    }
+
+    bool collide(const std::vector<LevelFloorConnector> &rhs, float padding) const
+    {
+        for (const auto &x : rhs)
+            if (collide(x, padding))
+                return true;
+
+        return false;
+    }
+
+    int floor_id;
+    LevelSide side;
+    float start, stop;
+};
+
+struct LevelWallInternal : LevelWall
+{
+    static constexpr float HALFWIDTH = 0.05f;
+    static constexpr float WIDTH = HALFWIDTH * 2;
+
+    LevelWallInternal(float x, float y, float w, float h)
+        : LevelWall(x, y, w, h)
+    {
+    }
+};
+
+struct LevelFloorInternal : LevelFloor
+{
+    LevelFloorInternal(Texture texture, float x, float y, float w, float h, bool skip_prop_generation = false)
+        : LevelFloor(texture, x, y, w, h)
+        , id(next_id++)
+        , skip_prop_generation(skip_prop_generation)
+    {
+    }
+
+    bool collide(const LevelFloorInternal &rhs, float tolerance = 0.05f) const
+    {
+        return x + w > rhs.x + tolerance && x < (rhs.x + rhs.w) - tolerance && y + h > rhs.y + tolerance && y < (rhs.y + rhs.h) - tolerance;
+    }
+
+    bool collide(const std::vector<LevelFloorInternal> &rhs) const
+    {
+        for (const auto &x : rhs)
+            if (collide(x))
+                return true;
+
+        return false;
+    }
+
+    int id;
+    bool skip_prop_generation;
+    std::vector<LevelFloorConnector> connectors;
+    std::vector<LevelPropInternal> prop_spawns;
+
+    inline static int next_id = 0;
+};

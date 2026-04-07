@@ -1,34 +1,30 @@
 #pragma once
 
+#include <vector>
+
 #include <win/Pool.hpp>
-#include <win/BlockMap.hpp>
+#include <win/SpatialIndex.hpp>
 
-#include "../Darktimes.hpp"
-#include "../GameInput.hpp"
-#include "../RenderableWorldState.hpp"
-#include "../levelgen/LevelObjects.hpp"
+#include "component/Components.hpp"
+#include "entity/Entities.hpp"
+#include "levelgen/LevelObjects.hpp"
 
-#include "entity/Entity.hpp"
-#include "component/Component.hpp"
-#include "component/PhysicalComponent.hpp"
-#include "component/RenderableComponent.hpp"
-#include "component/PlayerComponent.hpp"
-
-class World
+struct World
 {
-	NO_COPY_MOVE(World);
+    template<typename T> using Pool = win::Pool<T, 50, false>;
 
-public:
-	World() = default;
-	~World();
+    // gameplay state
 
-	void reset(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props);
-	void tick(const GameInput &input, RenderableWorldState &state);
+    Pool<Entity> entities;
+    Pool<PhysicalComponent> physicals;
+    Pool<RenderableComponent> renderables;
+    Pool<PlayerComponent> players;
 
-private:
-	win::BlockMap<PhysicalComponent> blockmap;
-	win::Pool<Entity> entities;
-	win::Pool<PhysicalComponent> physicals;
-	win::Pool<RenderableComponent> renderables;
-	win::Pool<PlayerComponent> players;
+    win::SpatialIndex<PhysicalComponent> index;
+
+    // Level gen data
+
+    std::vector<LevelFloor> level_floors;
+    std::vector<LevelProp> level_props;
+    std::vector<LevelWall> level_walls;
 };

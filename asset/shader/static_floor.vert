@@ -11,5 +11,5 @@ uniform mat4 view_projection;
 void main()
 {
     ftexcoord = vec3(texcoord.st, layer);
-    gl_Position = view_projection * vec4(pos.xy, 0.0, 1.0);
+    gl_Position = view_projection * vec4(pos, 0.0, 1.0);
 }

@@ -1,97 +1,95 @@
-#include <thread>
 #include <chrono>
+#include <thread>
 
+#include <win/Utility.hpp>
+
+#include "Game.hpp"
 #include "Simulation.hpp"
-#include "World.hpp"
 
-Simulation::Simulation()
-	: stop_flag(false)
-	, thread(simulation, std::ref(*this))
+Simulation::Simulation(win::SimStateExchanger<Renderables> &simexchanger)
+    : stop_flag(false)
+    , simexchanger(simexchanger)
+    , thread(simulation, std::ref(*this))
 {
 }
 
 Simulation::~Simulation()
 {
-	stop_flag = true;
-	if (thread.joinable())
-		thread.join();
+    stop_flag = true;
+    thread.join();
 }
 
-void Simulation::reset(const std::vector<LevelFloor> &floors, const std::vector<LevelWall> &walls, const std::vector<LevelProp> &props)
+void Simulation::queue_inputs(const std::vector<KeyEvent> &i)
 {
-	SimulationResetCommand *so;
-	while ((so = som_level_package.writer_acquire()) == NULL);
-
-	so->floors = floors;
-	so->walls = walls;
-	so->props = props;
-
-	som_level_package.writer_release(so);
+    int put = 0;
+    do
+    {
+        put += inputs.write(i.data() + put, i.size() - put);
+    } while (put != i.size());
 }
 
-void Simulation::set_input(const GameInput &input)
+void Simulation::set_mouse_input(const win::Pair<float> &p)
 {
-	GameInput *so;
-	while ((so = som_input.writer_acquire()) == NULL);
+    win::Pair<float> *x;
+    do
+    {
+        x = mouseinput.writer_acquire();
+    } while (x == NULL);
 
-	*so = input;
-	som_input.writer_release(so);
+    *x = p;
+
+    mouseinput.writer_release(x);
 }
 
-RenderableWorldState *Simulation::get_state(RenderableWorldState *previous)
+std::vector<Renderable> *Simulation::get_statics()
 {
-	if (previous != NULL)
-		som_state.reader_release(previous);
+    return statics.reader_acquire();
+}
 
-	return som_state.reader_acquire();
+void Simulation::release_statics(std::vector<Renderable> *renderables)
+{
+    statics.reader_release(renderables);
 }
 
 void Simulation::simulation(Simulation &sim)
 {
-	World world;
-	GameInput input;
-	RenderableWorldState *state;
+    const std::function<void(const std::vector<Renderable> &)> level_generated = [&sim](const std::vector<Renderable> &r)
+    {
+        std::vector<Renderable> *renderables;
+        do
+        {
+            renderables = sim.statics.writer_acquire();
+        } while (renderables == NULL);
 
-	auto tick_start = std::chrono::high_resolution_clock::now();
-	while (!sim.stop_flag)
-	{
-		// take int account newest input
-		{
-			GameInput *so;
-			if ((so = sim.som_input.reader_acquire()) != NULL)
-			{
-				input = *so;
-				sim.som_input.reader_release(so);
-			}
-		}
+        *renderables = r;
+        sim.statics.writer_release(renderables);
+    };
 
-		// see if there's a level update
-		{
-			SimulationResetCommand *so;
-			if ((so = sim.som_level_package.reader_acquire()) != NULL)
-			{
-				world.reset(so->floors, so->walls, so->props);
-				sim.som_level_package.reader_release(so);
-			}
-		}
+    Game game(level_generated);
+    game.reset();
 
-		// prepare a sync object for writing world state into
-		while ((state = sim.som_state.writer_acquire()) == NULL);
+    win::Pair<float> mouse;
+    std::vector<KeyEvent> buttons;
+    buttons.reserve(decltype(sim.inputs)::length());
 
-		// reset it
-		state->dynamics.clear();
-		state->dynamic_lights.clear();
+    while (!sim.stop_flag.load())
+    {
+        const auto i = sim.mouseinput.reader_acquire();
+        if (i != NULL)
+        {
+            mouse = *i;
+            sim.mouseinput.reader_release(i);
+        }
 
-		// run the world simulation
-		world.tick(input, *state);
+        buttons.resize(decltype(sim.inputs)::length());
+        const auto read = sim.inputs.read(buttons.data(), buttons.size());
+        buttons.resize(read);
 
-		// send up the results
-		sim.som_state.writer_release(state);
+        auto &renderables = sim.simexchanger.prepare_simstate();
+        renderables.clear();
 
-		// wait until time for next tick;
-		while (std::chrono::duration<float, std::milli>(std::chrono::high_resolution_clock::now() - tick_start).count() < 16.66666f)
-			std::this_thread::sleep_for(std::chrono::microseconds (1));
+        game.play(renderables, mouse, buttons);
 
-		tick_start = std::chrono::high_resolution_clock::now();
-	}
+        sim.simexchanger.release_simstate_and_sleep(renderables);
+    }
 }

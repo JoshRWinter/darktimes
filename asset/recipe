@@ -50,5 +50,5 @@ svg2tga {
 }
 
 atlas {
-    texture/atlas.txt texture/atlas
+    texture/atlas texture/atlas.txt
 }
