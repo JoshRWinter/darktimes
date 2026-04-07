@@ -14,8 +14,6 @@ void Renderer::set_statics(const std::vector<Renderable> &statics)
 
 void Renderer::render(Renderables &renderables)
 {
-    if (renderables.centerx != 0.0f || renderables.centery != 0.0f)
-        win::bug("bugly");
     backend->set_view(renderables.centerx, renderables.centery, 1.0);
 
     std::vector<int> ids;

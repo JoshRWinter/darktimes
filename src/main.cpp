@@ -2,6 +2,7 @@
 #include <win/Display.hpp>
 #include <win/gl/GL.hpp>
 
+#include "KeyEvent.hpp"
 #include "render/Renderer.hpp"
 #include "sim/Simulation.hpp"
 
@@ -36,14 +37,18 @@ int main()
 
 	});
 
+    std::vector<KeyEvent> keys;
+    keys.reserve(20);
     bool quit = false;
     display.register_button_handler(
-        [&quit](win::Button button, bool press)
+        [&quit, &keys](win::Button button, bool press)
         {
 #ifndef NDEBUG
             if (button == win::Button::esc)
                 quit = true;
 #endif
+
+            keys.emplace_back(button, press);
         });
 
     display.register_window_handler(
@@ -72,6 +77,12 @@ int main()
                 renderer.set_statics(*statics);
                 sim.release_statics(statics);
             }
+        }
+
+        if (!keys.empty())
+        {
+            sim.queue_inputs(keys);
+            keys.clear();
         }
 
         Renderables *prev, *current;

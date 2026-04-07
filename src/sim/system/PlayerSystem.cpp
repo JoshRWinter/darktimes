@@ -3,7 +3,7 @@
 #include "../entity/Entities.hpp"
 #include "Systems.hpp"
 
-void player_system(World &world, const GameInput &input)
+void player_system(World &world, const Controls &controls)
 {
     if (world.players.size() == 0)
         PlayerEntity::create(world);
@@ -13,18 +13,18 @@ void player_system(World &world, const GameInput &input)
 
     // movement
     const float scoot = 0.1f;
-    if (input.up)
+    if (controls.up)
         phys.y += scoot;
-    if (input.down)
+    if (controls.down)
         phys.y -= scoot;
-    if (input.left)
+    if (controls.left)
         phys.x -= scoot;
-    if (input.right)
+    if (controls.right)
         phys.x += scoot;
 
     // aim direction
-    const float aim = atan2f(input.y, input.x);
-    phys.rot = aim;
+    // const float aim = atan2f(input.y, input.x);
+    // phys.rot = aim;
 
     // collision
     for (const auto &p : world.index.query(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h)))

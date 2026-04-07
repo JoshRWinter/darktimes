@@ -9,11 +9,11 @@ set(sources
 	src/main.cpp
 
 	# top level nonsense
+	src/KeyEvent.hpp
 	src/Renderable.hpp
 	src/Texture.hpp
 	src/RandomNumberGenerator.hpp
 	src/RandomNumberGenerator.cpp
-	src/GameInput.hpp
 
 	# render
 	src/render/Renderer.hpp
@@ -35,6 +35,7 @@ set(sources
 	# sim
 	src/sim/Simulation.hpp
 	src/sim/Simulation.cpp
+	src/sim/Controls.hpp
 	src/sim/Game.hpp
 	src/sim/Game.cpp
 	src/sim/World.hpp

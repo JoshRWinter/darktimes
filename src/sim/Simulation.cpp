@@ -19,7 +19,7 @@ Simulation::~Simulation()
     thread.join();
 }
 
-void Simulation::queue_inputs(const std::vector<win::Button> &i)
+void Simulation::queue_inputs(const std::vector<KeyEvent> &i)
 {
     int put = 0;
     do
@@ -69,7 +69,7 @@ void Simulation::simulation(Simulation &sim)
     game.reset();
 
     win::Pair<float> mouse;
-    std::vector<win::Button> buttons;
+    std::vector<KeyEvent> buttons;
     buttons.reserve(decltype(sim.inputs)::length());
 
     while (!sim.stop_flag.load())
@@ -82,7 +82,6 @@ void Simulation::simulation(Simulation &sim)
         }
 
         buttons.resize(decltype(sim.inputs)::length());
-        buttons.clear();
         const auto read = sim.inputs.read(buttons.data(), buttons.size());
         buttons.resize(read);
 

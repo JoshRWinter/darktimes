@@ -1,16 +1,63 @@
 #include "Game.hpp"
 #include "levelgen/LevelGenerator.hpp"
+#include "system/Systems.hpp"
 
 Game::Game(const std::function<void(const std::vector<Renderable> &)> &level_generated)
     : level_generated(level_generated)
 {
 }
 
-void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const std::vector<win::Button> &buttons) {}
+void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons)
+{
+    process_inputs(buttons);
+    player_system(world, controls);
+
+    const auto &player = world.players.begin()->entity.get<PhysicalComponent>();
+    renderables.centerx = player.x;
+    renderables.centery = player.y;
+}
 
 void Game::reset()
 {
     generate_level();
+}
+
+void Game::process_inputs(const std::vector<KeyEvent> &buttons)
+{
+    bool up = matinputs.up;
+    bool down = matinputs.down;
+    bool left = matinputs.left;
+    bool right = matinputs.right;
+
+    for (const auto b : buttons)
+    {
+        switch (b.button)
+        {
+            case win::Button::w:
+                matinputs.up = b.press;
+                up = up || b.press;
+                break;
+            case win::Button::s:
+                matinputs.down = b.press;
+                down = down || b.press;
+                break;
+            case win::Button::a:
+                matinputs.left = b.press;
+                left = left || b.press;
+                break;
+            case win::Button::d:
+                matinputs.right = b.press;
+                right = right || b.press;
+                break;
+            default:
+                break;
+        }
+    }
+
+    controls.up = up;
+    controls.down = down;
+    controls.left = left;
+    controls.right = right;
 }
 
 void Game::generate_level()
