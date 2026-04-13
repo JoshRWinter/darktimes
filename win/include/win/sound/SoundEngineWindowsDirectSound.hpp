@@ -8,9 +8,8 @@
 #include <mutex>
 #include <thread>
 
-#include <mmsystem.h>
-
 #include <dsound.h>
+#include <mmsystem.h>
 
 #include <win/AssetRoll.hpp>
 #include <win/sound/SoundEngine.hpp>

@@ -72,24 +72,14 @@ struct BlockKey
     std::int16_t y;
 };
 
-template<typename T> struct PointerBox
-{
-    explicit PointerBox(T *p)
-        : p(p)
-    {
-    }
-
-    T *p;
-};
-
 template<typename T> struct Block
 {
     WIN_NO_COPY(Block);
 
     static constexpr int bag_part_size = 50;
-    typedef win::Pool<impl::PointerBox<T>, bag_part_size, false, true> PoolType;
+    typedef win::Pool<win::PoolBox<T *>, bag_part_size, false, true> PoolType;
 
-    explicit Block(win::Bag<win::PoolNode<PointerBox<T>>, bag_part_size, false> &bag)
+    explicit Block(win::Bag<win::PoolNode<win::PoolBox<T *>>, bag_part_size, false> &bag)
         : items(bag)
     {
     }
@@ -207,7 +197,7 @@ private:
 #endif
     }
 
-    T *dereference() const { return block_iterator->p; }
+    T *dereference() const { return block_iterator->inner; }
 
     const SpatialIndex<T> &map;
     std::unordered_set<const T *> *deduper;
@@ -409,9 +399,9 @@ private:
                 bool found = false;
                 for (auto &item : block.items)
                 {
-                    if (item.p == &id)
+                    if (item.inner == &id)
                     {
-                        item.p = NULL;
+                        item.inner = NULL;
                         if (++block.ghosts == vacuum_threshold)
                             vacuum_queue.push_back(idx);
 
@@ -433,7 +423,7 @@ private:
             block.ghosts = 0;
             for (auto it = block.items.begin(); it != block.items.end();)
             {
-                if (it->p == NULL)
+                if (it->inner == NULL)
                     it = block.items.remove(it);
                 else
                     ++it;
@@ -463,7 +453,7 @@ private:
     int map_width = 0;
     int map_height = 0;
 
-    win::Bag<win::PoolNode<impl::PointerBox<T>>, impl::Block<T>::bag_part_size, false> bag;
+    win::Bag<win::PoolNode<win::PoolBox<T *>>, impl::Block<T>::bag_part_size, false> bag;
     std::vector<impl::Block<T>> map;
     impl::SimplePool<std::unordered_set<const T *>, 4> dedupers;
 
