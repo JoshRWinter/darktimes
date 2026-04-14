@@ -8,3 +8,11 @@ void PlayerEntity::create(World &world)
     ent.add(world.players.add(ent));
     ent.add(world.renderables.add(ent, Texture::player));
 }
+
+void PlayerEntity::destroy(World &world, Entity &entity)
+{
+    world.physicals.remove(entity.remove<PhysicalComponent>());
+    world.players.remove(entity.remove<PlayerComponent>());
+    world.renderables.remove(entity.remove<RenderableComponent>());
+    world.entities.remove(entity);
+}

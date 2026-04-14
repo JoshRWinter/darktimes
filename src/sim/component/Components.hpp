@@ -20,13 +20,13 @@ struct Component
     WIN_NO_COPY_MOVE(Component);
 
     Component(ComponentType type, Entity &entity)
-        : type(type)
-        , entity(entity)
+        : entity(entity)
+        , type(type)
     {
     }
 
-    ComponentType type;
     Entity &entity;
+    ComponentType type;
 };
 
 struct RenderableComponent : Component

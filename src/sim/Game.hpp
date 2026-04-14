@@ -27,6 +27,7 @@ class Game
 
 public:
     explicit Game(const std::function<void(const std::vector<Renderable> &)> &level_generated);
+    ~Game();
 
     void play(Renderables &renderables, const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons);
     void reset();

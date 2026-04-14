@@ -8,6 +8,12 @@
 Game::Game(const std::function<void(const std::vector<Renderable> &)> &level_generated)
     : level_generated(level_generated)
 {
+    generate_level();
+}
+
+Game::~Game()
+{
+    reset();
 }
 
 void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons)
@@ -22,7 +28,8 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
 
 void Game::reset()
 {
-    generate_level();
+    if (world.players.size() > 0)
+        PlayerEntity::destroy(world, world.players.begin()->entity);
 }
 
 void Game::process_inputs(const std::vector<KeyEvent> &buttons)

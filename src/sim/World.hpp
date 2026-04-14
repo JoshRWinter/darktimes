@@ -21,10 +21,4 @@ struct World
     Pool<PlayerComponent> players;
 
     win::SpatialIndex<PhysicalComponent> index;
-
-    // Level gen data
-
-    std::vector<LevelFloor> level_floors;
-    std::vector<LevelProp> level_props;
-    std::vector<LevelWall> level_walls;
 };

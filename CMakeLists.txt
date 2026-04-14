@@ -40,6 +40,13 @@ set(sources
 	src/sim/Game.cpp
 	src/sim/World.hpp
 
+	src/sim/entity/Entities.hpp
+	src/sim/component/Components.hpp
+	src/sim/system/Systems.hpp
+
+	src/sim/entity/PlayerEntity.cpp
+	src/sim/system/PlayerSystem.cpp
+
 	# level gen nonsense
 	src/sim/levelgen/LevelObjects.hpp
 	src/sim/levelgen/LevelObjectsInternal.hpp
@@ -48,14 +55,6 @@ set(sources
 	src/sim/levelgen/Structure.hpp
 	src/sim/levelgen/LevelGenerator.hpp
 	src/sim/levelgen/LevelGenerator.cpp
-
-	src/sim/entity/Entities.hpp
-	src/sim/component/Components.hpp
-	src/sim/system/Systems.hpp
-
-	src/sim/entity/Entity.cpp
-	src/sim/entity/PlayerEntity.cpp
-	src/sim/system/PlayerSystem.cpp
 )
 
 if (WIN32 AND (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))

@@ -12,13 +12,51 @@ public:
     constexpr static int max_components = 4;
 
     // name MUST BE STATIC!!!
-    explicit Entity(const char *name);
-    ~Entity();
+    explicit Entity(const char *name)
+        : name(name)
+    {
+    }
 
-    Component &add(Component &c);
-    Component *add(Component *c);
-    void remove(ComponentType type);
-    void clear();
+    ~Entity()
+    {
+        for (const auto &component : components)
+            if (component.occupied)
+                win::bug("Live component on entity " + std::string(name));
+    }
+
+    Component &add(Component &c) { return *add(&c); }
+
+    Component *add(Component *c)
+    {
+        for (auto &component : components)
+        {
+            if (!component.occupied)
+            {
+                component.occupied = true;
+                component.component = c;
+
+                return c;
+            }
+        }
+
+        win::bug("Component slots full on entity " + std::string(name));
+    }
+
+    template<typename T> T &remove()
+    {
+        for (auto &component : components)
+        {
+            if (component.occupied && component.component->type == T::ctype)
+            {
+                component.occupied = false;
+                auto &c = *component.component;
+                component.component = NULL;
+                return (T &)c;
+            }
+        }
+
+        win::bug("No component of type " + std::to_string((int)T::ctype));
+    }
 
     template<typename T> T &get()
     {
@@ -48,7 +86,7 @@ private:
     } components[max_components];
 };
 
-class World;
+struct World;
 
 struct PlayerEntity
 {
@@ -57,5 +95,6 @@ struct PlayerEntity
     static constexpr float width = 0.4f;
     static constexpr float height = 0.4f;
 
-    static void create(World &);
+    static void create(World &world);
+    static void destroy(World &world, Entity &entity);
 };
