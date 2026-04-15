@@ -18,8 +18,7 @@ struct LevelPropExcluder
 struct LevelPropInternal : LevelProp
 {
     LevelPropInternal(Texture texture, LevelSide side, bool solid, float x, float y, float w, float h, float excluder_padding_x, float excluder_padding_y)
-        : LevelProp(texture, side, x, y, w, h)
-        , solid(solid)
+        : LevelProp(texture, side, solid, x, y, w, h)
         , excluder_padding_x(excluder_padding_x)
         , excluder_padding_y(excluder_padding_y)
     {
@@ -68,7 +67,6 @@ struct LevelPropInternal : LevelProp
         // clang-format on
     }
 
-    bool solid;
     float excluder_padding_x, excluder_padding_y;
 };
 

@@ -125,6 +125,9 @@ void Game::generate_level()
 
         for (const auto &prop : generator.level_props)
         {
+            if (!prop.solid)
+                continue;
+
             left = std::min(left, prop.x);
             right = std::max(right, prop.x + prop.w);
             bottom = std::min(bottom, prop.y);
@@ -143,7 +146,7 @@ void Game::generate_level()
 
         for (auto &prop : generator.level_props)
         {
-            if (prop.texture == Texture::transition_strip)
+            if (!prop.solid)
                 continue;
 
             auto &ent = world.entities.add("prop");

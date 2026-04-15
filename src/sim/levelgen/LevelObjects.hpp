@@ -12,9 +12,10 @@ enum class LevelSide
 
 struct LevelProp
 {
-    LevelProp(Texture texture, LevelSide side, float x, float y, float w, float h)
+    LevelProp(Texture texture, LevelSide side, bool solid, float x, float y, float w, float h)
         : texture(texture)
         , side(side)
+        , solid(solid)
         , x(x)
         , y(y)
         , w(w)
@@ -24,6 +25,7 @@ struct LevelProp
 
     Texture texture;
     LevelSide side;
+    bool solid;
     float x, y, w, h;
 };
 
