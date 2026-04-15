@@ -66,7 +66,6 @@ void Simulation::simulation(Simulation &sim)
     };
 
     Game game(level_generated);
-    game.reset();
 
     win::Pair<float> mouse;
     std::vector<KeyEvent> buttons;
