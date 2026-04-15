@@ -21,6 +21,12 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     process_inputs(buttons);
     player_system(world, controls);
 
+    for (const auto &r : world.renderables)
+    {
+        const auto &phys = r.entity.get<PhysicalComponent>();
+        renderables.renderables.emplace_back(r.texture, phys.x, phys.y, phys.w, phys.h, phys.rot);
+    }
+
     const auto &player = world.players.begin()->entity.get<PhysicalComponent>();
     renderables.centerx = player.x;
     renderables.centery = player.y;
@@ -86,7 +92,7 @@ void Game::generate_level()
     {
         renderables.emplace_back(Texture::debug, w.x, w.y, w.w, w.h, 0.0f);
     }
-     */
+    */
 
     for (const auto &p : generator.level_props)
     {

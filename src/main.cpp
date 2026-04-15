@@ -25,7 +25,7 @@ int main()
     display_options.height = 1;
 #endif
     display_options.gl_major = 4;
-    display_options.gl_minor = 6;
+    display_options.gl_minor = 4;
 
     win::Display display(display_options);
     display.vsync(true);

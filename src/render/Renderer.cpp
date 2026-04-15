@@ -24,6 +24,8 @@ void Renderer::render(Renderables &renderables)
 
     backend->render_statics(staging);
 
+    backend->render_dynamics(renderables.renderables);
+
     backend->end();
 }
 

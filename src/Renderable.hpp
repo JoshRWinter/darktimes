@@ -28,13 +28,8 @@ struct Renderables
 {
     std::vector<Renderable> renderables;
 
-    float centerx;
-    float centery;
+    float centerx = 0.0f;
+    float centery = 0.0f;
 
-    void clear()
-    {
-        centerx = 0.0f;
-        centery = 0.0f;
-        renderables.clear();
-    }
+    void clear() { renderables.clear(); }
 };

@@ -108,7 +108,10 @@ void GLRendererBackend::render_statics(const std::vector<int> &statics)
     check_error();
 }
 
-void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics) {}
+void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
+{
+    atlas_renderer.render(dynamics);
+}
 
 void GLRendererBackend::check_error()
 {

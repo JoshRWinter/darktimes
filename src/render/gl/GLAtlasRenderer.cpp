@@ -16,35 +16,121 @@ GLAtlasRenderer::GLAtlasRenderer(win::AssetRoll &roll, const TextureAssetMap &te
 {
     init_atlases(roll, texture_map);
 
-    program = win::GLProgram(win::gl_load_shaders(roll["shader/static_atlas.vert"], roll["shader/static_atlas.frag"]));
-    glUseProgram(program.get());
-    uniform_view_projection = get_uniform(program, "view_projection");
-    const auto uniform_tex = get_uniform(program, "tex");
-    glUniform1i(uniform_tex, GLConstants::atlas_texture_unit - GL_TEXTURE0);
+    {
+        staticmode.program = win::GLProgram(win::gl_load_shaders(roll["shader/static_atlas.vert"], roll["shader/static_atlas.frag"]));
+        glUseProgram(staticmode.program.get());
+        staticmode.uniform_view_projection = get_uniform(staticmode.program, "view_projection");
+        const auto uniform_tex = get_uniform(staticmode.program, "tex");
+        glUniform1i(uniform_tex, GLConstants::atlas_texture_unit - GL_TEXTURE0);
 
-    glBindVertexArray(vao.get());
+        glBindVertexArray(staticmode.vao.get());
 
-    glBindBuffer(GL_ARRAY_BUFFER, position.get());
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+        glBindBuffer(GL_ARRAY_BUFFER, staticmode.position.get());
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
-    glBindBuffer(GL_ARRAY_BUFFER, texcoord.get());
-    glEnableVertexAttribArray(1);
-    glVertexAttribIPointer(1, 2, GL_UNSIGNED_SHORT, 0, NULL);
+        glBindBuffer(GL_ARRAY_BUFFER, staticmode.texcoord.get());
+        glEnableVertexAttribArray(1);
+        glVertexAttribIPointer(1, 2, GL_UNSIGNED_SHORT, 0, NULL);
+    }
+
+    {
+        dynamicmode.program = win::GLProgram(win::gl_load_shaders(roll["shader/dynamic_atlas.vert"], roll["shader/dynamic_atlas.frag"]));
+        glUseProgram(dynamicmode.program.get());
+        dynamicmode.uniform_mvp = get_uniform(dynamicmode.program, "mvp");
+
+        const auto uniform_tex = get_uniform(staticmode.program, "tex");
+        glUniform1i(uniform_tex, GLConstants::atlas_texture_unit - GL_TEXTURE0);
+
+        glBindVertexArray(dynamicmode.vao.get());
+
+        std::vector<float> verts;
+        verts.reserve(500);
+
+        int index = 0;
+        for (int i = 0; i < texture_map.size(); ++i)
+        {
+            const auto &item = texture_map[(Texture)i];
+            if (!item.dynamic || item.atlas_index == -1)
+            {
+                dynamicmode.base_vertex_map.push_back(-1);
+                continue;
+            }
+
+            const auto atlas = atlas_map[i];
+            if (atlas == NULL)
+                win::bug("Bad atlas map");
+
+            const auto &coords = atlas->item(item.atlas_index);
+
+            verts.push_back(-0.5f);
+            verts.push_back(0.5f);
+            verts.push_back(coords.x1);
+            verts.push_back(coords.y2);
+
+            verts.push_back(-0.5f);
+            verts.push_back(-0.5f);
+            verts.push_back(coords.x1);
+            verts.push_back(coords.y1);
+
+            verts.push_back(0.5f);
+            verts.push_back(0.5f);
+            verts.push_back(coords.x2);
+            verts.push_back(coords.y2);
+
+            verts.push_back(0.5f);
+            verts.push_back(-0.5f);
+            verts.push_back(coords.x2);
+            verts.push_back(coords.y1);
+
+            dynamicmode.base_vertex_map.push_back(index * 4);
+            ++index;
+        }
+
+        glBindBuffer(GL_ARRAY_BUFFER, dynamicmode.buffer.get());
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * verts.size(), verts.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, NULL);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void *)(sizeof(float) * 2));
+    }
 
     check_error();
 }
 
 void GLAtlasRenderer::set_view_projection(const glm::mat4 &view_projection)
 {
-    glUseProgram(program.get());
-    glUniformMatrix4fv(uniform_view_projection, 1, GL_FALSE, glm::value_ptr(view_projection));
+    this->view_projection = view_projection;
+    glUseProgram(staticmode.program.get());
+    glUniformMatrix4fv(staticmode.uniform_view_projection, 1, GL_FALSE, glm::value_ptr(view_projection));
+}
+
+void GLAtlasRenderer::render(const std::vector<Renderable> &renderables)
+{
+    glUseProgram(dynamicmode.program.get());
+    glBindVertexArray(dynamicmode.vao.get());
+
+    const auto &ident = glm::identity<glm::mat4>();
+    for (const auto &r : renderables)
+    {
+        const auto translate = glm::translate(ident, glm::vec3(r.x + r.w / 2.0f, r.y + r.h / 2.0f, 0.0));
+        const auto rotate = glm::rotate(ident, r.rot, glm::vec3(0.0f, 0.0f, 1.0f));
+        const auto scale = glm::scale(ident, glm::vec3(r.w, r.h, 1.0f));
+
+        const auto model = translate * rotate * scale;
+        const auto mvp = view_projection * model;
+
+        glUniformMatrix4fv(dynamicmode.uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
+        glDrawArrays(GL_TRIANGLE_STRIP, dynamicmode.base_vertex_map[(int)r.texture], 4);
+    }
+
+    check_error();
 }
 
 void GLAtlasRenderer::render(const std::vector<std::uint16_t> &ids)
 {
-    glUseProgram(program.get());
-    glBindVertexArray(vao.get());
+    glUseProgram(staticmode.program.get());
+    glBindVertexArray(staticmode.vao.get());
 
     for (const auto base_vertex : ids)
     {
@@ -106,23 +192,16 @@ std::vector<std::uint16_t> GLAtlasRenderer::load(const std::vector<Renderable> &
         ++count;
     }
 
-    glBindVertexArray(vao.get());
+    glBindVertexArray(staticmode.vao.get());
 
-    glBindBuffer(GL_ARRAY_BUFFER, position.get());
+    glBindBuffer(GL_ARRAY_BUFFER, staticmode.position.get());
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * position_data.size(), position_data.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, texcoord.get());
+    glBindBuffer(GL_ARRAY_BUFFER, staticmode.texcoord.get());
     glBufferData(GL_ARRAY_BUFFER, sizeof(std::uint16_t) * texcoord_data.size(), texcoord_data.data(), GL_STATIC_DRAW);
 
     return results;
 }
-
-/*
-void GLAtlasRenderer::add(std::uint16_t base_vertex)
-{
-    scene.push_back(base_vertex);
-}
-*/
 
 void GLAtlasRenderer::init_atlases(win::AssetRoll &roll, const TextureAssetMap &map)
 {

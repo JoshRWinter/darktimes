@@ -24,9 +24,9 @@ public:
                 win::bug("Live component on entity " + std::string(name));
     }
 
-    Component &add(Component &c) { return *add(&c); }
+    template<typename T> T &add(T &c) { return *add(&c); }
 
-    Component *add(Component *c)
+    template<typename T> T *add(T *c)
     {
         for (auto &component : components)
         {
