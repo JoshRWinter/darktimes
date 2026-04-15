@@ -20,5 +20,8 @@ struct World
     Pool<RenderableComponent> renderables;
     Pool<PlayerComponent> players;
 
-    win::SpatialIndex<PhysicalComponent> index;
+    struct
+    {
+        win::SpatialIndex<PhysicalComponent> level;
+    } index;
 };

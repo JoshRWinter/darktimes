@@ -33,7 +33,7 @@ public:
     void reset();
 
 private:
-    void process_inputs(const std::vector<KeyEvent> &buttons);
+    void process_inputs(const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons);
     void generate_level();
     static LevelProp correct_prop_orientation(const LevelProp &prop);
     static float get_prop_rotation(LevelSide side);

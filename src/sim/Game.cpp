@@ -18,7 +18,7 @@ Game::~Game()
 
 void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons)
 {
-    process_inputs(buttons);
+    process_inputs(mouse, buttons);
     player_system(world, controls);
 
     for (const auto &r : world.renderables)
@@ -38,8 +38,11 @@ void Game::reset()
         PlayerEntity::destroy(world, world.players.begin()->entity);
 }
 
-void Game::process_inputs(const std::vector<KeyEvent> &buttons)
+void Game::process_inputs(const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons)
 {
+    controls.x = mouse.x;
+    controls.y = mouse.y;
+
     bool up = matinputs.up;
     bool down = matinputs.down;
     bool left = matinputs.left;
@@ -105,6 +108,50 @@ void Game::generate_level()
     for (const auto &wall : generator.level_walls)
         occluders.emplace_back(wall.x, wall.y, wall.w, wall.h);
         */
+
+    {
+        float left = 0.0f;
+        float right = 0.0f;
+        float bottom = 0.0f;
+        float top = 0.0f;
+
+        for (const auto &wall : generator.level_walls)
+        {
+            left = std::min(left, wall.x);
+            right = std::max(right, wall.x + wall.w);
+            bottom = std::min(bottom, wall.y);
+            top = std::max(top, wall.y + wall.h);
+        }
+
+        for (const auto &prop : generator.level_props)
+        {
+            left = std::min(left, prop.x);
+            right = std::max(right, prop.x + prop.w);
+            bottom = std::min(bottom, prop.y);
+            top = std::max(top, prop.y + prop.h);
+        }
+
+        world.index.level.reset(1.0f, left, right, bottom, top);
+
+        for (auto &wall : generator.level_walls)
+        {
+            auto &ent = world.entities.add("wall");
+            auto &phys = ent.add(world.physicals.add(ent, wall.x, wall.y, wall.w, wall.h, 0.0f));
+
+            world.index.level.add(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h), phys);
+        }
+
+        for (auto &prop : generator.level_props)
+        {
+            if (prop.texture == Texture::transition_strip)
+                continue;
+
+            auto &ent = world.entities.add("prop");
+            auto &phys = ent.add(world.physicals.add(ent, prop.x, prop.y, prop.w, prop.h, 0.0f));
+
+            world.index.level.add(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h), phys);
+        }
+    }
 
     level_generated(renderables);
 }

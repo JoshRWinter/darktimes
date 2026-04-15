@@ -32,10 +32,16 @@ int main()
 
     win::gl_load_functions();
 
-    display.register_mouse_handler([](int x, int y)
-	{
+    const win::Dimensions dims(display.width(), display.height());
+    const win::Area area(-8.0f, 8.0f, -4.5f, 4.5f);
 
-	});
+    win::Pair<float> mouse;
+    display.register_mouse_handler(
+        [&mouse, &dims, &area](int x, int y)
+        {
+            mouse.x = ((x / (float)dims.width) * (area.right - area.left)) - area.right;
+            mouse.y = ((-y / (float)dims.height) * (area.top - area.bottom)) + area.top;
+        });
 
     std::vector<KeyEvent> keys;
     keys.reserve(20);
@@ -58,8 +64,6 @@ int main()
                 quit = true;
         });
 
-    const win::Dimensions dims(display.width(), display.height());
-    const win::Area area(-8.0f, 8.0f, -4.5f, 4.5f);
     Renderer renderer(dims, area, roll);
 
     win::SimStateExchanger<Renderables> simexchanger(60.0f);
@@ -84,6 +88,8 @@ int main()
             sim.queue_inputs(keys);
             keys.clear();
         }
+
+        sim.set_mouse_input(mouse);
 
         Renderables *prev, *current;
         const float lerp = simexchanger.get_simstates(&prev, &current, display.refresh_rate());

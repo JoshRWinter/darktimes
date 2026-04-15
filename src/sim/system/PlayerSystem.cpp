@@ -12,7 +12,7 @@ void player_system(World &world, const Controls &controls)
     auto &phys = player.entity.get<PhysicalComponent>();
 
     // movement
-    const float scoot = 0.1f;
+    const float scoot = 0.065f;
     if (controls.up)
         phys.y += scoot;
     if (controls.down)
@@ -23,11 +23,11 @@ void player_system(World &world, const Controls &controls)
         phys.x += scoot;
 
     // aim direction
-    // const float aim = atan2f(input.y, input.x);
-    // phys.rot = aim;
+    const float aim = atan2f(controls.y, controls.x);
+    phys.rot = aim;
 
     // collision
-    for (const auto &p : world.index.query(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h)))
+    for (const auto &p : world.index.level.query(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h)))
     {
         phys.correct(p);
     }
