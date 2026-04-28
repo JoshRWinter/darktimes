@@ -139,31 +139,33 @@ void GLFloorRenderer::init_textures(win::AssetRoll &roll, const TextureAssetMap 
             continue;
         }
 
+        std::unique_ptr<unsigned char[]> converted;
         win::Targa tga(roll[item.asset_path]);
-        GLenum format;
-        switch (tga.bpp())
+        if (tga.bpp() == 8)
         {
-            case 8:
-                format = GL_RED;
-                break;
-            case 24:
-                format = GL_BGR;
-                break;
-            default:
-                win::bug("Unsupported color depth: " + std::to_string(tga.bpp()));
+            const auto *source = tga.data();
+            converted.reset(new unsigned char[tga.width() * tga.height() * 3]);
+            for (int s = 0, d = 0; s < tga.width() * tga.height(); s += 1, d += 3)
+            {
+                converted[d + 0] = source[s];
+                converted[d + 1] = source[s];
+                converted[d + 2] = source[s];
+            }
         }
+        else if (tga.bpp() != 24)
+            win::bug("Unsupported color depth: " + std::to_string(tga.bpp()));
 
         if (z == 0)
         {
             w = tga.width();
             h = tga.height();
-            glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_SRGB, w, h, count, 0, format, GL_UNSIGNED_BYTE, NULL);
+            glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_SRGB, w, h, count, 0, GL_BGR, GL_UNSIGNED_BYTE, NULL);
         }
 
         if (tga.width() != w || tga.height() != h)
             win::bug("Floor textures must be " + std::to_string(w) + "x" + std::to_string(h));
 
-        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, z, w, h, 1, format, GL_UNSIGNED_BYTE, tga.data());
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, z, w, h, 1, GL_BGR, GL_UNSIGNED_BYTE, converted ? converted.get() : tga.data());
         floortex_map[i] = z;
         ++z;
     }
