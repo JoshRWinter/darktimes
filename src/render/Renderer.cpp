@@ -15,7 +15,7 @@ void Renderer::set_statics(const std::vector<Renderable> &statics)
 
 void Renderer::render(Renderables &renderables)
 {
-    backend->set_view(renderables.centerx, renderables.centery, 1.0);
+    backend->set_view(renderables.centerx, renderables.centery, 1.5f);
     backend->begin();
 
     staging.clear();

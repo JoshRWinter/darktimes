@@ -12,41 +12,49 @@ shader/dynamic_light.frag z
 shader/blur.vert z
 shader/blur.frag z
 
-svg2tga {
-    texture/debug.svg 50 50
+shadowdef {
+    groundprop 0.22 0.12 0.095 0.08 0.04
+    furniture 0.20 0.15 0.13 0.11 0.07 0.03
+    rug 0.8 0.09 0.04
+}
 
+svg2tga {
 	texture/floor1.svg 120 120
 	texture/floor2.svg 120 120
 	texture/floor3.svg 120 120
 	texture/floor4.svg 120 120
 	texture/floor5.svg 120 120
+}
 
-	texture/tstrip.svg 3 120 exclude
+svg2tga exclude {
+    texture/debug.svg 50 50
 
-	texture/chair1.svg 48 72 exclude
-	texture/chair2.svg 48 72 exclude
-	texture/couch1.svg 48 126 exclude
+	texture/tstrip.svg 3 120
 
-	texture/side_table1.svg 52 120 exclude
-	texture/side_table2.svg 35 54 exclude
-	texture/side_shelf.svg 34 78 exclude
-	texture/piano.svg 40 102 exclude
+	texture/chair1.svg 48 72 shadowdef=furniture
+	texture/chair2.svg 48 72 shadowdef=furniture
+	texture/couch1.svg 48 126 shadowdef=furniture
 
-	texture/large_table.svg 96 180 exclude
-	texture/large_table2.svg 96 180 exclude
+	texture/side_table1.svg 52 120 shadowdef=furniture
+	texture/side_table2.svg 35 54 shadowdef=furniture
+	texture/side_shelf.svg 34 78 shadowdef=furniture
+	texture/piano.svg 40 102 shadowdef=furniture
 
-	texture/huge_table.svg 276 276 exclude
-	texture/long_table.svg 174 384 exclude
+	texture/large_table.svg 96 180 shadowdef=furniture
+	texture/large_table2.svg 96 150 shadowdef=furniture
 
-	texture/rug1.svg 240 120 exclude
-	texture/rug2.svg 240 159 exclude
-	texture/rug3.svg 300 84 exclude
-	texture/rug4.svg 216 140 exclude
+	texture/huge_table.svg 276 276 shadowdef=furniture
+	texture/long_table.svg 174 384 shadowdef=furniture
 
-	texture/clutter_brokenglass.svg 36 32 exclude
-	texture/clutter_boot.svg 30 24 exclude
+	texture/rug1.svg 240 120 shadowdef=rug
+	texture/rug2.svg 240 159 shadowdef=rug
+	texture/rug3.svg 300 84 shadowdef=rug
+	texture/rug4.svg 216 140 shadowdef=rug
 
-	texture/player.svg 50 50 exclude
+	texture/clutter_brokenglass.svg 36 32 shadowdef=groundprop
+	texture/clutter_boot.svg 30 24 shadowdef=groundprop
+
+	texture/player.svg 50 50
 }
 
 atlas {
