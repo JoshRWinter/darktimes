@@ -7,7 +7,7 @@
    viewBox="0 0 49.468312 114.63713"
    version="1.1"
    id="svg1"
-   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    sodipodi:docname="side_shelf.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
-     inkscape:zoom="1.306471"
-     inkscape:cx="-203.98462"
-     inkscape:cy="154.23227"
+     inkscape:zoom="5.225884"
+     inkscape:cx="21.144748"
+     inkscape:cy="83.813571"
      inkscape:window-width="2560"
      inkscape:window-height="1413"
      inkscape:window-x="0"
@@ -53,102 +53,97 @@
        height="111.58408"
        x="87.079483"
        y="49.215397" />
-    <g
-       id="g22"
-       transform="matrix(0.99790752,0,0,1.0842621,0.21995731,-11.794251)"
-       style="stroke-width:0.743896;stroke-dasharray:none">
-      <rect
-         style="fill:#18224d;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect9"
-         width="29.992994"
-         height="5.1911869"
-         x="87.305283"
-         y="74.252625" />
-      <rect
-         style="fill:#221900;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect10"
-         width="34.762573"
-         height="5.0973883"
-         x="87.344925"
-         y="104.93652" />
-      <rect
-         style="fill:#254245;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect12"
-         width="33.972874"
-         height="5.1123309"
-         x="87.338615"
-         y="110.41879" />
-      <rect
-         style="fill:#380b00;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect13"
-         width="34.762573"
-         height="5.0973883"
-         x="87.344925"
-         y="114.18986" />
-      <rect
-         style="fill:#423c37;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect14"
-         width="34.041534"
-         height="5.1110225"
-         x="87.339165"
-         y="119.67278" />
-      <rect
-         style="fill:#4a2500;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect15"
-         width="33.114712"
-         height="5.1288195"
-         x="87.33165"
-         y="125.15363" />
-      <rect
-         style="fill:#232800;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect16"
-         width="34.213196"
-         height="5.1077604"
-         x="87.340538"
-         y="128.92773" />
-      <rect
-         style="fill:#210b59;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect17"
-         width="33.835552"
-         height="5.1149511"
-         x="87.337509"
-         y="134.41397" />
-      <rect
-         style="fill:#421a10;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect19"
-         width="31.74213"
-         height="5.1557641"
-         x="87.320251"
-         y="84.099068" />
-      <rect
-         style="fill:#420b00;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect18"
-         width="33.389297"
-         height="5.1235147"
-         x="87.333885"
-         y="79.77623" />
-      <rect
-         style="fill:#202e00;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect21"
-         width="34.762573"
-         height="5.0973883"
-         x="87.344925"
-         y="93.956978" />
-      <rect
-         style="fill:#42291f;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect20"
-         width="35.518105"
-         height="5.0832944"
-         x="87.350883"
-         y="89.625069" />
-      <rect
-         style="fill:#422a00;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.743896;stroke-dasharray:none;stroke-opacity:1"
-         id="rect22"
-         width="34.144531"
-         height="5.1090636"
-         x="87.339989"
-         y="99.440903" />
-    </g>
+    <rect
+       style="fill:#081135;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect9"
+       width="29.930235"
+       height="5.6286073"
+       x="85.924927"
+       y="68.715057" />
+    <rect
+       style="fill:#1b1200;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect10"
+       width="34.689835"
+       height="5.5269051"
+       x="85.863235"
+       y="101.78193" />
+    <rect
+       style="fill:#19383c;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect12"
+       width="33.901787"
+       height="5.5431066"
+       x="85.958191"
+       y="107.72614" />
+    <rect
+       style="fill:#2a0600;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect13"
+       width="34.689835"
+       height="5.5269051"
+       x="86.470787"
+       y="112.11874" />
+    <rect
+       style="fill:#363128;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect14"
+       width="33.970303"
+       height="5.541688"
+       x="86.465034"
+       y="118.36745" />
+    <rect
+       style="fill:#3c1600;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect15"
+       width="33.045422"
+       height="5.5609846"
+       x="86.457535"
+       y="123.70258" />
+    <rect
+       style="fill:#1a2100;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect16"
+       width="34.141605"
+       height="5.5381513"
+       x="86.770187"
+       y="127.69343" />
+    <rect
+       style="fill:#130727;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect17"
+       width="33.764751"
+       height="5.5459476"
+       x="85.450798"
+       y="133.64195" />
+    <rect
+       style="fill:#341710;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect19"
+       width="31.675711"
+       height="5.5901995"
+       x="85.636093"
+       y="79.593697" />
+    <rect
+       style="fill:#270500;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect18"
+       width="33.319431"
+       height="5.5552325"
+       x="85.548447"
+       y="74.906609" />
+    <rect
+       style="fill:#102300;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect21"
+       width="34.689835"
+       height="5.5269051"
+       x="85.660721"
+       y="90.181" />
+    <rect
+       style="fill:#352115;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect20"
+       width="35.443783"
+       height="5.5116234"
+       x="86.071701"
+       y="85.382812" />
+    <rect
+       style="fill:#372000;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect22"
+       width="34.073086"
+       height="5.5395641"
+       x="85.45327"
+       y="96.127007" />
     <g
        id="g23"
        transform="translate(0,-0.38885546)">
@@ -167,5 +162,241 @@
          x="84.107185"
          y="152.39348" />
     </g>
+    <rect
+       style="fill:#1b1200;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1"
+       width="34.689835"
+       height="5.5269051"
+       x="85.863243"
+       y="62.797295" />
+    <rect
+       style="fill:#16242d;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2"
+       width="34.689835"
+       height="5.5269051"
+       x="87.280861"
+       y="139.76239" />
+    <rect
+       style="fill:#20231b;fill-opacity:1;fill-rule:evenodd;stroke:#0f0800;stroke-width:0.773793;stroke-dasharray:none;stroke-opacity:1"
+       id="rect3"
+       width="34.689835"
+       height="5.5269051"
+       x="86.673309"
+       y="143.4077" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:9.7;stroke-dasharray:none;stroke-opacity:1"
+       x="87.894646"
+       y="56.302193"
+       id="text7"><tspan
+         sodipodi:role="line"
+         id="tspan7"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.11667px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:9.7;stroke-dasharray:none;stroke-opacity:1"
+         x="87.894646"
+         y="56.302193">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.98215px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:9.08352;stroke-dasharray:none;stroke-opacity:1"
+       x="-127.37393"
+       y="57.559929"
+       id="text8"
+       transform="scale(-0.93644559,1.0678677)"><tspan
+         sodipodi:role="line"
+         id="tspan8"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.98215px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:9.08352;stroke-dasharray:none;stroke-opacity:1"
+         x="-127.37393"
+         y="57.559929">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.73309px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:7.94216;stroke-dasharray:none;stroke-opacity:1"
+       x="106.44214"
+       y="-53.196823"
+       id="text9"
+       transform="scale(0.81877956,-1.22133)"><tspan
+         sodipodi:role="line"
+         id="tspan9"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.73309px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:7.94216;stroke-dasharray:none;stroke-opacity:1"
+         x="106.44214"
+         y="-53.196823">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="104.61182"
+       y="60.448334"
+       id="text10"
+       transform="scale(0.83841249,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan10"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="104.61182"
+         y="60.448334">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="109.14085"
+       y="65.457237"
+       id="text11"
+       transform="scale(0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan11"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="109.14085"
+         y="65.457237">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="103.88716"
+       y="-68.862373"
+       id="text12"
+       transform="scale(0.8384125,-1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan12"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="103.88716"
+         y="-68.862373">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="107.26884"
+       y="74.328934"
+       id="text13"
+       transform="scale(0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan13"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="107.26884"
+         y="74.328934">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="-140.14293"
+       y="78.743561"
+       id="text14"
+       transform="scale(-0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan14"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="-140.14293"
+         y="78.743561">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="105.15529"
+       y="-82.360939"
+       id="text15"
+       transform="scale(0.8384125,-1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan15"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="105.15529"
+         y="-82.360939">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="112.40176"
+       y="88.124641"
+       id="text16"
+       transform="scale(0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan16"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="112.40176"
+         y="88.124641">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="-133.80228"
+       y="92.454369"
+       id="text17"
+       transform="scale(-0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan17"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="-133.80228"
+         y="92.454369">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="104.00793"
+       y="97.038788"
+       id="text18"
+       transform="scale(0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan18"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="104.00793"
+         y="97.038788">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="106.72535"
+       y="101.92034"
+       id="text19"
+       transform="scale(0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan19"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="106.72535"
+         y="101.92034">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="-136.58008"
+       y="105.82558"
+       id="text20"
+       transform="scale(-0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan20"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="-136.58008"
+         y="105.82558">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="109.20123"
+       y="109.94306"
+       id="text21"
+       transform="scale(0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan21"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="109.20123"
+         y="109.94306">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="-143.82654"
+       y="122.97469"
+       id="text22"
+       transform="scale(-0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan22"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="-143.82654"
+         y="122.97469">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="114.75685"
+       y="-118.22975"
+       id="text23"
+       transform="scale(0.8384125,-1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan23"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="114.75685"
+         y="-118.22975">Nobody will ever look closely at this</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold';writing-mode:lr-tb;direction:ltr;fill:#0a0a0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+       x="108.29542"
+       y="114.82462"
+       id="text24"
+       transform="scale(0.8384125,1.1927303)"><tspan
+         sodipodi:role="line"
+         id="tspan24"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.77465px;font-family:Sans;-inkscape-font-specification:'Sans Bold Italic';fill:#0a0a0a;fill-opacity:1;stroke:none;stroke-width:8.1326;stroke-dasharray:none;stroke-opacity:1"
+         x="108.29542"
+         y="114.82462">Nobody will ever look closely at this</tspan></text>
   </g>
 </svg>

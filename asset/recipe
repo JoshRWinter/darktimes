@@ -13,7 +13,7 @@ shader/blur.vert z
 shader/blur.frag z
 
 shadowdef {
-    groundprop 0.22 0.12 0.095 0.08 0.04
+    groundprop 0.22 0.11 0.085 0.02
     furniture 0.20 0.15 0.13 0.11 0.07 0.03
     rug 0.8 0.09 0.04
 }
@@ -37,8 +37,8 @@ svg2tga exclude {
 
 	texture/side_table1.svg 52 120 shadowdef=furniture
 	texture/side_table2.svg 35 54 shadowdef=furniture
-	texture/side_shelf.svg 34 78 shadowdef=furniture
-	texture/piano.svg 40 102 shadowdef=furniture
+	texture/side_shelf.svg 47 110 shadowdef=furniture
+	texture/piano.svg 47 150 shadowdef=furniture
 
 	texture/large_table.svg 96 180 shadowdef=furniture
 	texture/large_table2.svg 96 150 shadowdef=furniture

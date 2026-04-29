@@ -80,30 +80,48 @@ struct PropDefinitions
         return pd;
     }
 
-    std::vector<LevelPropDefinition> side_furniture = {
-        LevelPropDefinition(Texture::chair1, true, 58, 82, 0.18f, 0.0f),      LevelPropDefinition(Texture::chair2, true, 58, 82, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::couch1, true, 58, 136, 0.18f, 0.0f),     LevelPropDefinition(Texture::side_table1, true, 62, 130, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::side_table2, true, 45, 64, 0.18f, 0.0f), LevelPropDefinition(Texture::side_shelf, true, 44, 88, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::piano, true, 50, 112, 0.18f, 0.0f)
+    // clang-format off
+
+    std::vector<LevelPropDefinition> side_furniture =
+    {
+        LevelPropDefinition(Texture::chair1, true, 58, 82, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::chair2, true, 58, 82, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::couch1, true, 58, 136, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::side_table1, true, 62, 130, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::side_table2, true, 45, 64, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::side_shelf, true, 57, 120, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::piano, true, 57, 160, 0.18f, 0.0f)
     };
 
-    std::vector<LevelPropDefinition> center_tables = { LevelPropDefinition(Texture::large_table, true, 106, 190, 0.18f, 0.25f),
-                                                       LevelPropDefinition(Texture::large_table2, true, 106, 160, 0.18f, 0.25f) };
+    std::vector<LevelPropDefinition> center_tables =
+    {
+        LevelPropDefinition(Texture::large_table, true, 106, 190, 0.18f, 0.25f),
+        LevelPropDefinition(Texture::large_table2, true, 106, 160, 0.18f, 0.25f)
+    };
 
-    std::vector<LevelPropDefinition> huge_center_tables = {
+    std::vector<LevelPropDefinition> huge_center_tables =
+    {
         LevelPropDefinition(Texture::huge_table, true, 286, 286, 0.25f, 0.25f),
         LevelPropDefinition(Texture::long_table, true, 184, 394, 0.25f, 0.25f),
     };
 
-    std::vector<LevelPropDefinition> rugs = { LevelPropDefinition(Texture::rug1, false, 244, 124, 0.0f, 0.0f),
-                                              LevelPropDefinition(Texture::rug2, false, 244, 163, 0.0f, 0.0f),
-                                              LevelPropDefinition(Texture::rug3, false, 304, 88, 0.0f, 0.0f),
-                                              LevelPropDefinition(Texture::rug4, false, 220, 144, 0.0f, 0.0f) };
+    std::vector<LevelPropDefinition> rugs =
+    {
+        LevelPropDefinition(Texture::rug1, false, 244, 124, 0.0f, 0.0f),
+        LevelPropDefinition(Texture::rug2, false, 244, 163, 0.0f, 0.0f),
+        LevelPropDefinition(Texture::rug3, false, 304, 88, 0.0f, 0.0f),
+        LevelPropDefinition(Texture::rug4, false, 220, 144, 0.0f, 0.0f)
+    };
 
-    std::vector<LevelPropDefinition> clutter = { LevelPropDefinition(Texture::clutter_brokenglass, false, 44, 40, 0.0f, 0.0f),
-                                                 LevelPropDefinition(Texture::clutter_boot, false, 38, 32, 0.0f, 0.0f) };
+    std::vector<LevelPropDefinition> clutter =
+    {
+        LevelPropDefinition(Texture::clutter_brokenglass, false, 42, 48, 0.0f, 0.0f),
+        LevelPropDefinition(Texture::clutter_boot, false, 36, 30, 0.0f, 0.0f)
+    };
 
     LevelPropDefinition floor_transition_strip = LevelPropDefinition(Texture::transition_strip, false, 0.025f, 1.0f, 0.0f, 0.0f);
+
+    // clang-format on
 
 private:
     PropDefinitions() = default;
