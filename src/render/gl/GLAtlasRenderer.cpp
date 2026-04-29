@@ -39,7 +39,7 @@ GLAtlasRenderer::GLAtlasRenderer(win::AssetRoll &roll, const TextureAssetMap &te
         glUseProgram(dynamicmode.program.get());
         dynamicmode.uniform_mvp = get_uniform(dynamicmode.program, "mvp");
 
-        const auto uniform_tex = get_uniform(staticmode.program, "tex");
+        const auto uniform_tex = get_uniform(dynamicmode.program, "tex");
         glUniform1i(uniform_tex, GLConstants::atlas_texture_unit - GL_TEXTURE0);
 
         glBindVertexArray(dynamicmode.vao.get());
