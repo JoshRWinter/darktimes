@@ -166,8 +166,14 @@ void Game::generate_level()
             if (!prop.solid)
                 continue;
 
+            const auto shrink = 0.6f;
+            const auto w = prop.w * shrink;
+            const auto h = prop.h * shrink;
+            const float x = prop.x + ((prop.w - w) / 2.0f);
+            const float y = prop.y + ((prop.h - h) / 2.0f);
+
             auto &ent = world.entities.add("prop");
-            auto &phys = ent.add(world.physicals.add(ent, prop.x, prop.y, prop.w, prop.h, 0.0f));
+            auto &phys = ent.add(world.physicals.add(ent, x, y, w, h, 0.0f));
             ent.add(world.generics.add(ent));
 
             world.index.level.add(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h), phys);
