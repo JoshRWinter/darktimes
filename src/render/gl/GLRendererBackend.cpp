@@ -22,6 +22,11 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
     glEnable(GL_FRAMEBUFFER_SRGB);
 }
 
+void GLRendererBackend::resize(int w, int h)
+{
+    glViewport(0, 0, w, h);
+}
+
 void GLRendererBackend::set_view(float x, float y, float zoom)
 {
     const auto ident = glm::identity<glm::mat4>();

@@ -29,3 +29,7 @@ void Renderer::render(Renderables &renderables)
     backend->end();
 }
 
+void Renderer::resize(int w, int h)
+{
+    backend->resize(w, h);
+}

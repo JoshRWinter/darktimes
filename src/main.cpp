@@ -27,6 +27,8 @@ int main()
     display_options.gl_major = 4;
     display_options.gl_minor = 4;
 
+    bool fullscreen = display_options.fullscreen;
+
     win::Display display(display_options);
     display.vsync(true);
 
@@ -47,14 +49,26 @@ int main()
     keys.reserve(20);
     bool quit = false;
     display.register_button_handler(
-        [&quit, &keys](win::Button button, bool press)
+        [&quit, &keys, &fullscreen, &display](win::Button button, bool press)
         {
+            switch (button)
+            {
 #ifndef NDEBUG
-            if (button == win::Button::esc)
-                quit = true;
+                case win::Button::esc:
+                    quit = true;
+                    break;
 #endif
-
-            keys.emplace_back(button, press);
+                case win::Button::f11:
+                    if (press)
+                    {
+                        fullscreen = !fullscreen;
+                        display.set_fullscreen(fullscreen);
+                    }
+                    break;
+                default:
+                    keys.emplace_back(button, press);
+                    break;
+            }
         });
 
     display.register_window_handler(
@@ -65,6 +79,13 @@ int main()
         });
 
     Renderer renderer(dims, area, roll);
+
+    display.register_resize_handler(
+        [&renderer](int w, int h)
+        {
+            renderer.resize(w, h);
+            fprintf(stderr, "resizing %d %d\n", w, h);
+        });
 
     win::SimStateExchanger<Renderables> simexchanger(60.0f);
     Simulation sim(simexchanger);

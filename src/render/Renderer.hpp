@@ -16,6 +16,7 @@ public:
 
     void set_statics(const std::vector<Renderable> &statics);
     void render(Renderables &renderables);
+    void resize(int w, int h);
 
 private:
     std::vector<int> staging;

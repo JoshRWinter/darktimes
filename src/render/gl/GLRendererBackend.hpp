@@ -39,6 +39,7 @@ public:
     GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll);
     ~GLRendererBackend() override = default;
 
+    void resize(int w, int h) override;
     void set_view(float x, float y, float zoom) override;
     void load_statics(const std::vector<Renderable> &statics) override;
     void begin() override;
