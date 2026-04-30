@@ -2,12 +2,12 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="155.05135mm"
-   height="100.77797mm"
-   viewBox="0 0 155.05133 100.77797"
+   width="154.45134mm"
+   height="100.17797mm"
+   viewBox="0 0 154.45132 100.17797"
    version="1.1"
    id="svg1"
-   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    sodipodi:docname="rug4.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -24,8 +24,8 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
      inkscape:zoom="1.8476291"
-     inkscape:cx="200.52726"
-     inkscape:cy="196.73862"
+     inkscape:cx="199.44479"
+     inkscape:cy="195.38553"
      inkscape:window-width="2560"
      inkscape:window-height="1413"
      inkscape:window-x="0"
@@ -39,21 +39,26 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-37.321968,-82.14405)">
-    <ellipse
-       style="fill:#2a1a06;fill-opacity:1;fill-rule:evenodd;stroke:#171005;stroke-width:1.806;stroke-dasharray:none;stroke-opacity:1"
+     transform="translate(-37.621968,-82.44405)">
+    <path
        id="path1"
-       cx="114.84764"
-       cy="132.53304"
-       rx="76.622673"
-       ry="49.485985" />
+       style="fill:#2a1a06;fill-rule:evenodd;stroke:#171005;stroke-width:1.206"
+       d="m 191.47031,132.53304 a 76.622673,49.485985 0 0 1 -76.62267,49.48598 76.622673,49.485985 0 0 1 -76.622672,-49.48598 76.622673,49.485985 0 0 1 76.622672,-49.48599 76.622673,49.485985 0 0 1 76.62267,49.48599 z" />
+    <path
+       style="fill:#2c1c0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.206;stroke-dasharray:none;stroke-opacity:1"
+       d="m 112.82424,93.921295 c -5.04763,-1.274703 -11.65453,-1.758978 -16.54048,0.466521 -4.458278,2.030708 -7.702588,6.009814 -11.68024,8.740164 -6.7597,4.64 -15.492288,7.76395 -19.476604,15.48879 -2.962174,5.7431 -5.750067,16.92804 -3.606937,23.23864 2.152087,6.33699 8.286894,12.53659 13.097343,16.97522 3.727052,3.43896 6.933589,7.81274 11.95943,9.42228 4.697615,1.50443 11.990462,-3.18688 15.799638,-5.54611 7.2364,-4.48191 14.07611,-12.25389 18.70826,-19.34516 1.4981,-2.29341 4.79412,-8.06275 4.68818,-10.92582 -0.12907,-3.4883 -1.93025,-6.56612 -3.18386,-9.76156 -0.78274,-1.99517 -1.72881,-3.69612 -1.64437,-5.90459 0.12752,-3.33532 2.11615,-6.32944 3.54348,-9.22479 1.59259,-3.23057 2.56473,-7.51108 3.33206,-11.006587 0.45738,-2.083565 -1.72319,-3.044246 -3.26803,-3.778442 -1.60099,-0.760879 -3.01291,-1.242331 -4.7055,-1.731923 -2.07621,-0.600558 -3.16096,-0.291022 -4.94666,0.79413 -0.26659,0.162003 -1.91897,0.858937 -1.96858,1.062232 -0.0824,0.3376 -0.0714,0.691336 -0.10713,1.037005 z"
+       id="path2" />
+    <path
+       style="fill:#2c1c0a;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.721452;stroke-dasharray:none;stroke-opacity:1"
+       d="m 135.66223,141.61647 c 0.40819,-3.5766 1.50395,-7.9373 3.5393,-10.46238 1.85719,-2.30403 4.39468,-3.30321 6.48719,-5.11008 3.55605,-3.07062 6.78904,-7.81486 11.25099,-8.27322 3.31728,-0.34078 9.17981,0.90391 11.74201,3.9851 2.57293,3.09407 4.28175,8.70055 5.4213,12.98225 0.88289,3.31739 2.31345,6.55476 2.06839,10.20811 -0.22905,3.41474 -3.91638,6.81278 -5.79912,8.6123 -3.57672,3.41862 -8.63383,5.69216 -12.92534,6.73688 -1.38793,0.33785 -4.78461,0.88524 -6.12086,0.042 -1.62807,-1.02745 -2.72607,-3.01414 -3.98968,-4.68214 -0.78895,-1.04152 -1.40569,-2.10783 -2.46975,-2.65193 -1.60701,-0.82172 -3.42558,-0.35963 -5.08472,-0.23009 -1.85123,0.14453 -4.07582,-0.3925 -5.88712,-0.84803 -1.07966,-0.27153 -1.09773,-1.92768 -1.13593,-3.11549 -0.0396,-1.231 0.0153,-2.26526 0.12276,-3.48141 0.13174,-1.4918 0.49612,-2.10238 1.36886,-2.95162 0.13024,-0.12678 0.79224,-0.99578 0.89855,-0.97254 0.1766,0.0387 0.34211,0.14155 0.51317,0.2123 z"
+       id="path3" />
     <g
        id="g272"
        style="fill:#180f09;fill-opacity:1">
       <g
          id="g78"
          transform="matrix(1,0,0,1.0074156,1.4682545,-1.5903721)"
-         style="stroke-width:0.996313;fill:#180f09;fill-opacity:1">
+         style="fill:#180f09;fill-opacity:1;stroke-width:0.996313">
         <ellipse
            style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.06237;stroke-dasharray:none;stroke-opacity:1"
            id="path16"
@@ -568,7 +573,7 @@
       <g
          id="g205"
          transform="matrix(1.6261538,0,0,0.94923077,-71.912293,6.7286006)"
-         style="stroke-width:0.804885;fill:#180f09;fill-opacity:1">
+         style="fill:#180f09;fill-opacity:1;stroke-width:0.804885">
         <ellipse
            style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.66611;stroke-dasharray:none;stroke-opacity:1"
            id="path16-6"
@@ -1083,10 +1088,10 @@
       <g
          id="g245"
          transform="matrix(1.7142132,0,0,0.89406133,-82.886012,13.905482)"
-         style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+         style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
         <g
            id="g207"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse206"
@@ -1105,7 +1110,7 @@
         <g
            id="g209"
            transform="rotate(-90,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse208"
@@ -1124,7 +1129,7 @@
         <g
            id="g211"
            transform="rotate(-45,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse210"
@@ -1143,7 +1148,7 @@
         <g
            id="g213"
            transform="rotate(-135,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse212"
@@ -1162,7 +1167,7 @@
         <g
            id="g215"
            transform="rotate(-22.047281,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse214"
@@ -1181,7 +1186,7 @@
         <g
            id="g217"
            transform="rotate(-112.04728,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse216"
@@ -1200,7 +1205,7 @@
         <g
            id="g219"
            transform="rotate(-67.047281,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse218"
@@ -1219,7 +1224,7 @@
         <g
            id="g221"
            transform="rotate(-157.04728,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse220"
@@ -1238,7 +1243,7 @@
         <g
            id="g230"
            transform="rotate(-10.813851,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse229"
@@ -1257,7 +1262,7 @@
         <g
            id="g232"
            transform="rotate(-100.81385,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse231"
@@ -1276,7 +1281,7 @@
         <g
            id="g234"
            transform="rotate(-55.813851,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse233"
@@ -1295,7 +1300,7 @@
         <g
            id="g236"
            transform="rotate(-145.81385,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse235"
@@ -1314,7 +1319,7 @@
         <g
            id="g238"
            transform="rotate(-32.861132,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse237"
@@ -1333,7 +1338,7 @@
         <g
            id="g240"
            transform="rotate(-122.86113,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse239"
@@ -1352,7 +1357,7 @@
         <g
            id="g242"
            transform="rotate(-77.861132,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse241"
@@ -1371,7 +1376,7 @@
         <g
            id="g244"
            transform="rotate(-167.86113,115.34951,132.68391)"
-           style="stroke-width:0.807763;fill:#180f09;fill-opacity:1">
+           style="fill:#180f09;fill-opacity:1;stroke-width:0.807763">
           <ellipse
              style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.67208;stroke-dasharray:none;stroke-opacity:1"
              id="ellipse243"
@@ -1391,7 +1396,7 @@
       <g
          id="g260"
          transform="matrix(1.8526928,0,0,1,-97.929761,0)"
-         style="stroke-width:0.73468;fill:#180f09;fill-opacity:1">
+         style="fill:#180f09;fill-opacity:1;stroke-width:0.73468">
         <ellipse
            style="fill:#180f09;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.52079;stroke-dasharray:none;stroke-opacity:1"
            id="ellipse245"

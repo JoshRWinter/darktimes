@@ -3,11 +3,11 @@
 
 <svg
    width="137.12836mm"
-   height="38.46981mm"
-   viewBox="0 0 137.12836 38.469811"
+   height="37.870232mm"
+   viewBox="0 0 137.12836 37.870232"
    version="1.1"
    id="svg1"
-   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    sodipodi:docname="rug3.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -23,11 +23,11 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
-     inkscape:zoom="2.6129421"
-     inkscape:cx="241.29888"
-     inkscape:cy="16.073835"
+     inkscape:zoom="5.2258842"
+     inkscape:cx="107.63729"
+     inkscape:cy="58.74604"
      inkscape:window-width="2560"
-     inkscape:window-height="1440"
+     inkscape:window-height="1413"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
@@ -38,7 +38,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-40.874598,-105.70334)">
+     transform="translate(-40.874598,-106.00313)">
     <g
        id="g26"
        transform="translate(129.40872,-0.50629391)">
@@ -162,7 +162,7 @@
          id="path11" />
     </g>
     <rect
-       style="fill:#131907;fill-opacity:1;fill-rule:evenodd;stroke:#0a130a;stroke-width:1.23258;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#131907;fill-opacity:1;fill-rule:evenodd;stroke:#0a130a;stroke-width:0.633;stroke-dasharray:none;stroke-opacity:1"
        id="rect1"
        width="126.28879"
        height="37.237232"

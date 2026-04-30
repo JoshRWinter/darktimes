@@ -34,6 +34,7 @@ enum class Texture
 
     clutter_brokenglass,
     clutter_boot,
+    clutter_bottle,
 
     player,
 
