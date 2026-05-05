@@ -84,8 +84,8 @@ std::vector<std::uint16_t> GLFloorRenderer::load(const std::vector<Renderable> &
 
             position_texcoord_data.push_back(transformed.x);
             position_texcoord_data.push_back(transformed.y);
-            position_texcoord_data.push_back((tc.s * renderable.w) + renderable.x);
-            position_texcoord_data.push_back((tc.t * renderable.h) + renderable.y);
+            position_texcoord_data.push_back((tc.s * renderable.w * 2.0f) + renderable.x * 2.0f);
+            position_texcoord_data.push_back((tc.t * renderable.h * 2.0f) + renderable.y * 2.0f);
         }
 
         const int layer_index = floortex_map[(int)renderable.texture];
@@ -150,6 +150,17 @@ void GLFloorRenderer::init_textures(win::AssetRoll &roll, const TextureAssetMap 
                 converted[d + 0] = source[s];
                 converted[d + 1] = source[s];
                 converted[d + 2] = source[s];
+            }
+        }
+        else if (tga.bpp() == 32)
+        {
+            const auto *source = tga.data();
+            converted.reset(new unsigned char[tga.width() * tga.height() * 3]);
+            for (int s = 0, d = 0; s < tga.width() * tga.height() * 4; s += 4, d += 3)
+            {
+                converted[d + 0] = source[s + 0];
+                converted[d + 1] = source[s + 1];
+                converted[d + 2] = source[s + 2];
             }
         }
         else if (tga.bpp() != 24)
