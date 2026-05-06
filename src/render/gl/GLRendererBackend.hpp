@@ -12,6 +12,7 @@
 #include "../TextureAssetMap.hpp"
 #include "GLAtlasRenderer.hpp"
 #include "GLFloorRenderer.hpp"
+#include "GLPostRenderer.hpp"
 
 struct StaticObject
 {
@@ -54,8 +55,13 @@ private:
 
     TextureAssetMap texture_map;
 
+    win::GLFramebuffer fbo;
+    win::GLTexture fbotex;
+
     GLFloorRenderer floor_renderer;
     GLAtlasRenderer atlas_renderer;
+    GLPostRenderer post_renderer;
+
     std::vector<StaticObject> loaded_statics;
 
     win::GLTextRenderer text_renderer;

@@ -31,6 +31,8 @@ set(sources
 	src/render/gl/GLFloorRenderer.cpp
 	src/render/gl/GLAtlasRenderer.hpp
 	src/render/gl/GLAtlasRenderer.cpp
+	src/render/gl/GLPostRenderer.hpp
+	src/render/gl/GLPostRenderer.cpp
 
 	# sim
 	src/sim/Simulation.hpp
