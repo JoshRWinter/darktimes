@@ -7,6 +7,9 @@ shader/static_atlas.vert z
 shader/static_atlas.frag z
 shader/dynamic_atlas.vert z
 shader/dynamic_atlas.frag z
+shader/light.vert z
+shader/light.frag z
+shader/shadower.comp z
 shader/post.vert z
 shader/post.frag z
 

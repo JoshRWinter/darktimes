@@ -8,12 +8,12 @@
 
 using namespace win::gl;
 
-GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
-    : projection(glm::ortho(projection.left, projection.right, projection.bottom, projection.top))
+GLRendererBackend::GLRendererBackend(const win::Area<float> &area, const win::Dimensions<int> &res, win::AssetRoll &roll)
+    : projection(glm::ortho(area.left, area.right, area.bottom, area.top))
     , floor_renderer(roll, texture_map)
     , atlas_renderer(roll, texture_map)
+    , light_renderer(roll)
     , post_renderer(roll, GLConstants::intermediate_framebuffer_texture_unit)
-    , text_renderer(screen_dims, projection, GLConstants::font_texture_unit, true, 0, true)
 {
     fprintf(stderr, "%s\n%s\n%s\n\n", (const char *)glGetString(GL_VENDOR), (const char *)glGetString(GL_RENDERER), (const char *)glGetString(GL_VERSION));
 
@@ -27,7 +27,6 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screen_dims.width, screen_dims.height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbotex.get(), 0);
 
         const GLenum bufs[] { GL_COLOR_ATTACHMENT0 };
@@ -42,15 +41,21 @@ GLRendererBackend::GLRendererBackend(const win::Dimensions<int> &screen_dims, co
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_FRAMEBUFFER_SRGB);
 
+    GLRendererBackend::resize(area, res);
+
     check_error();
 }
 
-void GLRendererBackend::resize(int w, int h)
+void GLRendererBackend::resize(const win::Area<float> &area, const win::Dimensions<int> &res)
 {
-    glViewport(0, 0, w, h);
+    projection = glm::ortho(area.left, area.right, area.bottom, area.top);
+
+    glViewport(0, 0, res.width, res.height);
     glActiveTexture(GLConstants::intermediate_framebuffer_texture_unit);
     glBindTexture(GL_TEXTURE_2D, fbotex.get());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, res.width, res.height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+
+    light_renderer.resize(res);
 
     check_error();
 }
@@ -65,6 +70,7 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
 
     floor_renderer.set_view_projection(vp);
     atlas_renderer.set_view_projection(vp);
+    light_renderer.set_view_projection(vp);
 }
 
 void GLRendererBackend::begin()
@@ -148,6 +154,12 @@ void GLRendererBackend::render_statics(const std::vector<int> &statics)
 void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
 {
     atlas_renderer.render(dynamics);
+}
+
+void GLRendererBackend::render_lights(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &lights)
+{
+    for (const auto &light : lights)
+        light_renderer.render(occluders, light.x, light.y);
 }
 
 void GLRendererBackend::check_error()

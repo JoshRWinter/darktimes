@@ -1,0 +1,75 @@
+#version 460 core
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+uniform int shadow_map_size;
+uniform int occluder_count;
+uniform vec2 light;
+
+struct Occluder
+{
+	float x1;
+	float y1;
+	float x2;
+	float y2;
+};
+
+layout (std430) buffer Occluders
+{
+	Occluder occluders[];
+};
+
+layout(std430) buffer Shadowmap
+{
+	float shadowmap[];
+};
+
+bool intersects(float startx, float starty, float angle, Occluder line, out float dist)
+{
+	float mag = 100.0;
+	float x1 = startx;
+	float y1 = starty;
+	float x2 = startx + cos(angle) * mag;
+	float y2 = starty + sin(angle) * mag;
+
+	float s1_x = x2 - x1;
+	float s1_y = y2 - y1;
+	float s2_x = line.x2 - line.x1;
+	float s2_y = line.y2 - line.y1;
+	float s = (-s1_y * (x1 - line.x1) + s1_x * (y1 - line.y1)) / (-s2_x * s1_y + s1_x * s2_y);
+	float t = (s2_x * (y1 - line.y1) - s2_y * (x1 - line.x1)) / (-s2_x * s1_y + s1_x * s2_y);
+
+	if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+	{
+		float x = x1 + (t * s1_x);
+		float y = y1 + (t * s1_y);
+		dist = distance(vec2(startx, starty), vec2(x, y));
+		return true;
+	}
+
+	return false;
+}
+
+const float pi2 = 6.2831852;
+
+void main()
+{
+	uint index = gl_WorkGroupID.x;
+
+	if (index < shadow_map_size)
+	{
+		float angle = index / float(shadow_map_size) * pi2;
+		float mindist = 100.0f;
+		for (int i = 0; i < occluder_count; ++i)
+		{
+			float dist;
+			if (intersects(light.x, light.y, angle, occluders[i], dist))
+			{
+				if (dist < mindist)
+				mindist = dist;
+			}
+		}
+
+		shadowmap[index] = mindist;
+	}
+}

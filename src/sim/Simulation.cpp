@@ -3,6 +3,7 @@
 
 #include <win/Utility.hpp>
 
+#include "../LevelData.hpp"
 #include "Game.hpp"
 #include "Simulation.hpp"
 
@@ -41,28 +42,28 @@ void Simulation::set_mouse_input(const win::Pair<float> &p)
     mouseinput.writer_release(x);
 }
 
-std::vector<Renderable> *Simulation::get_statics()
+LevelData *Simulation::get_leveldata()
 {
-    return statics.reader_acquire();
+    return leveldata.reader_acquire();
 }
 
-void Simulation::release_statics(std::vector<Renderable> *renderables)
+void Simulation::release_leveldata(LevelData *renderables)
 {
-    statics.reader_release(renderables);
+    leveldata.reader_release(renderables);
 }
 
 void Simulation::simulation(Simulation &sim)
 {
-    const std::function<void(const std::vector<Renderable> &)> level_generated = [&sim](const std::vector<Renderable> &r)
+    const std::function<void(LevelData && data)> level_generated = [&sim](LevelData &&data)
     {
-        std::vector<Renderable> *renderables;
+        LevelData *leveldata;
         do
         {
-            renderables = sim.statics.writer_acquire();
-        } while (renderables == NULL);
+            leveldata = sim.leveldata.writer_acquire();
+        } while (leveldata == NULL);
 
-        *renderables = r;
-        sim.statics.writer_release(renderables);
+        *leveldata = std::move(data);
+        sim.leveldata.writer_release(leveldata);
     };
 
     Game game(level_generated);

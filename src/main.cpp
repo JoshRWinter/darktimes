@@ -34,8 +34,8 @@ int main()
 
     win::gl_load_functions();
 
-    const win::Dimensions dims(display.width(), display.height());
-    const win::Area area(-8.0f, 8.0f, -4.5f, 4.5f);
+    win::Dimensions dims(display.width(), display.height());
+    win::Area area(-8.0f, 8.0f, -4.5f, 4.5f);
 
     win::Pair<float> mouse;
     display.register_mouse_handler(
@@ -78,17 +78,37 @@ int main()
                 quit = true;
         });
 
-    Renderer renderer(dims, area, roll);
+    Renderer renderer(area, dims, roll);
 
     display.register_resize_handler(
-        [&renderer](int w, int h)
+        [&renderer, &dims, &area](int w, int h)
         {
-            renderer.resize(w, h);
+            dims.width = w;
+            dims.height = h;
+
+            const float width = (w / (float)h) * (area.top - area.bottom);
+
+            area.left = -width / 2.0f;
+            area.right = width / 2.0f;
+
+            renderer.resize(area, dims);
             fprintf(stderr, "resizing %d %d\n", w, h);
         });
 
     win::SimStateExchanger<Renderables> simexchanger(60.0f);
     Simulation sim(simexchanger);
+
+    {
+        // wait for first level data
+        LevelData *leveldata;
+        do
+        {
+            leveldata = sim.get_leveldata();
+        } while (leveldata == NULL);
+
+        renderer.set_leveldata(*leveldata);
+        sim.release_leveldata(leveldata);
+    }
 
     while (!quit)
     {
@@ -96,11 +116,11 @@ int main()
 
         // Look for new level gen data
         {
-            const auto statics = sim.get_statics();
-            if (statics != NULL)
+            const auto leveldata = sim.get_leveldata();
+            if (leveldata != NULL)
             {
-                renderer.set_statics(*statics);
-                sim.release_statics(statics);
+                renderer.set_leveldata(*leveldata);
+                sim.release_leveldata(leveldata);
             }
         }
 

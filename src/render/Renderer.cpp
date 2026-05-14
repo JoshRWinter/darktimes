@@ -1,21 +1,22 @@
 #include "Renderer.hpp"
 #include "gl/GLRendererBackend.hpp"
 
-Renderer::Renderer(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll)
-    : backend(new GLRendererBackend(screen_dims, projection, roll))
-    , staging(100)
+Renderer::Renderer(const win::Area<float> &area, const win::Dimensions<int> &res, win::AssetRoll &roll)
+    : staging(100)
+    , backend(new GLRendererBackend(area, res, roll))
 {
 }
 
-void Renderer::set_statics(const std::vector<Renderable> &statics)
+void Renderer::set_leveldata(const LevelData &leveldata)
 {
-    this->statics = statics;
+    statics = leveldata.renderables;
+    occluders = leveldata.occluders;
     backend->load_statics(statics);
 }
 
-void Renderer::render(Renderables &renderables)
+void Renderer::render(const Renderables &renderables)
 {
-    backend->set_view(renderables.centerx, renderables.centery, 1.5f);
+    backend->set_view(renderables.centerx, renderables.centery, 1.0f); // 2.5f);
     backend->begin();
 
     staging.clear();
@@ -23,13 +24,13 @@ void Renderer::render(Renderables &renderables)
         staging.push_back(staging.size());
 
     backend->render_statics(staging);
-
     backend->render_dynamics(renderables.renderables);
+    backend->render_lights(occluders, renderables.light_renderables);
 
     backend->end();
 }
 
-void Renderer::resize(int w, int h)
+void Renderer::resize(const win::Area<float> &area, const win::Dimensions<int> &res)
 {
-    backend->resize(w, h);
+    backend->resize(area, res);
 }

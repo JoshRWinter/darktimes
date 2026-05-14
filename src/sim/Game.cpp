@@ -5,7 +5,7 @@
 #include "levelgen/LevelGenerator.hpp"
 #include "system/Systems.hpp"
 
-Game::Game(const std::function<void(const std::vector<Renderable> &)> &level_generated)
+Game::Game(const std::function<void(LevelData &&)> &level_generated)
     : level_generated(level_generated)
 {
     generate_level();
@@ -30,6 +30,8 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     const auto &player = world.players.begin()->entity.get<PhysicalComponent>();
     renderables.centerx = player.x;
     renderables.centery = player.y;
+
+    renderables.light_renderables.emplace_back(player.x, player.y, 10.0f, win::Color(0.8f, 0.8f, 0.6f));
 }
 
 void Game::reset()
@@ -119,11 +121,14 @@ void Game::generate_level()
         renderables.emplace_back(p.texture, newprop.x, newprop.y, newprop.w, newprop.h, get_prop_rotation(newprop.side));
     }
 
-    /*
-    std::vector<win::Box<float>> occluders;
+    std::vector<LightOccluder> occluders;
     for (const auto &wall : generator.level_walls)
-        occluders.emplace_back(wall.x, wall.y, wall.w, wall.h);
-        */
+    {
+        if (wall.w > wall.h)
+            occluders.emplace_back(wall.x, wall.y + wall.h / 2.0f, wall.x + wall.w, wall.y + wall.h / 2.0f);
+        else
+            occluders.emplace_back(wall.x + wall.w / 2.0f, wall.y, wall.x + wall.w / 2.0f, wall.y + wall.h);
+    }
 
     {
         float left = 0.0f;
@@ -180,7 +185,10 @@ void Game::generate_level()
         }
     }
 
-    level_generated(renderables);
+    LevelData data;
+    data.renderables = std::move(renderables);
+    data.occluders = std::move(occluders);
+    level_generated(std::move(data));
 }
 
 LevelProp Game::correct_prop_orientation(const LevelProp &prop)

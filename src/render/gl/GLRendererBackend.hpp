@@ -6,12 +6,12 @@
 
 #include <win/AssetRoll.hpp>
 #include <win/gl/GL.hpp>
-#include <win/gl/GLTextRenderer.hpp>
 
 #include "../RendererBackend.hpp"
 #include "../TextureAssetMap.hpp"
 #include "GLAtlasRenderer.hpp"
 #include "GLFloorRenderer.hpp"
+#include "GLLightRenderer.hpp"
 #include "GLPostRenderer.hpp"
 
 struct StaticObject
@@ -37,16 +37,17 @@ class GLRendererBackend : public RendererBackend
     WIN_NO_COPY_MOVE(GLRendererBackend);
 
 public:
-    GLRendererBackend(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll);
+    GLRendererBackend(const win::Area<float> &area, const win::Dimensions<int> &res, win::AssetRoll &roll);
     ~GLRendererBackend() override = default;
 
-    void resize(int w, int h) override;
+    void resize(const win::Area<float> &area, const win::Dimensions<int> &res) override;
     void set_view(float x, float y, float zoom) override;
     void load_statics(const std::vector<Renderable> &statics) override;
     void begin() override;
     void end() override;
     void render_statics(const std::vector<int> &statics) override;
     void render_dynamics(const std::vector<Renderable> &dynamics) override;
+    void render_lights(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &lights) override;
 
 private:
     static void check_error();
@@ -60,11 +61,10 @@ private:
 
     GLFloorRenderer floor_renderer;
     GLAtlasRenderer atlas_renderer;
+    GLLightRenderer light_renderer;
     GLPostRenderer post_renderer;
 
     std::vector<StaticObject> loaded_statics;
-
-    win::GLTextRenderer text_renderer;
 
     std::vector<std::uint16_t> renderable_ids;
 };

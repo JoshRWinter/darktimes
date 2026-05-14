@@ -6,6 +6,8 @@
 
 class GLPostRenderer : GLRendererBase
 {
+    WIN_NO_COPY_MOVE(GLPostRenderer);
+
 public:
     explicit GLPostRenderer(win::AssetRoll &roll, GLenum fbtextarget);
 

@@ -7,6 +7,7 @@
 #include <win/Win.hpp>
 
 #include "../KeyEvent.hpp"
+#include "../LevelData.hpp"
 #include "../Renderable.hpp"
 #include "Controls.hpp"
 #include "levelgen/LevelObjects.hpp"
@@ -26,7 +27,7 @@ class Game
     WIN_NO_COPY_MOVE(Game);
 
 public:
-    explicit Game(const std::function<void(const std::vector<Renderable> &)> &level_generated);
+    explicit Game(const std::function<void(LevelData &&)> &level_generated);
     ~Game();
 
     void play(Renderables &renderables, const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons);
@@ -42,5 +43,5 @@ private:
     Controls controls;
     World world;
 
-    const std::function<void(const std::vector<Renderable> &)> &level_generated;
+    const std::function<void(LevelData &&)> &level_generated;
 };

@@ -9,11 +9,12 @@ class RendererBackend
 public:
     virtual ~RendererBackend() = default;
 
-    virtual void resize(int w, int h) = 0;
+    virtual void resize(const win::Area<float> &area, const win::Dimensions<int> &dims) = 0;
     virtual void set_view(float x, float y, float zoom) = 0;
     virtual void load_statics(const std::vector<Renderable> &statics) = 0;
     virtual void begin() = 0;
     virtual void end() = 0;
     virtual void render_statics(const std::vector<int> &statics) = 0;
     virtual void render_dynamics(const std::vector<Renderable> &dynamics) = 0;
+    virtual void render_lights(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &lights) = 0;
 };

@@ -10,6 +10,7 @@ set(sources
 
 	# top level nonsense
 	src/KeyEvent.hpp
+	src/LevelData.hpp
 	src/Renderable.hpp
 	src/Texture.hpp
 	src/RandomNumberGenerator.hpp
@@ -31,6 +32,8 @@ set(sources
 	src/render/gl/GLFloorRenderer.cpp
 	src/render/gl/GLAtlasRenderer.hpp
 	src/render/gl/GLAtlasRenderer.cpp
+	src/render/gl/GLLightRenderer.hpp
+	src/render/gl/GLLightRenderer.cpp
 	src/render/gl/GLPostRenderer.hpp
 	src/render/gl/GLPostRenderer.cpp
 

@@ -6,20 +6,22 @@
 #include <win/AssetRoll.hpp>
 #include <win/Utility.hpp>
 
+#include "../LevelData.hpp"
 #include "../Renderable.hpp"
 #include "RendererBackend.hpp"
 
 class Renderer
 {
 public:
-    explicit Renderer(const win::Dimensions<int> &screen_dims, const win::Area<float> &projection, win::AssetRoll &roll);
+    explicit Renderer(const win::Area<float> &area, const win::Dimensions<int> &res, win::AssetRoll &roll);
 
-    void set_statics(const std::vector<Renderable> &statics);
-    void render(Renderables &renderables);
-    void resize(int w, int h);
+    void set_leveldata(const LevelData &leveldata);
+    void render(const Renderables &renderables);
+    void resize(const win::Area<float> &area, const win::Dimensions<int> &res);
 
 private:
     std::vector<int> staging;
     std::vector<Renderable> statics;
+    std::vector<LightOccluder> occluders;
     std::unique_ptr<RendererBackend> backend;
 };
