@@ -38,7 +38,7 @@ GLRendererBackend::GLRendererBackend(const win::Area<float> &area, const win::Di
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_FRAMEBUFFER_SRGB);
 
     GLRendererBackend::resize(area, res);
@@ -158,8 +158,7 @@ void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
 
 void GLRendererBackend::render_lights(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &lights)
 {
-    for (const auto &light : lights)
-        light_renderer.render(occluders, light.x, light.y);
+    light_renderer.render(occluders, lights, fbo.get());
 }
 
 void GLRendererBackend::check_error()

@@ -10,6 +10,8 @@ shader/dynamic_atlas.frag z
 shader/light.vert z
 shader/light.frag z
 shader/shadower.comp z
+shader/blur.vert z
+shader/blur.frag z
 shader/post.vert z
 shader/post.frag z
 

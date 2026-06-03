@@ -1,12 +1,12 @@
-#version 330 core
+#version 460 core
 
-layout (location = 0) in vec2 vert;
-layout (location = 1) in vec2 texcoord;
+float[] verts = float[](-1.0, 3.0, -1.0, -1.0, 3.0, -1.0);
+float[] tc = float[](0.0, 2.0, 0.0, 0.0, 2.0, 0.0);
 
 out vec2 ftexcoord;
 
 void main()
 {
-    ftexcoord = texcoord;
-    gl_Position = vec4(vert.xy, 0.0, 1.0);
+	ftexcoord = vec2(tc[gl_VertexID * 2 + 0], tc[gl_VertexID * 2 + 1]);
+	gl_Position = vec4(verts[gl_VertexID * 2 + 0], verts[gl_VertexID * 2 + 1], 0.0, 1.0);
 }

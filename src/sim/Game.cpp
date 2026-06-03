@@ -31,7 +31,11 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     renderables.centerx = player.x;
     renderables.centery = player.y;
 
-    renderables.light_renderables.emplace_back(player.x, player.y, 10.0f, win::Color(0.8f, 0.8f, 0.6f));
+    renderables.light_renderables.emplace_back(player.x, player.y, 4.0f, win::Color(0.8f, 0.8f, 0.0f));
+
+    renderables.light_renderables.emplace_back(-1.6f, 1.6f, 8.0f, win::Color(0.0f, 0.8f, 0.4f));
+
+    renderables.light_renderables.emplace_back(4.6f, 3.6f, 3.0f, win::Color(0.4f, 0.0f, 0.0f));
 }
 
 void Game::reset()

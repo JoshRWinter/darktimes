@@ -7,8 +7,21 @@ layout(std430) buffer Shadowmap
 	float shadowmap[];
 };
 
+struct LightSource
+{
+	float x;
+	float y;
+	float power;
+	float r, g, b;
+};
+
+layout (std430) buffer LightSources
+{
+	LightSource lights[];
+};
+
 uniform int shadow_map_size;
-uniform vec2 light;
+uniform int light_count;
 uniform mat4 transform;
 
 const float pi = 3.1415926;
@@ -17,10 +30,28 @@ const float pi2 = pi * 2.0;
 void main()
 {
 	vec2 coord = (transform * vec4(gl_FragCoord.xy, 0.0, 1.0)).xy;
-	float angle = atan(light.y - coord.y, light.x - coord.x) + pi;
 
-	int index = int(round(angle / pi2 * shadow_map_size)) % shadow_map_size;
+	vec3 light = vec3(0.0, 0.0, 0.0);
+	bool is_primary_visible = false;
 
-	float distance = distance(light, coord);
-	frag = distance > shadowmap[index] ? vec4(0.0, 0.0, 0.0, 1.0) : vec4(0.0, 0.0, 0.0, 0.0);
+	for (int i = 0; i < light_count; ++i)
+	{
+		bool is_primary = i == 0;
+
+		float angle = atan(lights[i].y - coord.y, lights[i].x - coord.x) + pi;
+		int index = int(round(angle / pi2 * shadow_map_size)) % shadow_map_size;
+
+		float distance = distance(vec2(lights[i].x, lights[i].y), coord);
+		bool lighted = distance <= shadowmap[index + (i * shadow_map_size)];
+		if (lighted)
+		{
+			if (is_primary || is_primary_visible)
+			{
+				light += vec3(lights[i].r, lights[i].g, lights[i].b) * (lights[i].power / max(0.00000f, distance * distance));
+				is_primary_visible = true;
+			}
+		}
+	}
+
+	frag = vec4(light, 1.0);
 }

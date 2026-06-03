@@ -1,3 +1,4 @@
+#include <cmath>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "GLConstants.hpp"
@@ -9,9 +10,10 @@ GLLightRenderer::GLLightRenderer(win::AssetRoll &roll)
 {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.shadowmap.get());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, GLConstants::shadowmap_ssbo_index, shadower.shadowmap.get());
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * shadowmap_size, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * shadowmap_size * max_lights, NULL, GL_DYNAMIC_DRAW);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.occluders.get());
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, GLConstants::lights_ssbo_index, shadower.lights.get());
+
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, GLConstants::occluders_ssbo_index, shadower.occluders.get());
 
     {
@@ -19,7 +21,7 @@ GLLightRenderer::GLLightRenderer(win::AssetRoll &roll)
         glUseProgram(shadower.program.get());
 
         const auto uniform_shadow_map_size = get_uniform(shadower.program, "shadow_map_size");
-        shadower.uniform_light = get_uniform(shadower.program, "light");
+        shadower.uniform_light_count = get_uniform(shadower.program, "light_count");
         shadower.uniform_occluder_count = get_uniform(shadower.program, "occluder_count");
 
         glUniform1i(uniform_shadow_map_size, shadowmap_size);
@@ -33,29 +35,78 @@ GLLightRenderer::GLLightRenderer(win::AssetRoll &roll)
         }
 
         {
+            const auto location = glGetProgramResourceIndex(shadower.program.get(), GL_SHADER_STORAGE_BLOCK, "LightSources");
+            if (location == GL_INVALID_INDEX)
+                win::bug("No ssbo LightSources");
+
+            glShaderStorageBlockBinding(shadower.program.get(), location, GLConstants::lights_ssbo_index);
+        }
+
+        {
             const auto location = glGetProgramResourceIndex(shadower.program.get(), GL_SHADER_STORAGE_BLOCK, "Shadowmap");
             if (location == GL_INVALID_INDEX)
-                win::bug("No ssbo shadowmap");
+                win::bug("No ssbo Shadowmap");
 
             glShaderStorageBlockBinding(shadower.program.get(), location, GLConstants::shadowmap_ssbo_index);
         }
     }
 
     {
+        glBindFramebuffer(GL_FRAMEBUFFER, lighter.fbo.get());
+        glActiveTexture(GLConstants::light_framebuffer_texture_unit);
+        glBindTexture(GL_TEXTURE_2D, lighter.tex.get());
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lighter.tex.get(), 0);
+
+        {
+            const GLenum bufs[] { GL_COLOR_ATTACHMENT0 };
+            glDrawBuffers(1, bufs);
+        }
+
         lighter.program = win::GLProgram(win::gl_load_shaders(roll["shader/light.vert"], roll["shader/light.frag"]));
         glUseProgram(lighter.program.get());
 
         const auto uniform_shadow_map_size = get_uniform(lighter.program, "shadow_map_size");
-        lighter.uniform_light = get_uniform(lighter.program, "light");
+        lighter.uniform_light_count = get_uniform(lighter.program, "light_count");
         lighter.uniform_transform = get_uniform(lighter.program, "transform");
 
         glUniform1i(uniform_shadow_map_size, shadowmap_size);
 
-        const auto location = glGetProgramResourceIndex(lighter.program.get(), GL_SHADER_STORAGE_BLOCK, "Shadowmap");
-        if (location == GL_INVALID_INDEX)
-            win::bug("No ssbo shadowmap");
+        {
+            const auto location = glGetProgramResourceIndex(lighter.program.get(), GL_SHADER_STORAGE_BLOCK, "Shadowmap");
+            if (location == GL_INVALID_INDEX)
+                win::bug("No ssbo Shadowmap");
 
-        glShaderStorageBlockBinding(lighter.program.get(), location, GLConstants::shadowmap_ssbo_index);
+            glShaderStorageBlockBinding(lighter.program.get(), location, GLConstants::shadowmap_ssbo_index);
+        }
+
+        {
+            const auto location = glGetProgramResourceIndex(lighter.program.get(), GL_SHADER_STORAGE_BLOCK, "LightSources");
+            if (location == GL_INVALID_INDEX)
+                win::bug("No ssbo LightSources");
+
+            glShaderStorageBlockBinding(lighter.program.get(), location, GLConstants::lights_ssbo_index);
+        }
+    }
+
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, blur.fbo.get());
+        glActiveTexture(GLConstants::blur_framebuffer_texture_unit);
+        glBindTexture(GL_TEXTURE_2D, blur.tex.get());
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, blur.tex.get(), 0);
+
+        {
+            const GLenum bufs[] { GL_COLOR_ATTACHMENT0 };
+            glDrawBuffers(1, bufs);
+        }
+
+        blur.program = win::GLProgram(win::gl_load_shaders(roll["shader/blur.vert"], roll["shader/blur.frag"]));
+        glUseProgram(blur.program.get());
+        blur.uniform_tex = get_uniform(blur.program, "tex");
+        blur.uniform_horizontal = get_uniform(blur.program, "horizontal");
     }
 
     check_error();
@@ -66,7 +117,7 @@ void GLLightRenderer::set_view_projection(const glm::mat4 &view_projection)
     this->view_projection = view_projection;
     glUseProgram(lighter.program.get());
 
-    const glm::mat4 ident = glm::identity<glm::mat4>();
+    const auto ident = glm::identity<glm::mat4>();
     const auto scale = glm::scale(ident, glm::vec3(2.0f / res.width, 2.0 / res.height, 1.0f));
     const auto translate = glm::translate(ident, glm::vec3(-1.0f, -1.0f, 0.0f));
 
@@ -79,27 +130,79 @@ void GLLightRenderer::set_view_projection(const glm::mat4 &view_projection)
 void GLLightRenderer::resize(const win::Dimensions<int> &res)
 {
     this->res = res;
+
+    glActiveTexture(GLConstants::light_framebuffer_texture_unit);
+    glBindTexture(GL_TEXTURE_2D, lighter.tex.get());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, res.width, res.height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+
+    glActiveTexture(GLConstants::blur_framebuffer_texture_unit);
+    glBindTexture(GL_TEXTURE_2D, blur.tex.get());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, res.width, res.height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 }
 
-void GLLightRenderer::render(const std::vector<LightOccluder> &occluders, float x, float y)
+void GLLightRenderer::render(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &lights, GLuint fbo)
 {
-    glUseProgram(shadower.program.get());
-    glUniform2f(shadower.uniform_light, x, y);
-    glUniform1i(shadower.uniform_occluder_count, occluders.size());
+    glBindFramebuffer(GL_FRAMEBUFFER, lighter.fbo.get());
+    const int lightcount = std::min((int)lights.size(), max_lights);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.occluders.get());
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * 4 * occluders.size(), occluders.data(), GL_DYNAMIC_DRAW);
+    {
+        std::vector<float> lightdata;
+        lightdata.reserve(lights.size() * 6);
+        for (const auto &light : lights)
+        {
+            lightdata.push_back(light.x);
+            lightdata.push_back(light.y);
+            lightdata.push_back(light.power);
+            lightdata.push_back(light.color.red);
+            lightdata.push_back(light.color.green);
+            lightdata.push_back(light.color.blue);
+        }
 
-    glDispatchCompute(shadowmap_size, 1, 1);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.lights.get());
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * lightcount * 6, lightdata.data(), GL_DYNAMIC_DRAW);
+
+        glUseProgram(shadower.program.get());
+        glUniform1i(shadower.uniform_occluder_count, occluders.size());
+        glUniform1i(shadower.uniform_light_count, lightcount);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.occluders.get());
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * 4 * occluders.size(), occluders.data(), GL_DYNAMIC_DRAW);
+
+        glDispatchCompute(std::ceil(shadowmap_size / 32.0f), 1, 1);
+    }
 
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    glBindVertexArray(lighter.vao.get());
+    {
+        glBindVertexArray(lighter.vao.get());
 
-    glUseProgram(lighter.program.get());
-    glUniform2f(lighter.uniform_light, x, y);
+        glUseProgram(lighter.program.get());
+        glUniform1i(lighter.uniform_light_count, lightcount);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
+
+    {
+        glBindVertexArray(blur.vao.get());
+
+        glBindFramebuffer(GL_FRAMEBUFFER, blur.fbo.get());
+
+        glUseProgram(blur.program.get());
+
+        glUniform1i(blur.uniform_tex, GLConstants::light_framebuffer_texture_unit - GL_TEXTURE0);
+        glUniform1i(blur.uniform_horizontal, 1);
+
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+        glUniform1i(blur.uniform_tex, GLConstants::blur_framebuffer_texture_unit - GL_TEXTURE0);
+        glUniform1i(blur.uniform_horizontal, 0);
+
+        glBlendFunc(GL_DST_COLOR, GL_ZERO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    }
 
     check_error();
 }
