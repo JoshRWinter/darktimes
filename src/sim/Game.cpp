@@ -32,10 +32,6 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     renderables.centery = player.y;
 
     renderables.light_renderables.emplace_back(player.x, player.y, 4.0f, win::Color(0.8f, 0.8f, 0.0f));
-
-    renderables.light_renderables.emplace_back(-1.6f, 1.6f, 8.0f, win::Color(0.0f, 0.8f, 0.4f));
-
-    renderables.light_renderables.emplace_back(4.6f, 3.6f, 3.0f, win::Color(0.4f, 0.0f, 0.0f));
 }
 
 void Game::reset()
@@ -192,6 +188,9 @@ void Game::generate_level()
     LevelData data;
     data.renderables = std::move(renderables);
     data.occluders = std::move(occluders);
+    data.lights.emplace_back(-1.6f, 1.6f, 4, win::Color<float>(0.4f, 0.1f, 0.1f));
+    data.lights.emplace_back(4.6f, 3.6f, 6, win::Color<float>(0.1f, 0.9f, 0.2f));
+    data.lights.emplace_back(0.0f, 7.6f, 6, win::Color<float>(0.0f, 0.0f, 0.9f));
     level_generated(std::move(data));
 }
 

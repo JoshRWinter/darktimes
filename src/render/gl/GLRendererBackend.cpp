@@ -84,13 +84,15 @@ void GLRendererBackend::end()
     post_renderer.render();
 }
 
-void GLRendererBackend::load_statics(const std::vector<Renderable> &statics)
+void GLRendererBackend::load_statics(const std::vector<Renderable> &static_renderables,
+                                     const std::vector<LightOccluder> &occluders,
+                                     const std::vector<LightRenderable> &static_lights)
 {
     loaded_statics.clear();
 
     std::vector<Renderable> floor_renderables, atlas_renderables;
 
-    for (const auto &s : statics)
+    for (const auto &s : static_renderables)
     {
         if (texture_map[s.texture].atlas_index == -1)
             floor_renderables.push_back(s);
@@ -103,13 +105,15 @@ void GLRendererBackend::load_statics(const std::vector<Renderable> &statics)
 
     int floor_index = 0;
     int atlas_index = 0;
-    for (const auto &s : statics)
+    for (const auto &s : static_renderables)
     {
         if (texture_map[s.texture].atlas_index == -1)
             loaded_statics.emplace_back(StaticObject::Type::floor, floor_statics.at(floor_index++));
         else
             loaded_statics.emplace_back(StaticObject::Type::atlas, atlas_statics.at(atlas_index++));
     }
+
+    light_renderer.load(occluders, static_lights);
 }
 
 void GLRendererBackend::render_statics(const std::vector<int> &statics)
@@ -156,9 +160,9 @@ void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
     atlas_renderer.render(dynamics);
 }
 
-void GLRendererBackend::render_lights(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &lights)
+void GLRendererBackend::render_lights(const std::vector<LightRenderable> &lights)
 {
-    light_renderer.render(occluders, lights, fbo.get());
+    light_renderer.render(lights, fbo.get());
 }
 
 void GLRendererBackend::check_error()

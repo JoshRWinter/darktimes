@@ -4,6 +4,7 @@ layout (local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
 
 uniform int shadow_map_size;
 uniform int light_count;
+uniform int light_start;
 uniform int occluder_count;
 
 struct Occluder
@@ -16,6 +17,7 @@ struct Occluder
 
 struct LightSource
 {
+	int index;
 	float x;
 	float y;
 	float power;
@@ -32,7 +34,7 @@ layout (std430) buffer LightSources
 	LightSource lights[];
 };
 
-layout(std430) buffer Shadowmap
+layout (std430) buffer Shadowmap
 {
 	float shadowmap[];
 };
@@ -67,26 +69,28 @@ const float pi2 = 6.2831852;
 
 void main()
 {
-	uint index = gl_WorkGroupID.x * gl_WorkGroupSize.x + gl_LocalInvocationID.x;
+	int index = int(gl_WorkGroupID.x * gl_WorkGroupSize.x + gl_LocalInvocationID.x);
 
-	if (index < shadow_map_size)
+	int total_work_length = shadow_map_size * light_count;
+
+	if (index >= total_work_length)
+	return;
+
+	int local_index = index % shadow_map_size;
+	int light_index = (index / shadow_map_size) + light_start;
+
+	float angle = local_index / float(shadow_map_size) * pi2;
+	float mindist = 100.0f;
+
+	for (int i = 0; i < occluder_count; ++i)
 	{
-		for (int i = 0; i < light_count; ++i)
+		float dist;
+		if (intersects(lights[light_index].x, lights[light_index].y, angle, occluders[i], dist))
 		{
-			float angle = index / float(shadow_map_size) * pi2;
-			float mindist = 100.0f;
-
-			for (int j = 0; j < occluder_count; ++j)
-			{
-				float dist;
-				if (intersects(lights[i].x, lights[i].y, angle, occluders[j], dist))
-				{
-					if (dist < mindist)
-					mindist = dist;
-				}
-			}
-
-			shadowmap[index + (shadow_map_size * i)] = mindist;
+			if (dist < mindist)
+			mindist = dist;
 		}
 	}
+
+	shadowmap[(lights[light_index].index * shadow_map_size) + local_index] = mindist;
 }

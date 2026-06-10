@@ -8,12 +8,8 @@ using namespace win::gl;
 
 GLLightRenderer::GLLightRenderer(win::AssetRoll &roll)
 {
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.shadowmap.get());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, GLConstants::shadowmap_ssbo_index, shadower.shadowmap.get());
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * shadowmap_size * max_lights, NULL, GL_DYNAMIC_DRAW);
-
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, GLConstants::lights_ssbo_index, shadower.lights.get());
-
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, GLConstants::occluders_ssbo_index, shadower.occluders.get());
 
     {
@@ -22,6 +18,7 @@ GLLightRenderer::GLLightRenderer(win::AssetRoll &roll)
 
         const auto uniform_shadow_map_size = get_uniform(shadower.program, "shadow_map_size");
         shadower.uniform_light_count = get_uniform(shadower.program, "light_count");
+        shadower.uniform_light_start = get_uniform(shadower.program, "light_start");
         shadower.uniform_occluder_count = get_uniform(shadower.program, "occluder_count");
 
         glUniform1i(uniform_shadow_map_size, shadowmap_size);
@@ -29,7 +26,7 @@ GLLightRenderer::GLLightRenderer(win::AssetRoll &roll)
         {
             const auto location = glGetProgramResourceIndex(shadower.program.get(), GL_SHADER_STORAGE_BLOCK, "Occluders");
             if (location == GL_INVALID_INDEX)
-                win::bug("No ssbo occluders");
+                win::bug("No ssbo Occluders");
 
             glShaderStorageBlockBinding(shadower.program.get(), location, GLConstants::occluders_ssbo_index);
         }
@@ -140,35 +137,103 @@ void GLLightRenderer::resize(const win::Dimensions<int> &res)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, res.width, res.height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 }
 
-void GLLightRenderer::render(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &lights, GLuint fbo)
+void GLLightRenderer::load(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &static_lights)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, lighter.fbo.get());
-    const int lightcount = std::min((int)lights.size(), max_lights);
-
     {
-        std::vector<float> lightdata;
-        lightdata.reserve(lights.size() * 6);
+        lights.clear();
+        int index = 0;
+        for (const auto &light : static_lights)
+        {
+            lights.emplace_back(index, light.x, light.y, light.power, light.color.red, light.color.green, light.color.blue);
+            ++index;
+        }
+    }
+
+    glUseProgram(shadower.program.get());
+    glUniform1i(shadower.uniform_occluder_count, occluders.size());
+    glUniform1i(shadower.uniform_light_count, lights.size());
+    glUniform1i(shadower.uniform_light_start, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.occluders.get());
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * occluders.size() * 4, occluders.data(), GL_STATIC_DRAW);
+
+    std::vector<unsigned char> v(lights.size() * 4 * 7);
+    {
+        int offset = 0;
         for (const auto &light : lights)
         {
-            lightdata.push_back(light.x);
-            lightdata.push_back(light.y);
-            lightdata.push_back(light.power);
-            lightdata.push_back(light.color.red);
-            lightdata.push_back(light.color.green);
-            lightdata.push_back(light.color.blue);
+            memcpy(v.data() + offset + 0, &light.index, 4);
+            memcpy(v.data() + offset + 4, &light.x, 4);
+            memcpy(v.data() + offset + 8, &light.y, 4);
+            memcpy(v.data() + offset + 12, &light.power, 4);
+            memcpy(v.data() + offset + 16, &light.r, 4);
+            memcpy(v.data() + offset + 20, &light.g, 4);
+            memcpy(v.data() + offset + 24, &light.b, 4);
+
+            offset += 7 * 4;
+        }
+    }
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.lights.get());
+    glBufferData(GL_SHADER_STORAGE_BUFFER, v.size(), v.data(), GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.shadowmap.get());
+    glBufferData(GL_SHADER_STORAGE_BUFFER, shadowmap_size * sizeof(float) * (lights.size() + max_dynamic_lights), NULL, GL_STATIC_DRAW);
+
+    glDispatchCompute(std::ceil((shadowmap_size * lights.size()) / 32.0f), 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    glUniform1i(shadower.uniform_light_start, lights.size());
+
+    check_error();
+}
+
+void GLLightRenderer::render(const std::vector<LightRenderable> &dynamic_lights, GLuint fbo)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, lighter.fbo.get());
+
+    {
+        std::vector<unsigned char> v((lights.size() + dynamic_lights.size()) * 4 * 7);
+        {
+            int offset = 0;
+            for (const auto &light : lights)
+            {
+                memcpy(v.data() + offset + 0, &light.index, 4);
+                memcpy(v.data() + offset + 4, &light.x, 4);
+                memcpy(v.data() + offset + 8, &light.y, 4);
+                memcpy(v.data() + offset + 12, &light.power, 4);
+                memcpy(v.data() + offset + 16, &light.r, 4);
+                memcpy(v.data() + offset + 20, &light.g, 4);
+                memcpy(v.data() + offset + 24, &light.b, 4);
+
+                offset += 7 * 4;
+            }
+
+            int index = lights.size();
+            for (const auto &light : dynamic_lights)
+            {
+                memcpy(v.data() + offset + 0, &index, 4);
+                memcpy(v.data() + offset + 4, &light.x, 4);
+                memcpy(v.data() + offset + 8, &light.y, 4);
+                memcpy(v.data() + offset + 12, &light.power, 4);
+                memcpy(v.data() + offset + 16, &light.color.red, 4);
+                memcpy(v.data() + offset + 20, &light.color.green, 4);
+                memcpy(v.data() + offset + 24, &light.color.blue, 4);
+
+                offset += 7 * 4;
+                ++index;
+            }
         }
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.lights.get());
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * lightcount * 6, lightdata.data(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, v.size(), v.data(), GL_DYNAMIC_DRAW);
+    }
 
+    {
         glUseProgram(shadower.program.get());
-        glUniform1i(shadower.uniform_occluder_count, occluders.size());
-        glUniform1i(shadower.uniform_light_count, lightcount);
+        glUniform1i(shadower.uniform_light_count, dynamic_lights.size());
 
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, shadower.occluders.get());
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * 4 * occluders.size(), occluders.data(), GL_DYNAMIC_DRAW);
-
-        glDispatchCompute(std::ceil(shadowmap_size / 32.0f), 1, 1);
+        glDispatchCompute(std::ceil((shadowmap_size * dynamic_lights.size()) / 32.0f), 1, 1);
     }
 
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -177,7 +242,7 @@ void GLLightRenderer::render(const std::vector<LightOccluder> &occluders, const 
         glBindVertexArray(lighter.vao.get());
 
         glUseProgram(lighter.program.get());
-        glUniform1i(lighter.uniform_light_count, lightcount);
+        glUniform1i(lighter.uniform_light_count, lights.size() + dynamic_lights.size());
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }

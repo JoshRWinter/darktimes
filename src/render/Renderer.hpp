@@ -21,7 +21,6 @@ public:
 
 private:
     std::vector<int> staging;
-    std::vector<Renderable> statics;
-    std::vector<LightOccluder> occluders;
+    std::vector<Renderable> static_renderables;
     std::unique_ptr<RendererBackend> backend;
 };

@@ -42,12 +42,14 @@ public:
 
     void resize(const win::Area<float> &area, const win::Dimensions<int> &res) override;
     void set_view(float x, float y, float zoom) override;
-    void load_statics(const std::vector<Renderable> &statics) override;
+    void load_statics(const std::vector<Renderable> &static_renderables,
+                      const std::vector<LightOccluder> &occluders,
+                      const std::vector<LightRenderable> &static_lights) override;
     void begin() override;
     void end() override;
     void render_statics(const std::vector<int> &statics) override;
     void render_dynamics(const std::vector<Renderable> &dynamics) override;
-    void render_lights(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &lights) override;
+    void render_lights(const std::vector<LightRenderable> &lights) override;
 
 private:
     static void check_error();

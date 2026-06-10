@@ -9,6 +9,7 @@ layout(std430) buffer Shadowmap
 
 struct LightSource
 {
+	int index;
 	float x;
 	float y;
 	float power;
@@ -34,15 +35,15 @@ void main()
 	vec3 light = vec3(0.0, 0.0, 0.0);
 	bool is_primary_visible = false;
 
-	for (int i = 0; i < light_count; ++i)
+	for (int i = light_count - 1; i >= 0; --i)
 	{
-		bool is_primary = i == 0;
+		bool is_primary = i == light_count - 1;
 
 		float angle = atan(lights[i].y - coord.y, lights[i].x - coord.x) + pi;
 		int index = int(round(angle / pi2 * shadow_map_size)) % shadow_map_size;
 
 		float distance = distance(vec2(lights[i].x, lights[i].y), coord);
-		bool lighted = distance <= shadowmap[index + (i * shadow_map_size)];
+		bool lighted = distance <= shadowmap[index + (lights[i].index * shadow_map_size)];
 		if (lighted)
 		{
 			if (is_primary || is_primary_visible)

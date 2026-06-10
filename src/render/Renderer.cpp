@@ -9,9 +9,8 @@ Renderer::Renderer(const win::Area<float> &area, const win::Dimensions<int> &res
 
 void Renderer::set_leveldata(const LevelData &leveldata)
 {
-    statics = leveldata.renderables;
-    occluders = leveldata.occluders;
-    backend->load_statics(statics);
+    static_renderables = leveldata.renderables;
+    backend->load_statics(static_renderables, leveldata.occluders, leveldata.lights);
 }
 
 void Renderer::render(const Renderables &renderables)
@@ -20,12 +19,12 @@ void Renderer::render(const Renderables &renderables)
     backend->begin();
 
     staging.clear();
-    for (const auto &r : statics)
+    for (const auto &r : static_renderables)
         staging.push_back(staging.size());
 
     backend->render_statics(staging);
     backend->render_dynamics(renderables.renderables);
-    backend->render_lights(occluders, renderables.light_renderables);
+    backend->render_lights(renderables.light_renderables);
 
     backend->end();
 }
