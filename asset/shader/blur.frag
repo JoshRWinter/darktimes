@@ -6,7 +6,7 @@ uniform bool horizontal;
 in vec2 ftexcoord;
 layout (location = 0) out vec4 frag;
 
-const float[] weights = float[](0.108802, 0.104830, 0.093763, 0.077853, 0.060009, 0.042939, 0.028522, 0.017588, 0.010068, 0.005350, 0.002639, 0.001209);
+const float[] weights = float[](0.335138, 0.234927, 0.082898, 0.014607);
 
 void main()
 {
