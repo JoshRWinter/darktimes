@@ -124,10 +124,11 @@ void Game::generate_level()
     std::vector<LightOccluder> occluders;
     for (const auto &wall : generator.level_walls)
     {
-        if (wall.w > wall.h)
-            occluders.emplace_back(wall.x, wall.y + wall.h / 2.0f, wall.x + wall.w, wall.y + wall.h / 2.0f);
-        else
-            occluders.emplace_back(wall.x + wall.w / 2.0f, wall.y, wall.x + wall.w / 2.0f, wall.y + wall.h);
+        const float embiggen = 0.05f;
+        occluders.emplace_back(wall.x - embiggen, wall.y - embiggen, wall.x - embiggen, wall.y + wall.h + embiggen);
+        occluders.emplace_back(wall.x + wall.w + embiggen, wall.y - embiggen, wall.x + wall.w + embiggen, wall.y + wall.h + embiggen);
+        occluders.emplace_back(wall.x - embiggen, wall.y + wall.h + embiggen, wall.x + wall.w + embiggen, wall.y + wall.h + embiggen);
+        occluders.emplace_back(wall.x - embiggen, wall.y - embiggen, wall.x + wall.w + embiggen, wall.y - embiggen);
     }
 
     {
