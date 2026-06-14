@@ -234,7 +234,7 @@ void GLLightRenderer::load(const std::vector<LightOccluder> &occluders, const st
     check_error();
 }
 
-void GLLightRenderer::render(const std::vector<LightRenderable> &dynamic_lights, GLuint fbo)
+void GLLightRenderer::render(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights, GLuint fbo)
 {
     if (dynamic_lights.size() > max_dynamic_lights)
         win::bug("Too many dynamic lights");
@@ -289,13 +289,15 @@ void GLLightRenderer::render(const std::vector<LightRenderable> &dynamic_lights,
 
     // run the light rendering pass
     {
-        auto range = lighter.lightbuf.reserve(lights.size() + dynamic_lights.size());
+        auto range = lighter.lightbuf.reserve(static_lights.size() + dynamic_lights.size());
 
         int i = 0;
 
-        for (const auto &light : lights)
+        for (const auto &light_index : static_lights)
         {
+            const auto &light = lights[light_index];
             auto &item = range[i];
+
             item.index = light.index;
             item.x = light.x;
             item.y = light.y;
@@ -306,16 +308,18 @@ void GLLightRenderer::render(const std::vector<LightRenderable> &dynamic_lights,
             ++i;
         }
 
+        int j = 0;
         for (const auto &light : dynamic_lights)
         {
             auto &item = range[i];
-            item.index = i;
+            item.index = lights.size() + j;
             item.x = light.x;
             item.y = light.y;
             item.power = light.power;
             item.r = light.color.red;
             item.g = light.color.green;
             item.b = light.color.blue;
+            ++j;
             ++i;
         }
 
@@ -323,7 +327,7 @@ void GLLightRenderer::render(const std::vector<LightRenderable> &dynamic_lights,
 
         glUseProgram(lighter.program.get());
         glUniform1i(lighter.uniform_light_start, range.head());
-        glUniform1i(lighter.uniform_light_count, range.length());
+        glUniform1i(lighter.uniform_light_count, i);
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
         lighter.lightbuf.lock(range);

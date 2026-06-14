@@ -160,9 +160,9 @@ void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
     atlas_renderer.render(dynamics);
 }
 
-void GLRendererBackend::render_lights(const std::vector<LightRenderable> &lights)
+void GLRendererBackend::render_lights(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights)
 {
-    light_renderer.render(lights, fbo.get());
+    light_renderer.render(static_lights, dynamic_lights, fbo.get());
 }
 
 void GLRendererBackend::check_error()

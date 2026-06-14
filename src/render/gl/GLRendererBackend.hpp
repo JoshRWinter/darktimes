@@ -49,7 +49,7 @@ public:
     void end() override;
     void render_statics(const std::vector<int> &statics) override;
     void render_dynamics(const std::vector<Renderable> &dynamics) override;
-    void render_lights(const std::vector<LightRenderable> &lights) override;
+    void render_lights(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights) override;
 
 private:
     static void check_error();

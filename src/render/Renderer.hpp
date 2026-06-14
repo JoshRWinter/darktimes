@@ -20,7 +20,11 @@ public:
     void resize(const win::Area<float> &area, const win::Dimensions<int> &res);
 
 private:
-    std::vector<int> staging;
+    std::vector<int> static_renderable_staging;
+    std::vector<int> static_light_staging;
+
     std::vector<Renderable> static_renderables;
+    std::vector<LightRenderable> static_lights;
+
     std::unique_ptr<RendererBackend> backend;
 };
