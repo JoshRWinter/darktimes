@@ -3,7 +3,10 @@
 layout (local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
 
 uniform int shadow_map_size;
+uniform int light_start;
 uniform int light_count;
+uniform int light_buffer_size;
+uniform int occluder_buffer_size;
 
 struct Occluder
 {
@@ -75,14 +78,14 @@ void main()
 	return;
 
 	int local_index = index % shadow_map_size;
-	int light_index = (index / shadow_map_size);
+	int light_index = ((index / shadow_map_size) + light_start) % light_buffer_size;
 
 	float angle = local_index / float(shadow_map_size) * pi2;
 	float mindist = 100.0f;
 
 	for (int i = 0; i < lights[light_index].occluder_count; ++i)
 	{
-		int occluder_index = (i + lights[light_index].occluder_start) % lights[light_index].occluder_count;
+		int occluder_index = (i + lights[light_index].occluder_start) % occluder_buffer_size;
 
 		float dist;
 		if (intersects(lights[light_index].x, lights[light_index].y, angle, occluders[occluder_index], dist))

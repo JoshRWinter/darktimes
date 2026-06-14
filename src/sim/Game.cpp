@@ -31,7 +31,14 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     renderables.centerx = player.x;
     renderables.centery = player.y;
 
-    renderables.light_renderables.emplace_back(player.x, player.y, 4.0f, win::Color(0.8f, 0.8f, 0.0f));
+    const float orbitx = 7.0f;
+    const float orbity = 10.5f;
+    static float orbit = 0.0f;
+    static float dist = 0.6f;
+    orbit += 0.05f;
+    renderables.light_renderables.emplace_back(orbitx + std::cosf(orbit) * dist, orbity + std::sinf(orbit) * dist, 0.2f, win::Color<float>(1.0f, 0.0f, 1.0f));
+
+    renderables.light_renderables.emplace_back(player.x, player.y, 1.0f, win::Color(0.8f, 0.8f, 0.0f));
 }
 
 void Game::reset()

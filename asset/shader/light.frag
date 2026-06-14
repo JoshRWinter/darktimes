@@ -22,7 +22,9 @@ layout (std430) buffer LightSources
 };
 
 uniform int shadow_map_size;
+uniform int light_start;
 uniform int light_count;
+uniform int light_buffer_size;
 uniform mat4 transform;
 
 const float pi = 3.1415926;
@@ -37,18 +39,19 @@ void main()
 
 	for (int i = light_count - 1; i >= 0; --i)
 	{
+		int light_index = (light_start + i) % light_buffer_size;
 		bool is_primary = i == light_count - 1;
 
-		float angle = atan(lights[i].y - coord.y, lights[i].x - coord.x) + pi;
-		int index = int(round(angle / pi2 * shadow_map_size)) % shadow_map_size;
+		float angle = atan(lights[light_index].y - coord.y, lights[light_index].x - coord.x) + pi;
+		int shadow_index = int(round(angle / pi2 * shadow_map_size)) % shadow_map_size;
 
-		float distance = distance(vec2(lights[i].x, lights[i].y), coord);
-		bool lighted = distance <= shadowmap[index + (lights[i].index * shadow_map_size)];
+		float distance = distance(vec2(lights[light_index].x, lights[light_index].y), coord);
+		bool lighted = distance <= shadowmap[shadow_index + (lights[light_index].index * shadow_map_size)];
 		if (lighted)
 		{
 			if (is_primary || is_primary_visible)
 			{
-				light += vec3(lights[i].r, lights[i].g, lights[i].b) * (lights[i].power / max(0.00000f, distance * distance));
+				light += vec3(lights[light_index].r, lights[light_index].g, lights[light_index].b) * (lights[light_index].power / max(0.00000f, distance * distance));
 				is_primary_visible = true;
 			}
 		}
