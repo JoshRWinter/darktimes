@@ -57,7 +57,7 @@ class GLLightRenderer : GLRendererBase
     static constexpr int max_dynamic_lights = 5;
     static constexpr int lighter_light_buf_count = 50;
     static constexpr int shadower_light_buf_count = 50;
-    static constexpr int occluder_buf_count = 1000;
+    static constexpr int occluder_buf_count = 4000;
 
 public:
     explicit GLLightRenderer(win::AssetRoll &roll);
