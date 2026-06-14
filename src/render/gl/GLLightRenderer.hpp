@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include <win/AssetRoll.hpp>
+#include <win/SpatialIndex.hpp>
 #include <win/Utility.hpp>
 
 #include "../../Renderable.hpp"
@@ -47,13 +48,13 @@ private:
     win::Dimensions<int> res;
 
     std::vector<Light> lights;
+    std::vector<LightOccluder> occluders;
+    win::SpatialIndex<LightOccluder> occindex;
 
     struct
     {
         win::GLProgram program;
-        GLint uniform_occluder_count;
         GLint uniform_light_count;
-        GLint uniform_light_start;
         win::GLBuffer occluders;
         win::GLBuffer lights;
         win::GLBuffer shadowmap;
@@ -67,6 +68,7 @@ private:
         win::GLProgram program;
         GLint uniform_light_count;
         GLint uniform_transform;
+        win::GLBuffer lights;
         win::GLVertexArray vao;
     } lighter;
 

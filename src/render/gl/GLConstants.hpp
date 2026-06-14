@@ -13,6 +13,7 @@ public:
     constexpr static GLenum blur_framebuffer_texture_unit = GL_TEXTURE4;
 
     constexpr static GLuint occluders_ssbo_index = 0;
-    constexpr static GLuint lights_ssbo_index = 1;
-    constexpr static GLuint shadowmap_ssbo_index = 2;
+    constexpr static GLuint shadowmap_ssbo_index = 1;
+    constexpr static GLuint shadower_lights_ssbo_index = 2;
+    constexpr static GLuint lighter_lights_ssbo_index = 3;
 };
