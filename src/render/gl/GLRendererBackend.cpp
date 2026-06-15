@@ -73,17 +73,6 @@ void GLRendererBackend::set_view(float x, float y, float zoom)
     light_renderer.set_view_projection(vp);
 }
 
-void GLRendererBackend::begin()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo.get());
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void GLRendererBackend::end()
-{
-    post_renderer.render();
-}
-
 void GLRendererBackend::load_statics(const std::vector<Renderable> &static_renderables,
                                      const std::vector<LightOccluder> &occluders,
                                      const std::vector<LightRenderable> &static_lights)
@@ -116,53 +105,56 @@ void GLRendererBackend::load_statics(const std::vector<Renderable> &static_rende
     light_renderer.load(occluders, static_lights);
 }
 
-void GLRendererBackend::render_statics(const std::vector<int> &statics)
+void GLRendererBackend::render(const std::vector<int> &static_renderables,
+                               const std::vector<Renderable> &dynamic_renderables,
+                               const std::vector<int> &static_lights,
+                               const std::vector<LightRenderable> &dynamic_lights)
 {
-    if (statics.empty())
-        return;
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo.get());
 
-    renderable_ids.clear();
-    renderable_ids.reserve(statics.size());
-
-    auto type = loaded_statics[statics[0]].type;
-
-    const auto flush = [this, &type]()
+    if (!static_renderables.empty())
     {
-        if (type == StaticObject::Type::floor)
-            floor_renderer.render(renderable_ids);
-        else
-            atlas_renderer.render(renderable_ids);
-
         renderable_ids.clear();
-    };
+        renderable_ids.reserve(static_renderables.size());
 
-    for (const auto i : statics)
-    {
-        const auto &object = loaded_statics.at(i);
+        auto type = loaded_statics[static_renderables[0]].type;
 
-        if (type != object.type)
+        const auto flush = [this, &type]()
         {
-            flush();
-            type = object.type;
+            if (type == StaticObject::Type::floor)
+                floor_renderer.render(renderable_ids);
+            else
+                atlas_renderer.render(renderable_ids);
+
+            renderable_ids.clear();
+        };
+
+        for (const auto i : static_renderables)
+        {
+            const auto &object = loaded_statics.at(i);
+
+            if (type != object.type)
+            {
+                flush();
+                type = object.type;
+            }
+
+            renderable_ids.push_back(object.base_vertex);
         }
 
-        renderable_ids.push_back(object.base_vertex);
+        if (!renderable_ids.empty())
+            flush();
     }
 
-    if (!renderable_ids.empty())
-        flush();
+    if (!dynamic_renderables.empty())
+        atlas_renderer.render(dynamic_renderables);
+
+    if (!static_lights.empty() || !dynamic_lights.empty())
+        light_renderer.render(static_lights, dynamic_lights, fbo.get());
+
+    post_renderer.render();
 
     check_error();
-}
-
-void GLRendererBackend::render_dynamics(const std::vector<Renderable> &dynamics)
-{
-    atlas_renderer.render(dynamics);
-}
-
-void GLRendererBackend::render_lights(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights)
-{
-    light_renderer.render(static_lights, dynamic_lights, fbo.get());
 }
 
 void GLRendererBackend::check_error()

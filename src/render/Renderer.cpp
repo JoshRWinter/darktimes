@@ -26,15 +26,10 @@ void Renderer::render(const Renderables &renderables)
     };
 
     backend->set_view(renderables.centerx, renderables.centery, 1.0f); // 2.5f);
-    backend->begin();
 
     static_renderable_staging.clear();
     for (const auto &r : static_renderables)
         static_renderable_staging.push_back(static_renderable_staging.size());
-
-    backend->render_statics(static_renderable_staging);
-
-    backend->render_dynamics(renderables.renderables);
 
     static_light_staging.clear();
     for (int i = 0; i < static_lights.size(); ++i)
@@ -43,9 +38,7 @@ void Renderer::render(const Renderables &renderables)
             static_light_staging.push_back(i);
     }
 
-    backend->render_lights(static_light_staging, renderables.light_renderables);
-
-    backend->end();
+    backend->render(static_renderable_staging, renderables.renderables, static_light_staging, renderables.light_renderables);
 }
 
 void Renderer::resize(const win::Area<float> &area, const win::Dimensions<int> &res)

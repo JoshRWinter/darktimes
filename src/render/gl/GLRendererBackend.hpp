@@ -45,11 +45,10 @@ public:
     void load_statics(const std::vector<Renderable> &static_renderables,
                       const std::vector<LightOccluder> &occluders,
                       const std::vector<LightRenderable> &static_lights) override;
-    void begin() override;
-    void end() override;
-    void render_statics(const std::vector<int> &statics) override;
-    void render_dynamics(const std::vector<Renderable> &dynamics) override;
-    void render_lights(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights) override;
+    void render(const std::vector<int> &static_renderables,
+                const std::vector<Renderable> &dynamic_renderables,
+                const std::vector<int> &static_lights,
+                const std::vector<LightRenderable> &dynamic_lights) override;
 
 private:
     static void check_error();

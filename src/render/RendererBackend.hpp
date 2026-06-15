@@ -14,9 +14,8 @@ public:
     virtual void load_statics(const std::vector<Renderable> &statics,
                               const std::vector<LightOccluder> &occluders,
                               const std::vector<LightRenderable> &lights) = 0;
-    virtual void begin() = 0;
-    virtual void end() = 0;
-    virtual void render_statics(const std::vector<int> &statics) = 0;
-    virtual void render_dynamics(const std::vector<Renderable> &dynamics) = 0;
-    virtual void render_lights(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights) = 0;
+    virtual void render(const std::vector<int> &static_renderables,
+                        const std::vector<Renderable> &dynamic_renderables,
+                        const std::vector<int> &static_lights,
+                        const std::vector<LightRenderable> &dynamic_lights) = 0;
 };
