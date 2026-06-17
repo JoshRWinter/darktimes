@@ -38,7 +38,11 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     orbit += 0.05f;
     renderables.light_renderables.emplace_back(orbitx + std::cosf(orbit) * dist, orbity + std::sinf(orbit) * dist, 0.2f, win::Color<float>(1.0f, 0.0f, 1.0f));
 
-    renderables.light_renderables.emplace_back(player.x, player.y, 1.0f, win::Color(0.8f, 0.8f, 0.0f));
+    renderables.light_renderables.emplace_back(player.x + player.w / 2.0f + std::cos(player.rot - 0.5f) * 0.25f,
+                                               player.y + player.h / 2.0f + std::sin(player.rot - 0.5f) * 0.25f,
+                                               1.0f,
+                                               win::Color(0.8f, 0.8f, 0.3f),
+                                               player.rot);
 }
 
 void Game::reset()
@@ -131,7 +135,7 @@ void Game::generate_level()
     std::vector<LightOccluder> occluders;
     for (const auto &wall : generator.level_walls)
     {
-        const float embiggen = 0.05f;
+        const float embiggen = 0.03f;
         occluders.emplace_back(wall.x - embiggen, wall.y - embiggen, wall.x - embiggen, wall.y + wall.h + embiggen);
         occluders.emplace_back(wall.x + wall.w + embiggen, wall.y - embiggen, wall.x + wall.w + embiggen, wall.y + wall.h + embiggen);
         occluders.emplace_back(wall.x - embiggen, wall.y + wall.h + embiggen, wall.x + wall.w + embiggen, wall.y + wall.h + embiggen);
@@ -174,7 +178,7 @@ void Game::generate_level()
             world.index.level.add(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h), phys);
         }
 
-        for (auto &prop : generator.level_props)
+        for (const auto &prop : generator.level_props)
         {
             if (!prop.solid)
                 continue;
@@ -198,7 +202,7 @@ void Game::generate_level()
     data.occluders = std::move(occluders);
     data.lights.emplace_back(-1.6f, 1.6f, 4, win::Color<float>(0.4f, 0.1f, 0.1f));
     data.lights.emplace_back(4.6f, 3.6f, 6, win::Color<float>(0.1f, 0.9f, 0.2f));
-    data.lights.emplace_back(0.0f, 7.6f, 6, win::Color<float>(0.0f, 0.0f, 0.9f));
+    data.lights.emplace_back(0.0f, 7.6f, 6, win::Color<float>(0.1f, 0.1f, 0.9f));
     level_generated(std::move(data));
 }
 

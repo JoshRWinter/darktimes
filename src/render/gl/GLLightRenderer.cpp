@@ -177,11 +177,11 @@ void GLLightRenderer::resize(const win::Dimensions<int> &res)
 
     glActiveTexture(GLConstants::light_framebuffer_texture_unit);
     glBindTexture(GL_TEXTURE_2D, lighter.tex.get());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, res.width, res.height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, res.width, res.height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
     glActiveTexture(GLConstants::blur_framebuffer_texture_unit);
     glBindTexture(GL_TEXTURE_2D, blur.tex.get());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16, res.width, res.height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, res.width, res.height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 }
 
 void GLLightRenderer::load(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &static_lights)
@@ -214,7 +214,7 @@ void GLLightRenderer::load(const std::vector<LightOccluder> &occluders, const st
             item.occluder_start = occrange.head();
             item.occluder_count = occrange.length();
 
-            lights.emplace_back(index, light.x, light.y, light.power, light.color.red, light.color.green, light.color.blue);
+            lights.emplace_back(index, light.x, light.y, light.power, light.color.red, light.color.green, light.color.blue, light.angle);
             ++index;
         }
     }
@@ -305,6 +305,7 @@ void GLLightRenderer::render(const std::vector<int> &static_lights, const std::v
             item.r = light.r;
             item.g = light.g;
             item.b = light.b;
+            item.angle = light.angle;
             ++i;
         }
 
@@ -319,6 +320,7 @@ void GLLightRenderer::render(const std::vector<int> &static_lights, const std::v
             item.r = light.color.red;
             item.g = light.color.green;
             item.b = light.color.blue;
+            item.angle = light.angle;
             ++j;
             ++i;
         }

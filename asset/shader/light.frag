@@ -14,6 +14,7 @@ struct LightSource
 	float y;
 	float power;
 	float r, g, b;
+	float angle;
 };
 
 layout (std430) buffer LightSources
@@ -51,7 +52,10 @@ void main()
 		{
 			if (is_primary || is_primary_visible)
 			{
-				light += vec3(lights[light_index].r, lights[light_index].g, lights[light_index].b) * (lights[light_index].power / max(0.00000f, distance * distance));
+				float dproduct = dot(vec2(cos(lights[light_index].angle), sin(lights[light_index].angle)), vec2(cos(angle), sin(angle)));
+				bool in_angle = lights[light_index].angle == -1.0 || dproduct > 0.8;
+
+				light += vec3(lights[light_index].r, lights[light_index].g, lights[light_index].b) * (lights[light_index].power / max(in_angle ? 0.1 : 10, distance * distance));
 				is_primary_visible = true;
 			}
 		}

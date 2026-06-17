@@ -16,7 +16,7 @@ class GLLightRenderer : GLRendererBase
 {
     struct StaticLight
     {
-        StaticLight(int index, float x, float y, float power, float r, float g, float b)
+        StaticLight(int index, float x, float y, float power, float r, float g, float b, float angle)
             : index(index)
             , x(x)
             , y(y)
@@ -24,11 +24,12 @@ class GLLightRenderer : GLRendererBase
             , r(r)
             , g(g)
             , b(b)
+            , angle(angle)
         {
         }
 
         int index;
-        float x, y, power, r, g, b;
+        float x, y, power, r, g, b, angle;
     };
 
     struct ShadowerLight
@@ -49,6 +50,7 @@ class GLLightRenderer : GLRendererBase
         float r;
         float g;
         float b;
+        float angle;
     };
 
     WIN_NO_COPY_MOVE(GLLightRenderer);

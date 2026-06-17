@@ -28,11 +28,12 @@ struct Renderable
 
 struct LightRenderable
 {
-    LightRenderable(float x, float y, float power, const win::Color<float> &color)
+    LightRenderable(float x, float y, float power, const win::Color<float> &color, float angle = -1.0f)
         : x(x)
         , y(y)
         , power(power)
         , color(color)
+        , angle(angle)
     {
     }
 
@@ -40,6 +41,7 @@ struct LightRenderable
     float y;
     float power;
     win::Color<float> color;
+    float angle;
 };
 
 struct LightOccluder
