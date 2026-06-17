@@ -39,7 +39,6 @@ GLRendererBackend::GLRendererBackend(const win::Area<float> &area, const win::Di
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_FRAMEBUFFER_SRGB);
 
     GLRendererBackend::resize(area, res);
 
