@@ -7,7 +7,7 @@
    viewBox="0 0 101.33047 101.33049"
    version="1.1"
    id="svg1"
-   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    sodipodi:docname="floor1.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="true"
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
-     inkscape:zoom="3.6203867"
-     inkscape:cx="250.38762"
-     inkscape:cy="201.77403"
+     inkscape:zoom="1.8101934"
+     inkscape:cx="172.63349"
+     inkscape:cy="150.81262"
      inkscape:window-width="2560"
      inkscape:window-height="1413"
      inkscape:window-x="0"
@@ -43,28 +43,28 @@
      id="layer1"
      transform="translate(-13.005608,-68.796855)">
     <rect
-       style="fill:#210e00;fill-opacity:1;stroke:#130701;stroke-width:1.33;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#422317;fill-opacity:1;stroke:#130701;stroke-width:1.33;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
        id="rect1"
        width="100"
        height="24.999998"
        x="13.670843"
        y="69.46209" />
     <rect
-       style="fill:#1f0c00;fill-opacity:1;stroke:#130701;stroke-width:1.33047;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#3b1b12;fill-opacity:1;stroke:#130701;stroke-width:1.33047;stroke-dasharray:none;stroke-opacity:1"
        id="rect2"
        width="100"
        height="24.999998"
        x="13.670843"
        y="94.46209" />
     <rect
-       style="fill:#231107;fill-opacity:1;stroke:#130701;stroke-width:1.33047;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#391910;fill-opacity:1;stroke:#130701;stroke-width:1.33047;stroke-dasharray:none;stroke-opacity:1"
        id="rect3"
        width="100"
        height="24.999998"
        x="13.670843"
        y="119.46209" />
     <rect
-       style="fill:#220e07;fill-opacity:1;stroke:#130701;stroke-width:1.33047;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#3f251c;fill-opacity:1;stroke:#130701;stroke-width:1.33047;stroke-dasharray:none;stroke-opacity:1"
        id="rect4"
        width="100"
        height="24.999998"
