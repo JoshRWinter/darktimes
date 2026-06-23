@@ -1,5 +1,7 @@
 #pragma once
 
+#include <win/Utility.hpp>
+
 #include "../../Texture.hpp"
 
 enum class LevelSide
@@ -8,6 +10,24 @@ enum class LevelSide
     right,
     bottom,
     top
+};
+
+struct LevelLight
+{
+    LevelLight(float x, float y, float power, const win::Color<float> &color, float angle)
+        : x(x)
+        , y(y)
+        , power(power)
+        , color(color)
+        , angle(angle)
+    {
+    }
+
+    float x;
+    float y;
+    float power;
+    win::Color<float> color;
+    float angle;
 };
 
 struct LevelProp

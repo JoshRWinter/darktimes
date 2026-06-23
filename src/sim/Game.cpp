@@ -113,10 +113,11 @@ void Game::generate_level()
     LevelGenerator generator;
     generator.generate(69);
 
-    std::vector<Renderable> renderables;
+    LevelData data;
+
     for (const auto &f : generator.level_floors)
     {
-        renderables.emplace_back(f.texture, f.x, f.y, f.w, f.h, 0.0f);
+        data.renderables.emplace_back(f.texture, f.x, f.y, f.w, f.h, 0.0f);
     }
 
     /*
@@ -129,17 +130,21 @@ void Game::generate_level()
     for (const auto &p : generator.level_props)
     {
         const auto newprop = correct_prop_orientation(p);
-        renderables.emplace_back(p.texture, newprop.x, newprop.y, newprop.w, newprop.h, get_prop_rotation(newprop.side));
+        data.renderables.emplace_back(p.texture, newprop.x, newprop.y, newprop.w, newprop.h, get_prop_rotation(newprop.side));
     }
 
-    std::vector<LightOccluder> occluders;
+    for (const auto &l : generator.level_lights)
+    {
+        data.lights.emplace_back(l.x, l.y, l.power, l.color, l.angle);
+    }
+
     for (const auto &wall : generator.level_walls)
     {
         const float embiggen = 0.03f;
-        occluders.emplace_back(wall.x - embiggen, wall.y - embiggen, wall.x - embiggen, wall.y + wall.h + embiggen);
-        occluders.emplace_back(wall.x + wall.w + embiggen, wall.y - embiggen, wall.x + wall.w + embiggen, wall.y + wall.h + embiggen);
-        occluders.emplace_back(wall.x - embiggen, wall.y + wall.h + embiggen, wall.x + wall.w + embiggen, wall.y + wall.h + embiggen);
-        occluders.emplace_back(wall.x - embiggen, wall.y - embiggen, wall.x + wall.w + embiggen, wall.y - embiggen);
+        data.occluders.emplace_back(wall.x - embiggen, wall.y - embiggen, wall.x - embiggen, wall.y + wall.h + embiggen);
+        data.occluders.emplace_back(wall.x + wall.w + embiggen, wall.y - embiggen, wall.x + wall.w + embiggen, wall.y + wall.h + embiggen);
+        data.occluders.emplace_back(wall.x - embiggen, wall.y + wall.h + embiggen, wall.x + wall.w + embiggen, wall.y + wall.h + embiggen);
+        data.occluders.emplace_back(wall.x - embiggen, wall.y - embiggen, wall.x + wall.w + embiggen, wall.y - embiggen);
     }
 
     {
@@ -197,9 +202,6 @@ void Game::generate_level()
         }
     }
 
-    LevelData data;
-    data.renderables = std::move(renderables);
-    data.occluders = std::move(occluders);
     data.lights.emplace_back(-1.6f, 1.6f, 4, win::Color<float>(0.4f, 0.1f, 0.1f));
     data.lights.emplace_back(4.6f, 3.6f, 6, win::Color<float>(0.1f, 0.9f, 0.2f));
     data.lights.emplace_back(0.0f, 7.6f, 6, win::Color<float>(0.1f, 0.1f, 0.9f));

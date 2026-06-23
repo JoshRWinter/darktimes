@@ -42,6 +42,7 @@ void LevelGenerator::generate(int seed)
     level_floors.clear();
     level_walls.clear();
     level_props.clear();
+    level_lights.clear();
 
     const auto generated_floors = generate_impl();
     const auto props = generate_props(generated_floors);
@@ -54,6 +55,8 @@ void LevelGenerator::generate(int seed)
 
     for (const auto &p : props)
         level_props.push_back(p);
+
+    level_lights = generate_lights(generated_floors);
 
     /*
     // show prop excluders
@@ -953,6 +956,36 @@ std::vector<LevelPropInternal> LevelGenerator::generate_transition_strips(const 
     }
 
     return props;
+}
+
+///////////////////////////////////////////
+/// Light generation
+///////////////////////////////////////////
+
+std::vector<LevelLight> LevelGenerator::generate_lights(const std::vector<LevelFloorInternal> &floors)
+{
+    const std::array<win::Color<float>, 4> colors = {
+        win::Color<float>(0.4f, 0.4f, 0.1f),
+        win::Color<float>(0.3f, 0.4f, 0.2f),
+        win::Color<float>(0.4f, 0.3f, 0.12f),
+        win::Color<float>(0.5f, 0.1f, 0.06f),
+    };
+
+    std::vector<LevelLight> lights;
+
+    for (const auto &floor : floors)
+    {
+        if (rand.one_in(5))
+        {
+            lights.emplace_back(floor.x + floor.w / 2.0f,
+                                floor.y + floor.h / 2.0f,
+                                rand.uniform_real(0.4f, 0.8f),
+                                colors.at(rand.uniform_int(0, colors.size() - 1)),
+                                -1.0f);
+        }
+    }
+
+    return lights;
 }
 
 ///////////////////////////////////////////

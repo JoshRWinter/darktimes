@@ -6,8 +6,6 @@
 #include "../../Texture.hpp"
 #include "LevelObjectsInternal.hpp"
 
-void level_generate(int seed, std::vector<LevelFloor> &floors, std::vector<LevelWall> &walls, std::vector<LevelProp> &props);
-
 class LevelGenerator
 {
     WIN_NO_COPY_MOVE(LevelGenerator);
@@ -21,6 +19,7 @@ public:
     std::vector<LevelFloor> level_floors;
     std::vector<LevelWall> level_walls;
     std::vector<LevelProp> level_props;
+    std::vector<LevelLight> level_lights;
 
 private:
     std::vector<LevelFloorInternal> generate_impl();
@@ -48,6 +47,7 @@ private:
     std::vector<LevelPropInternal> generate_props_from_spawns(const LevelFloorInternal &floor, const std::vector<LevelPropExcluder> &excluders);
     static std::vector<LevelPropInternal> generate_transition_strips(const LevelFloorInternal &floor,
                                                                      const std::unordered_map<int, const LevelFloor *> &floor_map);
+    std::vector<LevelLight> generate_lights(const std::vector<LevelFloorInternal> &floors);
     Texture random_floor();
     static LevelSide flip(LevelSide side);
     LevelSide random_side();
