@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -67,7 +68,7 @@ public:
     void set_view_projection(const glm::mat4 &view_projection);
     void resize(const win::Dimensions<int> &res);
     void load(const std::vector<LightOccluder> &occluders, const std::vector<LightRenderable> &static_lights);
-    void render(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights, GLuint fbo);
+    void render(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights, GLuint fbo, float flicker);
 
 private:
     glm::mat4 view_projection;
@@ -76,6 +77,8 @@ private:
     std::vector<StaticLight> lights;
     std::vector<LightOccluder> occluders;
     win::SpatialIndex<LightOccluder> occindex;
+
+    std::array<float, 2000> flicker_pattern;
 
     struct
     {

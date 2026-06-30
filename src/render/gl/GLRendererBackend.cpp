@@ -148,8 +148,9 @@ void GLRendererBackend::render(const std::vector<int> &static_renderables,
     if (!dynamic_renderables.empty())
         atlas_renderer.render(dynamic_renderables);
 
+    flicker += 1.0f;
     if (!static_lights.empty() || !dynamic_lights.empty())
-        light_renderer.render(static_lights, dynamic_lights, fbo.get());
+        light_renderer.render(static_lights, dynamic_lights, fbo.get(), flicker);
 
     post_renderer.render();
 

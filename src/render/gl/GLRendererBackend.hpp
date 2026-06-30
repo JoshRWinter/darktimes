@@ -53,6 +53,8 @@ public:
 private:
     static void check_error();
 
+    float flicker = 0.0f;
+
     glm::mat4 projection;
 
     TextureAssetMap texture_map;

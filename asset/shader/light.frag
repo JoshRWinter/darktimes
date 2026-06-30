@@ -55,7 +55,7 @@ void main()
 				float dproduct = dot(vec2(cos(lights[light_index].angle), sin(lights[light_index].angle)), vec2(cos(angle), sin(angle)));
 				bool in_angle = lights[light_index].angle == -1.0 || dproduct > 0.88;
 
-				light += vec3(lights[light_index].r, lights[light_index].g, lights[light_index].b) * ((lights[light_index].power * (in_angle ? 1.0 : 0.1)) / max(in_angle ? 0.000001 : 5, distance * distance));
+				light += vec3(lights[light_index].r, lights[light_index].g, lights[light_index].b) * ((lights[light_index].power * (in_angle ? 1.0 : 0.2)) / max(in_angle ? 0.000001 : 5, distance * distance));
 				is_primary_visible = true;
 			}
 		}

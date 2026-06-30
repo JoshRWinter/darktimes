@@ -40,7 +40,7 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
 
     renderables.light_renderables.emplace_back(player.x + player.w / 2.0f + std::cos(player.rot - 0.5f) * 0.25f,
                                                player.y + player.h / 2.0f + std::sin(player.rot - 0.5f) * 0.25f,
-                                               2.0f,
+                                               3.5f,
                                                win::Color(0.8f, 0.8f, 0.3f),
                                                player.rot);
 }

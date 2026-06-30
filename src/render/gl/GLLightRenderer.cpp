@@ -2,6 +2,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../../RandomNumberGenerator.hpp"
 #include "GLConstants.hpp"
 #include "GLLightRenderer.hpp"
 
@@ -153,6 +154,23 @@ GLLightRenderer::GLLightRenderer(win::AssetRoll &roll)
         blur.uniform_horizontal = get_uniform(blur.program, "horizontal");
     }
 
+    {
+        RandomNumberGenerator rng(69'420);
+
+        float flicker = 0.0f;
+        for (int i = 0; i < flicker_pattern.size() / 2; ++i)
+        {
+            const float a = std::sin(flicker * 0.0007f) * 0.35f;
+            const float b = std::sin(flicker * 0.02f) * 0.06f;
+
+            const float x = 1.0f + a + b + rng.uniform_real(-0.02f, 0.02f);
+            flicker_pattern.at(i) = x;
+            flicker_pattern.at((flicker_pattern.size() - 1) - i) = x;
+
+            ++flicker;
+        }
+    }
+
     check_error();
 }
 
@@ -234,7 +252,7 @@ void GLLightRenderer::load(const std::vector<LightOccluder> &occluders, const st
     check_error();
 }
 
-void GLLightRenderer::render(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights, GLuint fbo)
+void GLLightRenderer::render(const std::vector<int> &static_lights, const std::vector<LightRenderable> &dynamic_lights, GLuint fbo, float flicker)
 {
     if (dynamic_lights.size() > max_dynamic_lights)
         win::bug("Too many dynamic lights");
@@ -293,6 +311,18 @@ void GLLightRenderer::render(const std::vector<int> &static_lights, const std::v
 
         int i = 0;
 
+        const auto get_flicker = [this, &flicker](float phase)
+        {
+            const float f = flicker + phase;
+            const auto a = flicker_pattern[(int)std::floor(f) % flicker_pattern.size()];
+            const auto b = flicker_pattern[(int)std::ceil(f) % flicker_pattern.size()];
+
+            const float t = std::fmod(f, 1.0f);
+            const float lerp = a + ((b - a) * t);
+
+            return lerp;
+        };
+
         for (const auto &light_index : static_lights)
         {
             const auto &light = lights[light_index];
@@ -301,7 +331,7 @@ void GLLightRenderer::render(const std::vector<int> &static_lights, const std::v
             item.index = light.index;
             item.x = light.x;
             item.y = light.y;
-            item.power = light.power;
+            item.power = light.power * get_flicker((light.power + light.r + light.g + light.b) * 100.0f);
             item.r = light.r;
             item.g = light.g;
             item.b = light.b;
@@ -316,7 +346,7 @@ void GLLightRenderer::render(const std::vector<int> &static_lights, const std::v
             item.index = lights.size() + j;
             item.x = light.x;
             item.y = light.y;
-            item.power = light.power;
+            item.power = light.power * get_flicker((light.power + light.color.red + light.color.green + light.color.blue) * 100.0f);
             item.r = light.color.red;
             item.g = light.color.green;
             item.b = light.color.blue;
