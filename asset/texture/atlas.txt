@@ -9,6 +9,7 @@ side_table1.tga:496:263:59:130
 side_table2.tga:629:427:45:65
 side_shelf.tga:444:397:57:120
 piano.tga:631:263:57:160
+lamp.tga:218:530:45:45
 rug1.tga:478:0:244:126
 rug2.tga:478:130:244:129
 rug3.tga:188:290:304:88
@@ -16,7 +17,7 @@ rug4.tga:220:382:220:144
 chair1.tga:505:397:58:81
 chair2.tga:566:263:58:81
 couch1.tga:567:348:58:136
-clutter_brokenglass.tga:258:530:42:38
-clutter_boot.tga:218:530:36:30
+clutter_brokenglass.tga:267:530:42:38
+clutter_boot.tga:313:530:36:30
 clutter_bottle.tga:505:482:31:44
 tstrip.tga:559:263:3:120

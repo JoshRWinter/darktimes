@@ -32,7 +32,17 @@ struct LevelLight
 
 struct LevelProp
 {
-    LevelProp(Texture texture, LevelSide side, bool solid, float x, float y, float w, float h)
+    LevelProp(Texture texture,
+              LevelSide side,
+              bool solid,
+              float x,
+              float y,
+              float w,
+              float h,
+              float lightx,
+              float lighty,
+              float lightpower,
+              const win::Color<float> &lightcolor)
         : texture(texture)
         , side(side)
         , solid(solid)
@@ -40,6 +50,10 @@ struct LevelProp
         , y(y)
         , w(w)
         , h(h)
+        , lightx(lightx)
+        , lighty(lighty)
+        , lightpower(lightpower)
+        , lightcolor(lightcolor)
     {
     }
 
@@ -47,6 +61,8 @@ struct LevelProp
     LevelSide side;
     bool solid;
     float x, y, w, h;
+    float lightx, lighty, lightpower;
+    win::Color<float> lightcolor;
 };
 
 struct LevelWall

@@ -42,6 +42,7 @@ svg2tga exclude {
 	texture/side_table2.svg 35 55 shadowdef=furniture
 	texture/side_shelf.svg 47 110 shadowdef=furniture
 	texture/piano.svg 47 150 shadowdef=furniture
+	texture/lamp.svg 35 35 shadowdef=furniture
 
 	texture/large_table.svg 96 180 shadowdef=furniture
 	texture/large_table2.svg 96 96 shadowdef=furniture

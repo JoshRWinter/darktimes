@@ -131,11 +131,8 @@ void Game::generate_level()
     {
         const auto newprop = correct_prop_orientation(p);
         data.renderables.emplace_back(p.texture, newprop.x, newprop.y, newprop.w, newprop.h, get_prop_rotation(newprop.side));
-    }
-
-    for (const auto &l : generator.level_lights)
-    {
-        data.lights.emplace_back(l.x, l.y, l.power, l.color, l.angle);
+        if (p.lightpower > 0.0f)
+            data.lights.emplace_back(p.lightx, p.lighty, p.lightpower, p.lightcolor);
     }
 
     for (const auto &wall : generator.level_walls)
@@ -202,9 +199,6 @@ void Game::generate_level()
         }
     }
 
-    data.lights.emplace_back(-1.6f, 1.6f, 4, win::Color<float>(0.4f, 0.1f, 0.1f));
-    data.lights.emplace_back(4.6f, 3.6f, 6, win::Color<float>(0.1f, 0.9f, 0.2f));
-    data.lights.emplace_back(0.0f, 7.6f, 6, win::Color<float>(0.1f, 0.1f, 0.9f));
     level_generated(std::move(data));
 }
 

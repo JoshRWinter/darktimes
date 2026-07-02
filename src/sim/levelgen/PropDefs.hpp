@@ -34,10 +34,13 @@ struct LevelPropDefinition
     {
     }
 
-    LevelPropInternal spawn(LevelSide side, float x, float y) const
+    LevelPropInternal spawn(LevelSide side, float x, float y) const { return spawn(side, x, y, 0.0f, win::Color<float>()); }
+
+    LevelPropInternal spawn(LevelSide side, float x, float y, float lightpower, const win::Color<float> &lightcolor) const
     {
-        float w, h;
-        float xpad, ypad;
+        float w = 0.0f, h = 0.0f;
+        float xpad = 0.0f, ypad = 0.0f;
+        float light_x = 0.0f, light_y = 0.0f;
         switch (side)
         {
             case LevelSide::left:
@@ -46,6 +49,8 @@ struct LevelPropDefinition
                 h = height;
                 xpad = excluder_padding_x;
                 ypad = excluder_padding_y;
+                light_x = side == LevelSide::right ? lightx : (width - lightx);
+                light_y = side == LevelSide::right ? lighty : (height - lighty);
                 break;
             case LevelSide::bottom:
             case LevelSide::top:
@@ -53,10 +58,32 @@ struct LevelPropDefinition
                 h = width;
                 xpad = excluder_padding_y;
                 ypad = excluder_padding_x;
+                light_x = side == LevelSide::bottom ? lighty : (height - lighty);
+                light_y = side == LevelSide::bottom ? (width - lightx) : lightx;
                 break;
         }
 
-        return LevelPropInternal(texture, side, solid, x, y, w, h, xpad, ypad);
+        return LevelPropInternal(texture,
+                                 side,
+                                 solid,
+                                 x,
+                                 y,
+                                 w,
+                                 h,
+                                 xpad,
+                                 ypad,
+                                 x + light_x,
+                                 y + light_y,
+                                 has_light ? lightpower : 0.0f,
+                                 has_light ? lightcolor : win::Color<float>());
+    }
+
+    LevelPropDefinition &set_light(int x, int y)
+    {
+        has_light = true;
+        lightx = x / 1920.0f * 16.0f;
+        lighty = y / 1080.0f * 9.0f;
+        return *this;
     }
 
     float get_width(LevelSide side) const { return side == LevelSide::left || side == LevelSide::right ? width : height; }
@@ -70,6 +97,9 @@ private:
     float excluder_padding_y;
     float width;
     float height;
+    bool has_light = false;
+    float lightx = 0.0f;
+    float lighty = 0.0f;
 };
 
 struct PropDefinitions
@@ -87,11 +117,12 @@ struct PropDefinitions
         LevelPropDefinition(Texture::chair1, true, 58, 81, 0.18f, 0.0f),
         LevelPropDefinition(Texture::chair2, true, 58, 81, 0.18f, 0.0f),
         LevelPropDefinition(Texture::couch1, true, 58, 136, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::side_table1, true, 59, 130, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::side_table1, true, 59, 130, 0.18f, 0.0f).set_light(16, 16),
         LevelPropDefinition(Texture::side_table2, true, 45, 65, 0.18f, 0.0f),
         LevelPropDefinition(Texture::side_shelf, true, 57, 120, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::piano, true, 57, 160, 0.18f, 0.0f)
-    };
+        LevelPropDefinition(Texture::piano, true, 57, 160, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::lamp, true, 45, 45, 0.18f, 0.0f).set_light(22, 22)
+    }   ;
 
     std::vector<LevelPropDefinition> center_tables =
     {

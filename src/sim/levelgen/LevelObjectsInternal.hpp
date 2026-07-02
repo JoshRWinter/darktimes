@@ -17,8 +17,20 @@ struct LevelPropExcluder
 
 struct LevelPropInternal : LevelProp
 {
-    LevelPropInternal(Texture texture, LevelSide side, bool solid, float x, float y, float w, float h, float excluder_padding_x, float excluder_padding_y)
-        : LevelProp(texture, side, solid, x, y, w, h)
+    LevelPropInternal(Texture texture,
+                      LevelSide side,
+                      bool solid,
+                      float x,
+                      float y,
+                      float w,
+                      float h,
+                      float excluder_padding_x,
+                      float excluder_padding_y,
+                      float lightx,
+                      float lighty,
+                      float lightpower,
+                      const win::Color<float> &lightcolor)
+        : LevelProp(texture, side, solid, x, y, w, h, lightx, lighty, lightpower, lightcolor)
         , excluder_padding_x(excluder_padding_x)
         , excluder_padding_y(excluder_padding_y)
     {

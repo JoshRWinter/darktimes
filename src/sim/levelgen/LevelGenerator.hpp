@@ -19,7 +19,6 @@ public:
     std::vector<LevelFloor> level_floors;
     std::vector<LevelWall> level_walls;
     std::vector<LevelProp> level_props;
-    std::vector<LevelLight> level_lights;
 
 private:
     std::vector<LevelFloorInternal> generate_impl();
