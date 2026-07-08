@@ -18,14 +18,19 @@ void Renderer::set_leveldata(const LevelData &leveldata)
     backend->load_statics(static_renderables, leveldata.occluders, leveldata.lights);
 }
 
-void Renderer::render(const Renderables &renderables)
+void Renderer::render(const Renderables &prev, const Renderables &next, float lerp)
 {
-    const auto nearby = [&renderables](const auto &item, float dist)
+    const auto nearby = [&](const auto &item, float dist)
     {
-        return std::max(std::abs(item.x - renderables.centerx), std::abs(item.y - renderables.centery)) < dist;
+        return std::max(std::abs(item.x - prev.centerx), std::abs(item.y - prev.centery)) < dist;
     };
 
-    backend->set_view(renderables.centerx, renderables.centery, 1.0f); // 2.5f);
+    const auto interpolate = [lerp](float a, float b)
+    {
+        return a + (a - b) * lerp;
+    };
+
+    backend->set_view(interpolate(prev.centerx, next.centerx), interpolate(prev.centery, prev.centery), 1.0f);
 
     static_renderable_staging.clear();
     for (const auto &r : static_renderables)
@@ -38,7 +43,7 @@ void Renderer::render(const Renderables &renderables)
             static_light_staging.push_back(i);
     }
 
-    backend->render(static_renderable_staging, renderables.renderables, static_light_staging, renderables.light_renderables);
+    backend->render(static_renderable_staging, prev.renderables, static_light_staging, prev.light_renderables);
 }
 
 void Renderer::resize(const win::Area<float> &area, const win::Dimensions<int> &res)

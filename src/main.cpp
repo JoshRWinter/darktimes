@@ -135,7 +135,7 @@ int main()
         Renderables *prev, *current;
         const float lerp = simexchanger.get_simstates(&prev, &current, display.refresh_rate());
 
-        renderer.render(*current);
+        renderer.render(*prev, *current, lerp);
 
         display.swap();
     }

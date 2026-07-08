@@ -16,7 +16,7 @@ public:
     explicit Renderer(const win::Area<float> &area, const win::Dimensions<int> &res, win::AssetRoll &roll);
 
     void set_leveldata(const LevelData &leveldata);
-    void render(const Renderables &renderables);
+    void render(const Renderables &prev, const Renderables &next, float lerp);
     void resize(const win::Area<float> &area, const win::Dimensions<int> &res);
 
 private:
