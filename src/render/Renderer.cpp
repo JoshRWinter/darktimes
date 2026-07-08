@@ -27,10 +27,10 @@ void Renderer::render(const Renderables &prev, const Renderables &next, float le
 
     const auto interpolate = [lerp](float a, float b)
     {
-        return a + (a - b) * lerp;
+        return a + (b - a) * lerp;
     };
 
-    backend->set_view(interpolate(prev.centerx, next.centerx), interpolate(prev.centery, prev.centery), 1.0f);
+    backend->set_view(interpolate(prev.centerx, next.centerx), interpolate(prev.centery, next.centery), 1.0f);
 
     static_renderable_staging.clear();
     for (const auto &r : static_renderables)
