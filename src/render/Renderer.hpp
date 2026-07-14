@@ -12,6 +12,17 @@
 
 class Renderer
 {
+    struct StaticRenderable : Renderable
+    {
+        StaticRenderable(const Renderable &renderable, int index)
+            : Renderable(renderable)
+            , index(index)
+        {
+        }
+
+        int index;
+    };
+
 public:
     explicit Renderer(const win::Area<float> &area, const win::Dimensions<int> &res, win::AssetRoll &roll);
 
@@ -23,7 +34,7 @@ private:
     std::vector<int> static_renderable_staging;
     std::vector<int> static_light_staging;
 
-    std::vector<Renderable> static_renderables;
+    std::vector<StaticRenderable> static_renderables;
     std::vector<LightRenderable> static_lights;
 
     std::unique_ptr<RendererBackend> backend;

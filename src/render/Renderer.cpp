@@ -12,35 +12,53 @@ Renderer::Renderer(const win::Area<float> &area, const win::Dimensions<int> &res
 
 void Renderer::set_leveldata(const LevelData &leveldata)
 {
-    static_renderables = leveldata.renderables;
+    int index = 0;
+    for (const auto &r : leveldata.renderables)
+        static_renderables.emplace_back(r, index++);
+
     static_lights = leveldata.lights;
 
-    backend->load_statics(static_renderables, leveldata.occluders, leveldata.lights);
+    backend->load_statics(leveldata.renderables, leveldata.occluders, leveldata.lights);
 }
 
 void Renderer::render(const Renderables &prev, const Renderables &next, float lerp)
 {
-    const auto nearby = [&](const auto &item, float dist)
-    {
-        return std::max(std::abs(item.x - prev.centerx), std::abs(item.y - prev.centery)) < dist;
-    };
-
     const auto interpolate = [lerp](float a, float b)
     {
         return a + (b - a) * lerp;
     };
 
-    backend->set_view(interpolate(prev.centerx, next.centerx), interpolate(prev.centery, next.centery), 1.0f);
+    const float centerx = interpolate(prev.centerx, next.centerx);
+    const float centery = interpolate(prev.centery, next.centery);
 
-    static_renderable_staging.clear();
-    for (const auto &r : static_renderables)
-        static_renderable_staging.push_back(static_renderable_staging.size());
+    backend->set_view(centerx, centery, 1.0f);
 
-    static_light_staging.clear();
-    for (int i = 0; i < static_lights.size(); ++i)
     {
-        if (nearby(static_lights[i], 15.0f))
-            static_light_staging.push_back(i);
+        const auto nearby = [&](const auto &item, float radius_x, float radius_y)
+        {
+            return centerx + radius_x > item.x && centerx - radius_x < item.x + item.w && centery + radius_y > item.y && centery - radius_y < item.y + item.h;
+        };
+
+        static_renderable_staging.clear();
+        for (const auto &r : static_renderables)
+        {
+            if (nearby(r, 8.0f, 4.5f))
+                static_renderable_staging.push_back(r.index);
+        }
+    }
+
+    {
+        const auto nearby = [&](const auto &item, float dist)
+        {
+            return std::max(std::abs(item.x - prev.centerx), std::abs(item.y - prev.centery)) < dist;
+        };
+
+        static_light_staging.clear();
+        for (int i = 0; i < static_lights.size(); ++i)
+        {
+            if (nearby(static_lights[i], 15.0f))
+                static_light_staging.push_back(i);
+        }
     }
 
     backend->render(static_renderable_staging, prev.renderables, static_light_staging, prev.light_renderables);
