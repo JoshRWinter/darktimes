@@ -10,6 +10,7 @@ void player_system(World &world, const Controls &controls)
 
     auto &player = *world.players.begin();
     auto &phys = player.entity.get<PhysicalComponent>();
+    auto &light = player.entity.get<LightRenderableComponent>();
 
     // movement
     const float scoot = 0.065f;
@@ -31,4 +32,8 @@ void player_system(World &world, const Controls &controls)
     {
         phys.correct(p);
     }
+
+    light.x = phys.x + phys.w / 2.0f + std::cos(phys.rot - 0.5f) * 0.25f;
+    light.y = phys.y + phys.h / 2.0f + std::sin(phys.rot - 0.5f) * 0.25f;
+    light.angle = phys.rot;
 }

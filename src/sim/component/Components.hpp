@@ -2,6 +2,7 @@
 
 #include <cmath>
 
+#include <win/Utility.hpp>
 #include <win/Win.hpp>
 
 #include "../../Texture.hpp"
@@ -10,6 +11,7 @@ enum class ComponentType
 {
     generic,
     renderable,
+    light_renderable,
     physical,
     player
 };
@@ -44,13 +46,40 @@ struct RenderableComponent : Component
 {
     static constexpr auto ctype = ComponentType::renderable;
 
-    RenderableComponent(Entity &entity, Texture texture)
+    RenderableComponent(Entity &entity, int id, Texture texture)
         : Component(ctype, entity)
+        , id(id)
         , texture(texture)
     {
     }
 
+    int id;
     Texture texture;
+};
+
+struct LightRenderableComponent : Component
+{
+    static constexpr auto ctype = ComponentType::light_renderable;
+
+    LightRenderableComponent(Entity &entity, int id, float x, float y, float power, const win::Color<float> &color, float angle, bool primary)
+        : Component(ctype, entity)
+        , id(id)
+        , x(x)
+        , y(y)
+        , power(power)
+        , color(color)
+        , angle(angle)
+        , primary(primary)
+    {
+    }
+
+    int id;
+    float x;
+    float y;
+    float power;
+    win::Color<float> color;
+    float angle;
+    bool primary;
 };
 
 struct PhysicalComponent : Component

@@ -23,6 +23,7 @@ layout (std430) buffer LightSources
 };
 
 uniform int shadow_map_size;
+uniform int primary_index;
 uniform int light_start;
 uniform int light_count;
 uniform int light_buffer_size;
@@ -41,7 +42,7 @@ void main()
 	for (int i = light_count - 1; i >= 0; --i)
 	{
 		int light_index = (light_start + i) % light_buffer_size;
-		bool is_primary = i == light_count - 1;
+		bool is_primary = i == primary_index;
 
 		float angle = atan(lights[light_index].y - coord.y, lights[light_index].x - coord.x) + pi;
 		int shadow_index = int(round(angle / pi2 * shadow_map_size)) % shadow_map_size;

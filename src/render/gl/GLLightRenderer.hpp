@@ -101,6 +101,7 @@ private:
         win::GLTexture tex;
 
         win::GLProgram program;
+        GLint uniform_primary_index;
         GLint uniform_light_start;
         GLint uniform_light_count;
         GLint uniform_transform;

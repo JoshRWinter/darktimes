@@ -95,6 +95,7 @@ GLLightRenderer::GLLightRenderer(win::AssetRoll &roll)
         glUseProgram(lighter.program.get());
 
         const auto uniform_shadow_map_size = get_uniform(lighter.program, "shadow_map_size");
+        lighter.uniform_primary_index = get_uniform(lighter.program, "primary_index");
         lighter.uniform_light_start = get_uniform(lighter.program, "light_start");
         lighter.uniform_light_count = get_uniform(lighter.program, "light_count");
         const auto uniform_light_buffer_size = get_uniform(lighter.program, "light_buffer_size");
@@ -339,6 +340,7 @@ void GLLightRenderer::render(const std::vector<int> &static_lights, const std::v
             ++i;
         }
 
+        int primary_index = -1;
         int j = 0;
         for (const auto &light : dynamic_lights)
         {
@@ -351,6 +353,8 @@ void GLLightRenderer::render(const std::vector<int> &static_lights, const std::v
             item.g = light.color.green;
             item.b = light.color.blue;
             item.angle = light.angle;
+            if (light.primary)
+                primary_index = i;
             ++j;
             ++i;
         }
@@ -358,6 +362,7 @@ void GLLightRenderer::render(const std::vector<int> &static_lights, const std::v
         glBindVertexArray(lighter.vao.get());
 
         glUseProgram(lighter.program.get());
+        glUniform1i(lighter.uniform_primary_index, primary_index);
         glUniform1i(lighter.uniform_light_start, range.head());
         glUniform1i(lighter.uniform_light_count, i);
 

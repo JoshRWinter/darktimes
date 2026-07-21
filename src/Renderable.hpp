@@ -8,8 +8,9 @@
 
 struct Renderable
 {
-    Renderable(Texture texture, float x, float y, float w, float h, float rot)
-        : texture(texture)
+    Renderable(int id, Texture texture, float x, float y, float w, float h, float rot)
+        : id(id)
+        , texture(texture)
         , x(x)
         , y(y)
         , w(w)
@@ -18,6 +19,7 @@ struct Renderable
     {
     }
 
+    int id;
     Texture texture;
     float x;
     float y;
@@ -28,20 +30,24 @@ struct Renderable
 
 struct LightRenderable
 {
-    LightRenderable(float x, float y, float power, const win::Color<float> &color, float angle = -1.0f)
-        : x(x)
+    LightRenderable(int id, float x, float y, float power, const win::Color<float> &color, float angle, bool primary)
+        : id(id)
+        , x(x)
         , y(y)
         , power(power)
         , color(color)
         , angle(angle)
+        , primary(primary)
     {
     }
 
+    int id;
     float x;
     float y;
     float power;
     win::Color<float> color;
     float angle;
+    bool primary;
 };
 
 struct LightOccluder

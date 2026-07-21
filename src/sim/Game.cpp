@@ -24,7 +24,12 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     for (const auto &r : world.renderables)
     {
         const auto &phys = r.entity.get<PhysicalComponent>();
-        renderables.renderables.emplace_back(r.texture, phys.x, phys.y, phys.w, phys.h, phys.rot);
+        renderables.renderables.emplace_back(r.id, r.texture, phys.x, phys.y, phys.w, phys.h, phys.rot);
+    }
+
+    for (const auto &r : world.light_renderables)
+    {
+        renderables.light_renderables.emplace_back(r.id, r.x, r.y, r.power, r.color, r.angle, r.primary);
     }
 
     const auto &player = world.players.begin()->entity.get<PhysicalComponent>();
@@ -35,14 +40,15 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     const float orbity = 10.5f;
     static float orbit = 0.0f;
     static float dist = 0.6f;
+    static int orbid = world.renderableid++;
     orbit += 0.05f;
-    renderables.light_renderables.emplace_back(orbitx + std::cosf(orbit) * dist, orbity + std::sinf(orbit) * dist, 0.2f, win::Color<float>(1.0f, 0.0f, 1.0f));
-
-    renderables.light_renderables.emplace_back(player.x + player.w / 2.0f + std::cos(player.rot - 0.5f) * 0.25f,
-                                               player.y + player.h / 2.0f + std::sin(player.rot - 0.5f) * 0.25f,
-                                               3.5f,
-                                               win::Color(0.8f, 0.8f, 0.3f),
-                                               player.rot);
+    renderables.light_renderables.emplace_back(orbid,
+                                               orbitx + std::cosf(orbit) * dist,
+                                               orbity + std::sinf(orbit) * dist,
+                                               0.2f,
+                                               win::Color<float>(1.0f, 0.0f, 1.0f),
+                                               -1.0f,
+                                               false);
 }
 
 void Game::reset()
@@ -117,7 +123,7 @@ void Game::generate_level()
 
     for (const auto &f : generator.level_floors)
     {
-        data.renderables.emplace_back(f.texture, f.x, f.y, f.w, f.h, 0.0f);
+        data.renderables.emplace_back(-1, f.texture, f.x, f.y, f.w, f.h, 0.0f);
     }
 
     /*
@@ -130,9 +136,9 @@ void Game::generate_level()
     for (const auto &p : generator.level_props)
     {
         const auto newprop = correct_prop_orientation(p);
-        data.renderables.emplace_back(p.texture, newprop.x, newprop.y, newprop.w, newprop.h, get_prop_rotation(newprop.side));
+        data.renderables.emplace_back(-1, p.texture, newprop.x, newprop.y, newprop.w, newprop.h, get_prop_rotation(newprop.side));
         if (p.lightpower > 0.0f)
-            data.lights.emplace_back(p.lightx, p.lighty, p.lightpower, p.lightcolor);
+            data.lights.emplace_back(-1, p.lightx, p.lighty, p.lightpower, p.lightcolor, -1.0f, false);
     }
 
     for (const auto &wall : generator.level_walls)

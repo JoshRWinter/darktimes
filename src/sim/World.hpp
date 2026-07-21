@@ -12,10 +12,13 @@ struct World
 
     // gameplay state
 
+    int renderableid = 0;
+
     Pool<Entity> entities;
     Pool<GenericComponent> generics;
     Pool<PhysicalComponent> physicals;
     Pool<RenderableComponent> renderables;
+    Pool<LightRenderableComponent> light_renderables;
     Pool<PlayerComponent> players;
 
     struct
