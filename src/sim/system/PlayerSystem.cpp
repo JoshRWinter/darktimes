@@ -12,20 +12,31 @@ void player_system(World &world, const Controls &controls)
     auto &phys = player.entity.get<PhysicalComponent>();
     auto &light = player.entity.get<LightRenderableComponent>();
 
-    // movement
-    const float scoot = 0.065f;
-    if (controls.up)
-        phys.y += scoot;
-    if (controls.down)
-        phys.y -= scoot;
-    if (controls.left)
-        phys.x -= scoot;
-    if (controls.right)
-        phys.x += scoot;
-
     // aim direction
-    const float aim = atan2f(controls.y, controls.x);
-    phys.rot = aim;
+    phys.rot = atan2f(controls.y, controls.x);
+
+    // movement
+    const float scoot = 0.045f;
+    if (controls.up)
+    {
+        phys.x += std::cosf(phys.rot) * scoot;
+        phys.y += std::sinf(phys.rot) * scoot;
+    }
+    if (controls.down)
+    {
+        phys.x -= std::cosf(phys.rot) * scoot;
+        phys.y -= std::sinf(phys.rot) * scoot;
+    }
+    if (controls.left)
+    {
+        phys.x += std::cosf(phys.rot + M_PI / 2.0f) * scoot;
+        phys.y += std::sinf(phys.rot + M_PI / 2.0f) * scoot;
+    }
+    if (controls.right)
+    {
+        phys.x += std::cosf(phys.rot - M_PI / 2.0f) * scoot;
+        phys.y += std::sinf(phys.rot - M_PI / 2.0f) * scoot;
+    }
 
     // collision
     for (const auto &p : world.index.level.query(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h)))
