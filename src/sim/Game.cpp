@@ -33,8 +33,8 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     }
 
     const auto &player = world.players.begin()->entity.get<PhysicalComponent>();
-    renderables.centerx = player.x;
-    renderables.centery = player.y;
+    renderables.centerx = player.x + player.w / 2.0f;
+    renderables.centery = player.y + player.h / 2.0f;
 
     const float orbitx = 7.0f;
     const float orbity = 10.5f;
