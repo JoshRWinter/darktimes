@@ -31,6 +31,8 @@ int main()
 
     win::Display display(display_options);
     display.vsync(true);
+    display.show_pointer(false);
+    display.lock_pointer(true);
 
     win::gl_load_functions();
 
