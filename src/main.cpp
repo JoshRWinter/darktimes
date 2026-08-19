@@ -3,6 +3,7 @@
 #include <win/gl/GL.hpp>
 
 #include "KeyEvent.hpp"
+#include "MouseInput.hpp"
 #include "render/Renderer.hpp"
 #include "sim/Simulation.hpp"
 
@@ -36,15 +37,16 @@ int main()
 
     win::gl_load_functions();
 
+    // win::gl_enable_debug();
+
     win::Dimensions dims(display.width(), display.height());
     win::Area area(-8.0f, 8.0f, -4.5f, 4.5f);
 
-    win::Pair<float> mouse;
-    display.register_mouse_handler(
+    MouseInput mouse;
+    display.register_relative_mouse_handler(
         [&mouse, &dims, &area](int x, int y)
         {
-            mouse.x = ((x / (float)dims.width) * (area.right - area.left)) - area.right;
-            mouse.y = ((-y / (float)dims.height) * (area.top - area.bottom)) + area.top;
+            mouse.pan += x * ((area.right - area.left) / (float)dims.width);
         });
 
     std::vector<KeyEvent> keys;
@@ -137,7 +139,7 @@ int main()
         Renderables *prev, *current;
         const float lerp = simexchanger.get_simstates(&prev, &current, display.refresh_rate());
 
-        renderer.render(*prev, *current, lerp);
+        renderer.render(*prev, *current, lerp, mouse.pan / 14.0f);
 
         display.swap();
     }

@@ -4,6 +4,7 @@ struct Controls
 {
     float x = 0.0f;
     float y = 0.0f;
+    float pan = 0.0f;
 
     bool up = false;
     bool down = false;

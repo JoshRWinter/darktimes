@@ -41,7 +41,7 @@ public:
     ~GLRendererBackend() override = default;
 
     void resize(const win::Area<float> &area, const win::Dimensions<int> &res) override;
-    void set_view(float x, float y, float zoom) override;
+    void set_view(float x, float y, float angle, float zoom) override;
     void load_statics(const std::vector<Renderable> &static_renderables,
                       const std::vector<LightOccluder> &occluders,
                       const std::vector<LightRenderable> &static_lights) override;

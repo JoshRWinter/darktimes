@@ -59,12 +59,14 @@ void GLRendererBackend::resize(const win::Area<float> &area, const win::Dimensio
     check_error();
 }
 
-void GLRendererBackend::set_view(float x, float y, float zoom)
+void GLRendererBackend::set_view(float x, float y, float angle, float zoom)
 {
     const auto ident = glm::identity<glm::mat4>();
     const auto translate = glm::translate(ident, glm::vec3(-x, -y, 0.0f));
     const auto scale = glm::scale(ident, glm::vec3(zoom, zoom, 1.0f));
-    const auto view = scale * translate;
+    const auto rotate = glm::rotate(ident, -(angle - (float)M_PI / 2.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    const auto translate2 = glm::translate(ident, glm::vec3(0.0f, -1.0f, 0.0f));
+    const auto view = scale * translate2 * rotate * translate;
     const auto vp = projection * view;
 
     floor_renderer.set_view_projection(vp);

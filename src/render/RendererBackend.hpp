@@ -10,7 +10,7 @@ public:
     virtual ~RendererBackend() = default;
 
     virtual void resize(const win::Area<float> &area, const win::Dimensions<int> &dims) = 0;
-    virtual void set_view(float x, float y, float zoom) = 0;
+    virtual void set_view(float x, float y, float angle, float zoom) = 0;
     virtual void load_statics(const std::vector<Renderable> &statics,
                               const std::vector<LightOccluder> &occluders,
                               const std::vector<LightRenderable> &lights) = 0;

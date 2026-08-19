@@ -22,7 +22,7 @@ void Renderer::set_leveldata(const LevelData &leveldata)
     backend->load_statics(leveldata.renderables, leveldata.occluders, leveldata.lights);
 }
 
-void Renderer::render(const Renderables &prev, const Renderables &current, float lerp)
+void Renderer::render(const Renderables &prev, const Renderables &current, float lerp, float angle)
 {
     const auto interpolate = [lerp](float a, float b)
     {
@@ -43,7 +43,7 @@ void Renderer::render(const Renderables &prev, const Renderables &current, float
     const float centerx = interpolate(prev.centerx, current.centerx);
     const float centery = interpolate(prev.centery, current.centery);
 
-    backend->set_view(centerx, centery, 1.0f);
+    backend->set_view(centerx, centery, -angle, 1.0f);
 
     {
         const auto nearby = [&](const auto &item, float radius_x, float radius_y)

@@ -10,6 +10,7 @@ set(sources
 
 	# top level nonsense
 	src/KeyEvent.hpp
+	src/MouseInput.hpp
 	src/LevelData.hpp
 	src/Renderable.hpp
 	src/Texture.hpp

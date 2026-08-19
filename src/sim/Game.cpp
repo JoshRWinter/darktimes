@@ -16,7 +16,7 @@ Game::~Game()
     reset();
 }
 
-void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons)
+void Game::play(Renderables &renderables, const MouseInput &mouse, const std::vector<KeyEvent> &buttons)
 {
     process_inputs(mouse, buttons);
     player_system(world, controls);
@@ -35,6 +35,7 @@ void Game::play(Renderables &renderables, const win::Pair<float> &mouse, const s
     const auto &player = world.players.begin()->entity.get<PhysicalComponent>();
     renderables.centerx = player.x + player.w / 2.0f;
     renderables.centery = player.y + player.h / 2.0f;
+    renderables.angle = player.rot;
 
     const float orbitx = 7.0f;
     const float orbity = 10.5f;
@@ -73,10 +74,11 @@ void Game::reset()
         win::bug("Renderable components left over");
 }
 
-void Game::process_inputs(const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons)
+void Game::process_inputs(const MouseInput &mouse, const std::vector<KeyEvent> &buttons)
 {
     controls.x = mouse.x;
     controls.y = mouse.y;
+    controls.pan = mouse.pan;
 
     bool up = matinputs.up;
     bool down = matinputs.down;

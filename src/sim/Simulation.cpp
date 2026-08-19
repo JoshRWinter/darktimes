@@ -29,15 +29,15 @@ void Simulation::queue_inputs(const std::vector<KeyEvent> &i)
     } while (put != i.size());
 }
 
-void Simulation::set_mouse_input(const win::Pair<float> &p)
+void Simulation::set_mouse_input(const MouseInput &mi)
 {
-    win::Pair<float> *x;
+    MouseInput *x;
     do
     {
         x = mouseinput.writer_acquire();
     } while (x == NULL);
 
-    *x = p;
+    *x = mi;
 
     mouseinput.writer_release(x);
 }
@@ -68,7 +68,7 @@ void Simulation::simulation(Simulation &sim)
 
     Game game(level_generated);
 
-    win::Pair<float> mouse;
+    MouseInput mouse;
     std::vector<KeyEvent> buttons;
     buttons.reserve(decltype(sim.inputs)::length());
 

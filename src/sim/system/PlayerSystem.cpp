@@ -13,7 +13,7 @@ void player_system(World &world, const Controls &controls)
     auto &light = player.entity.get<LightRenderableComponent>();
 
     // aim direction
-    phys.rot = atan2f(controls.y, controls.x);
+    phys.rot = -controls.pan / 14.0f;
 
     // movement
     const float scoot = 0.045f;

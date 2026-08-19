@@ -73,6 +73,7 @@ struct Renderables
 
     float centerx = 0.0f;
     float centery = 0.0f;
+    float angle = 0.0f;
 
     void clear()
     {

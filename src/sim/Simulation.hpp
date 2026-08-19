@@ -10,6 +10,7 @@
 
 #include "../KeyEvent.hpp"
 #include "../LevelData.hpp"
+#include "../MouseInput.hpp"
 #include "../Renderable.hpp"
 
 class Simulation
@@ -21,7 +22,7 @@ public:
     ~Simulation();
 
     void queue_inputs(const std::vector<KeyEvent> &i);
-    void set_mouse_input(const win::Pair<float> &p);
+    void set_mouse_input(const MouseInput &p);
     LevelData *get_leveldata();
     void release_leveldata(LevelData *renderables);
 
@@ -30,7 +31,7 @@ private:
 
     std::atomic<bool> stop_flag;
     win::ConcurrentRingBuffer<KeyEvent, 20> inputs;
-    win::ObjectExchanger<win::Pair<float>, 3> mouseinput;
+    win::ObjectExchanger<MouseInput, 3> mouseinput;
     win::ObjectExchanger<LevelData, 1> leveldata;
     win::SimStateExchanger<Renderables> &simexchanger;
     std::thread thread;

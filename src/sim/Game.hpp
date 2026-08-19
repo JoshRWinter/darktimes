@@ -3,11 +3,11 @@
 #include <functional>
 #include <vector>
 
-#include <win/Utility.hpp>
 #include <win/Win.hpp>
 
 #include "../KeyEvent.hpp"
 #include "../LevelData.hpp"
+#include "../MouseInput.hpp"
 #include "../Renderable.hpp"
 #include "Controls.hpp"
 #include "levelgen/LevelObjects.hpp"
@@ -30,11 +30,11 @@ public:
     explicit Game(const std::function<void(LevelData &&)> &level_generated);
     ~Game();
 
-    void play(Renderables &renderables, const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons);
+    void play(Renderables &renderables, const MouseInput &mouse, const std::vector<KeyEvent> &buttons);
     void reset();
 
 private:
-    void process_inputs(const win::Pair<float> &mouse, const std::vector<KeyEvent> &buttons);
+    void process_inputs(const MouseInput &mouse, const std::vector<KeyEvent> &buttons);
     void generate_level();
     static LevelProp correct_prop_orientation(const LevelProp &prop);
     static float get_prop_rotation(LevelSide side);
