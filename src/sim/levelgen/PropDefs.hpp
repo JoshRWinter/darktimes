@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include <vector>
 
 #include "LevelObjectsInternal.hpp"
@@ -13,9 +12,15 @@ struct LevelPropDefinition
                         bool solid,
                         int width,
                         int height,
+                        int shadowpad = 0,
                         float excluder_padding_x = default_excluder_padding,
                         float excluder_padding_y = default_excluder_padding)
-        : LevelPropDefinition(texture, solid, (width / 1920.0f) * 16.0f, (height / 1080.0f) * 9.0f, excluder_padding_x, excluder_padding_y)
+        : LevelPropDefinition(texture,
+                              solid,
+                              ((width + shadowpad) / 1920.0f) * 16.0f,
+                              ((height + shadowpad) / 1080.0f) * 9.0f,
+                              excluder_padding_x,
+                              excluder_padding_y)
     {
     }
 
@@ -114,41 +119,41 @@ struct PropDefinitions
 
     std::vector<LevelPropDefinition> side_furniture =
     {
-        LevelPropDefinition(Texture::chair1, true, 58, 81, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::chair2, true, 58, 81, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::couch1, true, 58, 136, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::side_table1, true, 59, 130, 0.18f, 0.0f).set_light(16, 16),
-        LevelPropDefinition(Texture::side_table2, true, 45, 65, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::side_shelf, true, 57, 120, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::piano, true, 57, 160, 0.18f, 0.0f),
-        LevelPropDefinition(Texture::lamp, true, 45, 45, 0.18f, 0.0f).set_light(22, 22)
+        LevelPropDefinition(Texture::chair1, true, 48, 71, 12, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::chair2, true, 48, 71, 12, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::couch1, true, 48, 126, 12, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::side_table1, true, 49, 120, 12, 0.18f, 0.0f).set_light(16, 16),
+        LevelPropDefinition(Texture::side_table2, true, 35, 55, 12, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::side_shelf, true, 47, 110, 12, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::piano, true, 47, 150, 12, 0.18f, 0.0f),
+        LevelPropDefinition(Texture::lamp, true, 35, 35, 12, 0.18f, 0.0f).set_light(22, 22)
     }   ;
 
     std::vector<LevelPropDefinition> center_tables =
     {
-        LevelPropDefinition(Texture::large_table, true, 106, 190, 0.18f, 0.25f),
-        LevelPropDefinition(Texture::large_table2, true, 106, 106, 0.18f, 0.25f)
+        LevelPropDefinition(Texture::large_table, true, 96, 179, 18, 0.18f, 0.25f),
+        LevelPropDefinition(Texture::large_table2, true, 96, 96, 18, 0.18f, 0.25f)
     };
 
     std::vector<LevelPropDefinition> huge_center_tables =
     {
-        LevelPropDefinition(Texture::huge_table, true, 286, 286, 0.25f, 0.25f),
-        LevelPropDefinition(Texture::long_table, true, 184, 394, 0.25f, 0.25f),
+        LevelPropDefinition(Texture::huge_table, true, 276, 276, 18, 0.25f, 0.25f),
+        LevelPropDefinition(Texture::long_table, true, 174, 384, 18, 0.25f, 0.25f),
     };
 
     std::vector<LevelPropDefinition> rugs =
     {
-        LevelPropDefinition(Texture::rug1, false, 244, 126, 0.0f, 0.0f),
-        LevelPropDefinition(Texture::rug2, false, 244, 129, 0.0f, 0.0f),
-        LevelPropDefinition(Texture::rug3, false, 304, 88, 0.0f, 0.0f),
-        LevelPropDefinition(Texture::rug4, false, 220, 144, 0.0f, 0.0f)
+        LevelPropDefinition(Texture::rug1, false, 240, 122, 4, 0.0f, 0.0f),
+        LevelPropDefinition(Texture::rug2, false, 240, 125, 4, 0.0f, 0.0f),
+        LevelPropDefinition(Texture::rug3, false, 300, 84, 4, 0.0f, 0.0f),
+        LevelPropDefinition(Texture::rug4, false, 216, 140, 4, 0.0f, 0.0f)
     };
 
     std::vector<LevelPropDefinition> clutter =
     {
-        LevelPropDefinition(Texture::clutter_brokenglass, false, 42, 48, 0.0f, 0.0f),
-        LevelPropDefinition(Texture::clutter_boot, false, 36, 30, 0.0f, 0.0f),
-        LevelPropDefinition(Texture::clutter_bottle, false, 31, 44, 0.0f, 0.0f)
+        LevelPropDefinition(Texture::clutter_brokenglass, false, 36, 32, 6, 0.0f, 0.0f),
+        LevelPropDefinition(Texture::clutter_boot, false, 30, 24, 6, 0.0f, 0.0f),
+        LevelPropDefinition(Texture::clutter_bottle, false, 25, 38, 6, 0.0f, 0.0f)
     };
 
     LevelPropDefinition floor_transition_strip = LevelPropDefinition(Texture::transition_strip, false, 0.025f, 1.0f, 0.0f, 0.0f);

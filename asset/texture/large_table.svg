@@ -3,11 +3,11 @@
 
 <svg
    width="83.048569mm"
-   height="155.30399mm"
-   viewBox="0 0 83.048572 155.30399"
+   height="155.00398mm"
+   viewBox="0 0 83.048572 155.00399"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    sodipodi:docname="large_table.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -25,9 +25,9 @@
      inkscape:document-units="mm"
      inkscape:zoom="2"
      inkscape:cx="139.75"
-     inkscape:cy="203"
+     inkscape:cy="202.75"
      inkscape:window-width="2560"
-     inkscape:window-height="1413"
+     inkscape:window-height="1440"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
@@ -40,9 +40,9 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-55.121649,-62.674624)">
+     transform="translate(-55.121649,-62.824624)">
     <ellipse
-       style="fill:#331f11;fill-opacity:1;stroke:#170a00;stroke-width:0.617;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#331f11;fill-opacity:1;stroke:#170a00;stroke-width:0.317;stroke-dasharray:none;stroke-opacity:1"
        id="path1"
        ry="77.343491"
        rx="38.354801"
