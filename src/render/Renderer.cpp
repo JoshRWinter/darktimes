@@ -54,7 +54,7 @@ void Renderer::render(const Renderables &prev, const Renderables &current, float
         static_renderables_staging.clear();
         for (const auto &r : static_renderables)
         {
-            if (nearby(r, 8.0f, 4.5f))
+            if (nearby(r, 12.0f, 8.0f))
                 static_renderables_staging.push_back(r.index);
         }
     }
