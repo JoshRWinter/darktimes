@@ -18,25 +18,29 @@ void player_system(World &world, const Controls &controls)
 
     // movement
     const float scoot = 0.045f;
-    if (controls.up)
+
+    float dir = -1.0f;
+    if (controls.up && controls.right && !controls.left && !controls.down)
+        dir = M_PI / 4.0f;
+    else if (controls.up && controls.left && !controls.right && !controls.down)
+        dir = (M_PI + (M_PI / 2.0f)) / 2.0f;
+    else if (controls.down && controls.right && !controls.up && !controls.left)
+        dir = ((3.0f * M_PI / 2.0f) + M_PI * 2.0f) / 2.0f;
+    else if (controls.down && controls.left && !controls.up && !controls.right)
+        dir = (M_PI + (3 * M_PI / 2.0f)) / 2.0f;
+    else if (controls.up && !controls.down && !controls.right && !controls.left)
+        dir = M_PI / 2.0f;
+    else if (controls.right && !controls.down && !controls.left && !controls.left)
+        dir = 0.0f;
+    else if (controls.left && !controls.down && !controls.right && !controls.up)
+        dir = M_PI;
+    else if (controls.down && !controls.up && !controls.right && !controls.left)
+        dir = 3.0f * M_PI / 2.0f;
+
+    if (dir != -1.0f)
     {
-        phys.x += std::cosf(phys.rot) * scoot;
-        phys.y += std::sinf(phys.rot) * scoot;
-    }
-    if (controls.down)
-    {
-        phys.x -= std::cosf(phys.rot) * scoot;
-        phys.y -= std::sinf(phys.rot) * scoot;
-    }
-    if (controls.left)
-    {
-        phys.x += std::cosf(phys.rot + M_PI / 2.0f) * scoot;
-        phys.y += std::sinf(phys.rot + M_PI / 2.0f) * scoot;
-    }
-    if (controls.right)
-    {
-        phys.x += std::cosf(phys.rot - M_PI / 2.0f) * scoot;
-        phys.y += std::sinf(phys.rot - M_PI / 2.0f) * scoot;
+        phys.x += std::cosf(phys.rot + dir - M_PI / 2.0f) * scoot;
+        phys.y += std::sinf(phys.rot + dir - M_PI / 2.0f) * scoot;
     }
 
     // collision
