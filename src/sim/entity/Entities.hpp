@@ -17,13 +17,6 @@ public:
     {
     }
 
-    ~Entity()
-    {
-        for (const auto &component : components)
-            if (component.occupied)
-                win::bug("Live component on entity " + std::string(name));
-    }
-
     template<typename T> T &add(T &c) { return *add(&c); }
 
     template<typename T> T *add(T *c)

@@ -36,42 +36,11 @@ void Game::play(Renderables &renderables, const MouseInput &mouse, const std::ve
     renderables.centerx = player.x + player.w / 2.0f;
     renderables.centery = player.y + player.h / 2.0f;
     renderables.angle = player.rot;
-
-    const float orbitx = 7.0f;
-    const float orbity = 10.5f;
-    static float orbit = 0.0f;
-    static float dist = 0.6f;
-    static int orbid = world.renderableid++;
-    orbit += 0.05f;
-    renderables.light_renderables.emplace_back(orbid,
-                                               orbitx + std::cosf(orbit) * dist,
-                                               orbity + std::sinf(orbit) * dist,
-                                               0.2f,
-                                               win::Color<float>(1.0f, 0.0f, 1.0f),
-                                               -1.0f,
-                                               false);
 }
 
 void Game::reset()
 {
-    if (world.players.size() > 0)
-        PlayerEntity::destroy(world, world.players.begin()->entity);
-
-    for (auto &gen : world.generics)
-    {
-        auto &ent = gen.entity;
-        world.generics.remove(ent.remove<GenericComponent>());
-        world.physicals.remove(ent.remove<PhysicalComponent>());
-    }
-
-    if (world.generics.size() != 0)
-        win::bug("Generic components left over");
-
-    if (world.physicals.size() != 0)
-        win::bug("Physicals components left over");
-
-    if (world.renderables.size() != 0)
-        win::bug("Renderable components left over");
+    world.reset();
 }
 
 void Game::process_inputs(const MouseInput &mouse, const std::vector<KeyEvent> &buttons)
@@ -183,7 +152,6 @@ void Game::generate_level()
         {
             auto &ent = world.entities.add("wall");
             auto &phys = ent.add(world.physicals.add(ent, wall.x, wall.y, wall.w, wall.h, 0.0f));
-            ent.add(world.generics.add(ent));
 
             world.index.level.add(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h), phys);
         }
@@ -201,7 +169,6 @@ void Game::generate_level()
 
             auto &ent = world.entities.add("prop");
             auto &phys = ent.add(world.physicals.add(ent, x, y, w, h, 0.0f));
-            ent.add(world.generics.add(ent));
 
             world.index.level.add(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h), phys);
         }

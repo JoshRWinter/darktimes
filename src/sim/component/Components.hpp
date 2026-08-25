@@ -9,7 +9,6 @@
 
 enum class ComponentType
 {
-    generic,
     renderable,
     light_renderable,
     physical,
@@ -30,16 +29,6 @@ struct Component
 
     Entity &entity;
     ComponentType type;
-};
-
-struct GenericComponent : Component
-{
-    static constexpr auto ctype = ComponentType::generic;
-
-    explicit GenericComponent(Entity &entity)
-        : Component(ComponentType::generic, entity)
-    {
-    }
 };
 
 struct RenderableComponent : Component

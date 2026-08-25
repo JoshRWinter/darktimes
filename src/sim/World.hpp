@@ -12,10 +12,7 @@ struct World
 
     // gameplay state
 
-    int renderableid = 0;
-
     Pool<Entity> entities;
-    Pool<GenericComponent> generics;
     Pool<PhysicalComponent> physicals;
     Pool<RenderableComponent> renderables;
     Pool<LightRenderableComponent> light_renderables;
@@ -25,4 +22,18 @@ struct World
     {
         win::SpatialIndex<PhysicalComponent> level;
     } index;
+
+    int next_renderable() { return ++renderableid; }
+
+    void reset()
+    {
+        entities.clear();
+        physicals.clear();
+        renderables.clear();
+        light_renderables.clear();
+        players.clear();
+    }
+
+private:
+    int renderableid = 0;
 };
