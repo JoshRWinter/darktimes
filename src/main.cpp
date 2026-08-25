@@ -46,7 +46,7 @@ int main()
     display.register_relative_mouse_handler(
         [&mouse, &dims, &area](int x, int y)
         {
-            mouse.pan += x * ((area.right - area.left) / (float)dims.width);
+            mouse.pan += x / 100.0f;
         });
 
     std::vector<KeyEvent> keys;
