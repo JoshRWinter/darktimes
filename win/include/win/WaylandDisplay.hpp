@@ -2,6 +2,7 @@
 
 #include <array>
 #include <map>
+#include <vector>
 
 #include <EGL/egl.h>
 #include <wayland-client.h>
@@ -12,9 +13,11 @@
 
 #include <win/DisplayBase.hpp>
 
+#include "WaylandFractionalScale.h"
 #include "WaylandPointerConstraints.h"
 #include "WaylandRelativePointer.h"
 #include "WaylandTearingControl.h"
+#include "WaylandViewporter.h"
 #include "WaylandXdg.h"
 
 namespace win
@@ -27,6 +30,7 @@ class WaylandDisplay : public win::DisplayBase
     struct Output
     {
         int width = 0, height = 0;
+        int scale = 1;
         float refresh = 60.0f;
     };
 
@@ -48,6 +52,7 @@ public:
 
 private:
     void load_normal_pointer(wl_pointer *pointer, uint32_t serial);
+    void set_monitor_props();
 
     static void registry_add_object(void *data, wl_registry *registry, uint32_t name, const char *interface, uint32_t version);
     static void registry_remove_object(void *data, wl_registry *registry, uint32_t name);
@@ -74,6 +79,9 @@ private:
                                                uint32_t mods_locked,
                                                uint32_t group);
     static void wl_output_listener_mode(void *data, wl_output *output, uint32_t flags, int32_t width, int32_t height, int32_t refresh);
+    static void wl_output_listener_scale(void *data, wl_output *output, int32_t factor);
+    static void wp_fractional_scale_listener_preferred_scale(void *data, wp_fractional_scale_v1 *fs, unsigned scale);
+    static void wp_cursor_fractional_scale_listener_preferred_scale(void *data, wp_fractional_scale_v1 *fs, unsigned scale);
     static void wl_surface_listener_enter(void *data, wl_surface *surface, wl_output *output);
     static void wl_surface_listener_leave(void *data, wl_surface *surface, wl_output *output);
     static void xdg_wm_base_listener_pong(void *data, xdg_wm_base *wm_base, uint32_t serial);
@@ -88,7 +96,9 @@ private:
     struct
     {
         int width = 0, height = 0;
-    	int relx = 0, rely = 0;
+        float scale = 1.0f;
+        float cursor_scale = 1.0f;
+        int relx = 0, rely = 0;
         float refresh = 60.0f;
         bool resized = false;
         std::chrono::time_point<std::chrono::steady_clock> resize_time;
@@ -132,25 +142,35 @@ private:
 
         wl_shm *shm = NULL;
 
-        std::map<wl_output *, Output> outputs;
-        wl_output *current_output = NULL;
-        int current_outputs = 0;
+        std::map<wl_output *, Output> known_outputs;
+        std::vector<wl_output *> current_outputs;
         wl_output_listener output_listener = { .geometry =
                                                    [](void *, wl_output *, int32_t, int32_t, int32_t, int32_t, int32_t, const char *, const char *, int32_t) {},
                                                .mode = wl_output_listener_mode,
                                                .done = [](void *, wl_output *) {},
-                                               .scale = [](void *, wl_output *, int32_t) {},
+                                               .scale = wl_output_listener_scale,
                                                .name = [](void *, wl_output *, const char *name) {},
                                                .description = [](void *, wl_output *, const char *) {} };
+
+        wp_fractional_scale_manager_v1 *fractional_scale_manager = NULL;
+        wp_fractional_scale_v1 *fractional_scale = NULL;
+        wp_fractional_scale_v1 *cursor_fractional_scale = NULL;
+        wp_fractional_scale_v1_listener fractional_scale_listener = { .preferred_scale = wp_fractional_scale_listener_preferred_scale };
+        wp_fractional_scale_v1_listener cursor_fractional_scale_listener = { .preferred_scale = wp_cursor_fractional_scale_listener_preferred_scale };
+
+        wp_viewporter *viewporter = NULL;
+        wp_viewport *viewport = NULL;
 
         wp_tearing_control_manager_v1 *tearing_control_manager = NULL;
         wp_tearing_control_v1 *tearing_control = NULL;
 
         wl_cursor_theme *cursor_theme = NULL;
-        wl_cursor *cursor = NULL;
         wl_surface *cursor_surface = NULL;
+        wp_viewport *cursor_viewport = NULL;
         wl_surface_listener surface_listener { .enter = wl_surface_listener_enter,
-                                               .leave = wl_surface_listener_leave }; //[](void *, wl_surface *, wl_output *) {} };
+                                               .leave = wl_surface_listener_leave,
+                                               .preferred_buffer_scale = [](void *, wl_surface *, int) {},
+                                               .preferred_buffer_transform = [](void *, wl_surface *, unsigned) {} };
 
         wl_registry *registry = NULL;
         wl_compositor *compositor = NULL;

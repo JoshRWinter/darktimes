@@ -99,6 +99,8 @@ add_library(win STATIC
 	src/WaylandRelativePointer.c
 	src/WaylandPointerConstraints.c
 	src/WaylandTearingControl.c
+	src/WaylandFractionalScale.c
+	src/WaylandViewporter.c
 
 	include/win/WaylandMonitorEnumerator.hpp
 	src/WaylandMonitorEnumerator.cpp
@@ -177,6 +179,8 @@ if (WIN32)
 		${DSOUND_LIBRARIES}
 		dxgi.lib
 		dxguid.lib
+		shcore.lib
+		#dwmapi.lib
 		${CMAKE_CURRENT_LIST_DIR}/lib/zlib.lib
 		${CMAKE_CURRENT_LIST_DIR}/lib/freetype.lib
 		${CMAKE_CURRENT_LIST_DIR}/lib/ogg.lib
