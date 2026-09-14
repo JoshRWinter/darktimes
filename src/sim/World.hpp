@@ -25,15 +25,6 @@ struct World
 
     int next_renderable() { return ++renderableid; }
 
-    void reset()
-    {
-        entities.clear();
-        physicals.clear();
-        renderables.clear();
-        light_renderables.clear();
-        players.clear();
-    }
-
 private:
     int renderableid = 0;
 };

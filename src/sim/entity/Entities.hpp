@@ -15,6 +15,15 @@ public:
     explicit Entity(const char *name)
         : name(name)
     {
+        for (auto &c : components)
+            c = NULL;
+    }
+
+    ~Entity()
+    {
+        for (const auto c : components)
+            if (c != NULL)
+                win::bug("Live component on entity " + std::string(name));
     }
 
     template<typename T> T &add(T &c) { return *add(&c); }
@@ -23,11 +32,9 @@ public:
     {
         for (auto &component : components)
         {
-            if (!component.occupied)
+            if (component == NULL)
             {
-                component.occupied = true;
-                component.component = c;
-
+                component = c;
                 return c;
             }
         }
@@ -39,11 +46,10 @@ public:
     {
         for (auto &component : components)
         {
-            if (component.occupied && component.component->type == T::ctype)
+            if (component != NULL && component->type == T::ctype)
             {
-                component.occupied = false;
-                auto &c = *component.component;
-                component.component = NULL;
+                auto &c = *component;
+                component = NULL;
                 return (T &)c;
             }
         }
@@ -54,8 +60,8 @@ public:
     template<typename T> T &get()
     {
         for (auto &component : components)
-            if (component.occupied && component.component->type == T::ctype)
-                return *(T *)component.component;
+            if (component != NULL && component->type == T::ctype)
+                return *(T *)component;
 
         win::bug("No component with type " + std::to_string((int)T::ctype) + " on entity " + name);
     }
@@ -63,20 +69,14 @@ public:
     template<typename T> T *get_optional()
     {
         for (auto &component : components)
-            if (component.occupied && component.component->type == T::ctype)
-                return (T *)component.component;
+            if (component != NULL && component->type == T::ctype)
+                return (T *)component;
 
         return NULL;
     }
 
-private:
-    const char *name;
-
-    struct
-    {
-        Component *component = NULL;
-        bool occupied = false;
-    } components[max_components];
+    const char *const name;
+    Component *components[max_components];
 };
 
 struct World;

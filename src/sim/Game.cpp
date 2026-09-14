@@ -40,7 +40,15 @@ void Game::play(Renderables &renderables, const MouseInput &mouse, const std::ve
 
 void Game::reset()
 {
-    world.reset();
+    for (auto &ent : world.entities)
+        for (auto &c : ent.components)
+            c = NULL;
+
+    world.entities.clear();
+    world.physicals.clear();
+    world.renderables.clear();
+    world.light_renderables.clear();
+    world.players.clear();
 }
 
 void Game::process_inputs(const MouseInput &mouse, const std::vector<KeyEvent> &buttons)
