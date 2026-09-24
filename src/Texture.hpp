@@ -37,7 +37,9 @@ enum class Texture
     clutter_boot,
     clutter_bottle,
 
-    player,
+    player_head,
+    player_torso,
+    player_leg,
 
     // leave this last
     max_texture

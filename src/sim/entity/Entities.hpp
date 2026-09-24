@@ -1,82 +1,38 @@
 #pragma once
 
+#include <win/Bag.hpp>
+#include <win/ComponentSet.hpp>
 #include <win/Win.hpp>
 
 #include "../component/Components.hpp"
+
+constexpr float pixelsize(int s, int shadowpad = 0)
+{
+    return (s + shadowpad) / 1920.0f * 16.0f;
+}
 
 class Entity
 {
     WIN_NO_COPY_MOVE(Entity);
 
 public:
-    constexpr static int max_components = 4;
+    typedef win::Bag<win::ComponentChunk<Component>, 100, true> ComponentBag;
 
     // name MUST BE STATIC!!!
-    explicit Entity(const char *name)
+    Entity(ComponentBag &bag, const char *name)
         : name(name)
+        , components(bag)
     {
-        for (auto &c : components)
-            c = NULL;
     }
 
     ~Entity()
     {
-        for (const auto c : components)
-            if (c != NULL)
-                win::bug("Live component on entity " + std::string(name));
-    }
-
-    template<typename T> T &add(T &c) { return *add(&c); }
-
-    template<typename T> T *add(T *c)
-    {
-        for (auto &component : components)
-        {
-            if (component == NULL)
-            {
-                component = c;
-                return c;
-            }
-        }
-
-        win::bug("Component slots full on entity " + std::string(name));
-    }
-
-    template<typename T> T &remove()
-    {
-        for (auto &component : components)
-        {
-            if (component != NULL && component->type == T::ctype)
-            {
-                auto &c = *component;
-                component = NULL;
-                return (T &)c;
-            }
-        }
-
-        win::bug("No component of type " + std::to_string((int)T::ctype));
-    }
-
-    template<typename T> T &get()
-    {
-        for (auto &component : components)
-            if (component != NULL && component->type == T::ctype)
-                return *(T *)component;
-
-        win::bug("No component with type " + std::to_string((int)T::ctype) + " on entity " + name);
-    }
-
-    template<typename T> T *get_optional()
-    {
-        for (auto &component : components)
-            if (component != NULL && component->type == T::ctype)
-                return (T *)component;
-
-        return NULL;
+        if (components.size() != 0)
+            win::bug("Live component on entity " + std::string(name));
     }
 
     const char *const name;
-    Component *components[max_components];
+    win::ComponentSet<Component, ComponentBag> components;
 };
 
 struct World;
@@ -87,6 +43,15 @@ struct PlayerEntity
 
     static constexpr float width = 0.4f;
     static constexpr float height = 0.4f;
+
+    static constexpr float torso_width = pixelsize(22, 6);
+    static constexpr float torso_height = pixelsize(49, 6);
+
+    static constexpr float leg_width = pixelsize(29, 4);
+    static constexpr float leg_height = pixelsize(10, 4);
+
+    static constexpr float head_width = pixelsize(20, 4);
+    static constexpr float head_height = pixelsize(20, 4);
 
     static void create(World &world);
     static void destroy(World &world, Entity &entity);

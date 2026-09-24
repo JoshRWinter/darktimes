@@ -9,10 +9,11 @@
 
 enum class ComponentType
 {
+    physical,
     renderable,
     light_renderable,
-    physical,
-    player
+    player,
+    body
 };
 
 class Entity;
@@ -29,46 +30,6 @@ struct Component
 
     Entity &entity;
     ComponentType type;
-};
-
-struct RenderableComponent : Component
-{
-    static constexpr auto ctype = ComponentType::renderable;
-
-    RenderableComponent(Entity &entity, int id, Texture texture)
-        : Component(ctype, entity)
-        , id(id)
-        , texture(texture)
-    {
-    }
-
-    int id;
-    Texture texture;
-};
-
-struct LightRenderableComponent : Component
-{
-    static constexpr auto ctype = ComponentType::light_renderable;
-
-    LightRenderableComponent(Entity &entity, int id, float x, float y, float power, const win::Color<float> &color, float angle, bool primary)
-        : Component(ctype, entity)
-        , id(id)
-        , x(x)
-        , y(y)
-        , power(power)
-        , color(color)
-        , angle(angle)
-        , primary(primary)
-    {
-    }
-
-    int id;
-    float x;
-    float y;
-    float power;
-    win::Color<float> color;
-    float angle;
-    bool primary;
 };
 
 struct PhysicalComponent : Component
@@ -116,6 +77,67 @@ struct PhysicalComponent : Component
     float x, y, w, h, rot;
 };
 
+struct RenderableComponent : Component
+{
+    static constexpr auto ctype = ComponentType::renderable;
+
+    RenderableComponent(Entity &entity, int id, float w, float h, Texture texture)
+        : Component(ctype, entity)
+        , id(id)
+        , w(w)
+        , h(h)
+        , texture(texture)
+    {
+    }
+
+    RenderableComponent(Entity &entity, int id, float x, float y, float w, float h, Texture texture)
+        : Component(ctype, entity)
+        , id(id)
+        , x(x)
+        , y(y)
+        , w(w)
+        , h(h)
+        , texture(texture)
+    {
+    }
+
+    void from_physical(const PhysicalComponent &phys)
+    {
+        x = phys.x + phys.w / 2.0f - w / 2.0f;
+        y = phys.y + phys.h / 2.0f - h / 2.0f;
+        rot = phys.rot;
+    }
+
+    int id;
+    float x = 0.0f, y = 0.0f, w = 0.0f, h = 0.0f, rot = 0.0f;
+    Texture texture;
+};
+
+struct LightRenderableComponent : Component
+{
+    static constexpr auto ctype = ComponentType::light_renderable;
+
+    LightRenderableComponent(Entity &entity, int id, float x, float y, float power, const win::Color<float> &color, float angle, bool primary)
+        : Component(ctype, entity)
+        , id(id)
+        , x(x)
+        , y(y)
+        , power(power)
+        , color(color)
+        , angle(angle)
+        , primary(primary)
+    {
+    }
+
+    int id;
+    float x;
+    float y;
+    float power;
+    win::Color<float> color;
+    float angle;
+    bool primary;
+};
+
 struct PlayerComponent : Component
 {
     static constexpr auto ctype = ComponentType::player;
@@ -124,4 +146,28 @@ struct PlayerComponent : Component
         : Component(ctype, entity)
     {
     }
+};
+
+struct BodyComponent : Component
+{
+    static constexpr auto ctype = ComponentType::body;
+
+    BodyComponent(Entity &ent, RenderableComponent &head, RenderableComponent &torso, RenderableComponent &left, RenderableComponent &right)
+        : Component(ctype, ent)
+        , head(head)
+        , torso(torso)
+        , left(left)
+        , right(right)
+    {
+    }
+
+    RenderableComponent &head;
+    RenderableComponent &torso;
+    RenderableComponent &left;
+    RenderableComponent &right;
+
+    bool moving = false;
+
+    float speed = 0.0f;
+    int cycle = 0;
 };

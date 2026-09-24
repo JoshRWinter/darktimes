@@ -10,8 +10,9 @@ void player_system(World &world, const Controls &controls)
         PlayerEntity::create(world);
 
     auto &player = *world.players.begin();
-    auto &phys = player.entity.get<PhysicalComponent>();
-    auto &light = player.entity.get<LightRenderableComponent>();
+    auto &phys = player.entity.components.get<PhysicalComponent>();
+    auto &light = player.entity.components.get<LightRenderableComponent>();
+    auto &body = player.entity.components.get<BodyComponent>();
 
     // aim direction
     phys.rot = -controls.pan / 14.0f;
@@ -37,8 +38,13 @@ void player_system(World &world, const Controls &controls)
     else if (controls.down && !controls.up && !controls.right && !controls.left)
         dir = 3.0f * M_PI / 2.0f;
 
-    if (dir != -1.0f)
+    if (dir == -1.0f)
     {
+        body.moving = false;
+    }
+    else
+    {
+        body.moving = true;
         phys.x += std::cosf(phys.rot + dir - M_PI / 2.0f) * scoot;
         phys.y += std::sinf(phys.rot + dir - M_PI / 2.0f) * scoot;
     }
@@ -49,7 +55,7 @@ void player_system(World &world, const Controls &controls)
         phys.correct(p);
     }
 
-    light.x = phys.x + phys.w / 2.0f + std::cos(phys.rot - 0.5f) * 0.25f;
-    light.y = phys.y + phys.h / 2.0f + std::sin(phys.rot - 0.5f) * 0.25f;
+    light.x = phys.x + phys.w / 2.0f + std::cos(phys.rot - 0.5f) * 0.14f;
+    light.y = phys.y + phys.h / 2.0f + std::sin(phys.rot - 0.5f) * 0.14f;
     light.angle = phys.rot;
 }

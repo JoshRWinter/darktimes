@@ -1,6 +1,8 @@
 $padding 4
 debug.tga:118:524:50:50
-player.tga:172:524:50:50
+player_head.tga:204:524:24:24
+player_torso.tga:172:524:28:55
+player_leg.tga:118:578:33:14
 large_table.tga:0:406:114:197
 large_table2.tga:118:406:114:114
 huge_table.tga:196:0:294:294
@@ -9,7 +11,7 @@ side_table1.tga:638:263:61:132
 side_table2.tga:460:390:47:67
 side_shelf.tga:460:461:59:122
 piano.tga:575:263:59:162
-lamp.tga:226:538:47:47
+lamp.tga:232:538:47:47
 rug1.tga:494:0:244:126
 rug2.tga:494:130:244:129
 rug3.tga:196:298:304:88
@@ -17,7 +19,7 @@ rug4.tga:236:390:220:144
 chair1.tga:511:350:60:83
 chair2.tga:504:263:60:83
 couch1.tga:523:437:60:138
-clutter_brokenglass.tga:277:538:42:38
-clutter_boot.tga:323:538:36:30
-clutter_bottle.tga:363:538:31:44
+clutter_brokenglass.tga:283:538:42:38
+clutter_boot.tga:329:538:36:30
+clutter_bottle.tga:369:538:31:44
 tstrip.tga:587:429:3:120

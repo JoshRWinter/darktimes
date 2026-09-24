@@ -20,6 +20,9 @@ shadowdef {
     furniture 0.20 0.16 0.14 0.12 0.09 0.06 0.035
     yugefurniture 0.20 0.15 0.12 0.10 0.07 0.065 0.045 0.045 0.035 0.025
     rug 0.8 0.09 0.04
+
+    player 0.4 0.2 0.15 0.06
+    player_leg 0.8 0.09 0.04
 }
 
 svg2tga {
@@ -60,7 +63,9 @@ svg2tga exclude {
 	texture/clutter_boot.svg 30 24 shadowdef=groundprop
 	texture/clutter_bottle.svg 25 38 shadowdef=groundprop
 
-	texture/player.svg 50 50
+	texture/player_head.svg 20 20 shadowdef=player_leg
+	texture/player_torso.svg 22 49 shadowdef=player
+	texture/player_leg.svg 29 10 shadowdef=player_leg
 }
 
 atlas {

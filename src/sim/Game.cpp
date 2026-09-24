@@ -19,12 +19,13 @@ Game::~Game()
 void Game::play(Renderables &renderables, const MouseInput &mouse, const std::vector<KeyEvent> &buttons)
 {
     process_inputs(mouse, buttons);
+
     player_system(world, controls);
+    body_system(world);
 
     for (const auto &r : world.renderables)
     {
-        const auto &phys = r.entity.get<PhysicalComponent>();
-        renderables.renderables.emplace_back(r.id, r.texture, phys.x, phys.y, phys.w, phys.h, phys.rot);
+        renderables.renderables.emplace_back(r.id, r.texture, r.x, r.y, r.w, r.h, r.rot);
     }
 
     for (const auto &r : world.light_renderables)
@@ -32,7 +33,7 @@ void Game::play(Renderables &renderables, const MouseInput &mouse, const std::ve
         renderables.light_renderables.emplace_back(r.id, r.x, r.y, r.power, r.color, r.angle, r.primary);
     }
 
-    const auto &player = world.players.begin()->entity.get<PhysicalComponent>();
+    const auto &player = world.players.begin()->entity.components.get<PhysicalComponent>();
     renderables.centerx = player.x + player.w / 2.0f;
     renderables.centery = player.y + player.h / 2.0f;
     renderables.angle = player.rot;
@@ -41,8 +42,7 @@ void Game::play(Renderables &renderables, const MouseInput &mouse, const std::ve
 void Game::reset()
 {
     for (auto &ent : world.entities)
-        for (auto &c : ent.components)
-            c = NULL;
+        ent.components.remove_all();
 
     world.entities.clear();
     world.physicals.clear();
@@ -158,8 +158,8 @@ void Game::generate_level()
 
         for (auto &wall : generator.level_walls)
         {
-            auto &ent = world.entities.add("wall");
-            auto &phys = ent.add(world.physicals.add(ent, wall.x, wall.y, wall.w, wall.h, 0.0f));
+            auto &ent = world.entities.add(world.component_bag, "wall");
+            auto &phys = ent.components.add(world.physicals.add(ent, wall.x, wall.y, wall.w, wall.h, 0.0f));
 
             world.index.level.add(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h), phys);
         }
@@ -175,8 +175,8 @@ void Game::generate_level()
             const float x = prop.x + ((prop.w - w) / 2.0f);
             const float y = prop.y + ((prop.h - h) / 2.0f);
 
-            auto &ent = world.entities.add("prop");
-            auto &phys = ent.add(world.physicals.add(ent, x, y, w, h, 0.0f));
+            auto &ent = world.entities.add(world.component_bag, "prop");
+            auto &phys = ent.components.add(world.physicals.add(ent, x, y, w, h, 0.0f));
 
             world.index.level.add(win::SpatialIndexLocation(phys.x, phys.y, phys.w, phys.h), phys);
         }

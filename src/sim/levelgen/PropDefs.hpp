@@ -127,7 +127,7 @@ struct PropDefinitions
         LevelPropDefinition(Texture::side_shelf, true, 47, 110, 12, 0.18f, 0.0f),
         LevelPropDefinition(Texture::piano, true, 47, 150, 12, 0.18f, 0.0f),
         LevelPropDefinition(Texture::lamp, true, 35, 35, 12, 0.18f, 0.0f).set_light(22, 22)
-    }   ;
+    };
 
     std::vector<LevelPropDefinition> center_tables =
     {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <type_traits>
 
 #include <win/Bag.hpp>
@@ -23,8 +24,12 @@ template<typename ComponentBase> struct ComponentChunk
     ComponentChunk *next = NULL;
 };
 
-template<typename ComponentBase, typename Component> class ComponentSetIterator
+template<typename ComponentBase, typename Bag> class ComponentSet;
+
+template<typename ComponentBase, typename Component, typename Bag> class ComponentSetIterator
 {
+    friend class ComponentSet<ComponentBase, Bag>;
+
 public:
     ComponentSetIterator(ComponentChunk<ComponentBase> *first, int index, decltype(ComponentBase::type) filter)
         : current(first)
@@ -79,12 +84,12 @@ private:
     decltype(ComponentBase::type) filter;
 };
 
-template<typename ComponentBase, typename Component, typename ComponentType> class ComponentSetQuery
+template<typename ComponentBase, typename Component, typename Bag> class ComponentSetQuery
 {
     WIN_NO_COPY_MOVE(ComponentSetQuery);
 
 public:
-    ComponentSetQuery(ComponentChunk<ComponentBase> *first, ComponentType filter, bool &querying)
+    ComponentSetQuery(ComponentChunk<ComponentBase> *first, decltype(Component::type) filter, bool &querying)
         : first(first)
         , querying(querying)
         , filter(filter)
@@ -93,14 +98,14 @@ public:
 
     ~ComponentSetQuery() { querying = false; }
 
-    ComponentSetIterator<ComponentBase, Component> begin() { return ComponentSetIterator<ComponentBase, Component>(first, 0, filter); }
+    ComponentSetIterator<ComponentBase, Component, Bag> begin() { return ComponentSetIterator<ComponentBase, Component, Bag>(first, 0, filter); }
 
-    ComponentSetIterator<ComponentBase, Component> end() { return ComponentSetIterator<ComponentBase, Component>(NULL, 0, filter); }
+    ComponentSetIterator<ComponentBase, Component, Bag> end() { return ComponentSetIterator<ComponentBase, Component, Bag>(NULL, 0, filter); }
 
 private:
     ComponentChunk<ComponentBase> *first;
     bool &querying;
-    ComponentType filter;
+    decltype(ComponentBase::type) filter;
 };
 
 template<typename ComponentBase, typename Bag> class ComponentSet
@@ -128,7 +133,7 @@ public:
 
     int size() const { return count; }
 
-    ComponentBase &add(ComponentBase &component)
+    template<typename Component> Component &add(Component &component)
     {
         if (querying)
             win::bug("ComponentSet add: a query is open");
@@ -153,14 +158,14 @@ public:
         }
     }
 
-    template<typename Component> ComponentSetQuery<ComponentBase, Component, decltype(ComponentBase::type)> get_all()
+    template<typename Component> ComponentSetQuery<ComponentBase, Component, Bag> get_all()
     {
         static_assert(std::is_enum_v<decltype(Component::ctype)>, "Component must have a static enum member named ctype");
 
         if (querying)
             win::bug("ComponentSet get_all: a query is already open");
 
-        return ComponentSetQuery<ComponentBase, Component, decltype(ComponentBase::type)>(&first, Component::ctype, querying);
+        return ComponentSetQuery<ComponentBase, Component, Bag>(&first, Component::ctype, querying);
     }
 
     template<typename Component> Component &get()
@@ -171,7 +176,7 @@ public:
         if (it != q.end())
             return *it;
 
-        win::bug("ComponentSet get: no component of type " + std::to_string(Component::ctype));
+        win::bug("ComponentSet get: no component of type " + std::to_string((int)Component::ctype));
     }
 
     template<typename Component> Component *get_optional()
@@ -196,7 +201,7 @@ public:
             return c;
         }
 
-        win::bug("ComponentSet remove: no component of type " + std::to_string(Component::ctype));
+        win::bug("ComponentSet remove: no component of type " + std::to_string((int)Component::ctype));
     }
 
     template<typename Component> void remove_all()
@@ -206,7 +211,21 @@ public:
             it = remove(it);
     }
 
-    template<typename Component> ComponentSetIterator<ComponentBase, Component> remove(ComponentSetIterator<ComponentBase, Component> &it)
+    void remove_all()
+    {
+        ComponentChunk<ComponentBase> *current = &first;
+        while (current != NULL)
+        {
+            for (auto &c : current->set)
+                c = NULL;
+
+            current = current->next;
+        }
+
+        count = 0;
+    }
+
+    template<typename Component> ComponentSetIterator<ComponentBase, Component, Bag> remove(ComponentSetIterator<ComponentBase, Component, Bag> &it)
     {
         it.current->set[it.index] = NULL;
         --count;

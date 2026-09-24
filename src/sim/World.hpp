@@ -13,10 +13,13 @@ struct World
     // gameplay state
 
     Pool<Entity> entities;
+    Entity::ComponentBag component_bag;
+
     Pool<PhysicalComponent> physicals;
     Pool<RenderableComponent> renderables;
     Pool<LightRenderableComponent> light_renderables;
     Pool<PlayerComponent> players;
+    Pool<BodyComponent> bodies;
 
     struct
     {

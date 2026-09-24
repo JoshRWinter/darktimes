@@ -52,6 +52,7 @@ set(sources
 
 	src/sim/entity/PlayerEntity.cpp
 	src/sim/system/PlayerSystem.cpp
+	src/sim/system/BodySystem.cpp
 
 	# level gen nonsense
 	src/sim/levelgen/LevelObjects.hpp
